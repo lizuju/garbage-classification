@@ -1,0 +1,39 @@
+import os
+from pathlib import Path
+
+
+class Config:
+    """
+    统一管理配置（论文里也好写）：
+    - 路径（项目根、YOLOv5 目录、uploads、db）
+    - Flask/SQLAlchemy 配置
+    """
+
+    FILE = Path(__file__).resolve()
+
+    # 从 backend/config.py 开始，逐层向上找 yolov5-6.2
+    YOLOV5_PATH = None
+    for parent in FILE.parents:
+        candidate = parent / 'yolov5-6.2'
+        if candidate.exists():
+            YOLOV5_PATH = candidate
+            break
+    if YOLOV5_PATH is None:
+        raise RuntimeError("❌ 未找到 yolov5-6.2 目录，请检查项目结构")
+
+    ROOT = YOLOV5_PATH.parent  # 项目根目录（Garbage_classification_Yolov5）
+    BASE_DIR = FILE.parent  # backend/
+
+    # Flask
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-key-should-be-changed')
+    MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5MB
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+    # 上传目录：统一走项目根 uploads
+    UPLOAD_FOLDER = str(ROOT / 'uploads')
+
+    # SQLite（固定到 backend/instance 下）
+    DB_PATH = str(BASE_DIR / 'instance' / 'garbage_classification.db')
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or f"sqlite:///{DB_PATH}"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+

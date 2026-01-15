@@ -29,16 +29,29 @@ from functools import wraps
 
 # 文件路径
 FILE = Path(__file__).resolve()
-ROOT = FILE.parents[2]  # Garbage_classification_Yolov5 根目录
-YOLOV5_PATH = ROOT / 'yolov5-6.2'
+
+# 从 app.py 开始，逐层向上找 yolov5-6.2
+YOLOV5_PATH = None
+for parent in FILE.parents:
+    candidate = parent / 'yolov5-6.2'
+    if candidate.exists():
+        YOLOV5_PATH = candidate
+        break
+
+if YOLOV5_PATH is None:
+    raise RuntimeError("❌ 未找到 yolov5-6.2 目录，请检查项目结构")
+
+# 加入 Python 搜索路径
+if str(YOLOV5_PATH) not in sys.path:
+    sys.path.insert(0, str(YOLOV5_PATH))
+    
+print("✅ YOLOv5 路径:", YOLOV5_PATH)
+
+ROOT = YOLOV5_PATH.parent  # 项目根目录
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 #  SQLite 数据库路径
 db_path = os.path.join(BASE_DIR, 'instance', 'garbage_classification.db')
-
-# 添加 yolov5 路径
-if str(YOLOV5_PATH) not in sys.path:
-    sys.path.append(str(YOLOV5_PATH))
 
 # sys.path.append('../../yolov5-6.2')
 from models.experimental import attempt_load
