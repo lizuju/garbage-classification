@@ -1,12 +1,228 @@
-<!-- backend/templates/profile.html -->
-<!DOCTYPE html>
-<html lang="zh">
-<head>
-    <meta charset="UTF-8">
-    <title>个人中心</title>
-</head>
-<body>
-    <h1>用户个人中心</h1>
-    <p>该页面后续完善</p>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}个人中心 - 垃圾分类识别系统{% endblock %}
+
+{% block extra_head %}
+<style>
+    .profile-container {
+        max-width: 800px;
+        margin: 50px auto;
+    }
+    .profile-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    .profile-card {
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container profile-container">
+    <div class="profile-header">
+        <h1>个人中心</h1>
+        <p class="text-muted">管理您的账户信息和设置</p>
+    </div>
+    
+    <!-- 用户信息卡片 -->
+    <div class="card profile-card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-person-circle me-2"></i>用户信息</h5>
+        </div>
+        <div class="card-body">
+            <div id="user-info-loading" class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">加载中...</span>
+                </div>
+            </div>
+            <div id="user-info" class="d-none">
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>用户名：</strong></div>
+                    <div class="col-sm-9" id="username-display"></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>电子邮箱：</strong></div>
+                    <div class="col-sm-9" id="email-display"></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>注册时间：</strong></div>
+                    <div class="col-sm-9" id="created-at-display"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-3"><strong>账户类型：</strong></div>
+                    <div class="col-sm-9">
+                        <span id="user-type-display" class="badge bg-secondary"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 修改密码卡片 -->
+    <div class="card profile-card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-key me-2"></i>修改密码</h5>
+        </div>
+        <div class="card-body">
+            <div id="password-error" class="alert alert-danger d-none mb-3" role="alert"></div>
+            <div id="password-success" class="alert alert-success d-none mb-3" role="alert">密码修改成功！</div>
+            
+            <form id="change-password-form">
+                <div class="mb-3">
+                    <label for="old-password" class="form-label">旧密码</label>
+                    <input type="password" class="form-control" id="old-password" name="old_password" required>
+                </div>
+                <div class="mb-3">
+                    <label for="new-password" class="form-label">新密码</label>
+                    <input type="password" class="form-control" id="new-password" name="new_password" required>
+                    <div class="form-text">密码长度至少为8个字符</div>
+                </div>
+                <div class="mb-3">
+                    <label for="confirm-new-password" class="form-label">确认新密码</label>
+                    <input type="password" class="form-control" id="confirm-new-password" name="confirm_new_password" required>
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">修改密码</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block user_status_check %}
+<script>
+    fetch('/api/user/profile')
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('未登录');
+        })
+        .then(data => {
+            // 用户已登录
+            document.getElementById('login-item').classList.add('d-none');
+            document.getElementById('user-dropdown').classList.remove('d-none');
+            document.getElementById('username').textContent = data.user.username;
+            
+            // 显示用户信息
+            document.getElementById('user-info-loading').classList.add('d-none');
+            document.getElementById('user-info').classList.remove('d-none');
+            document.getElementById('username-display').textContent = data.user.username;
+            document.getElementById('email-display').textContent = data.user.email;
+            document.getElementById('created-at-display').textContent = new Date(data.user.created_at).toLocaleString('zh-CN');
+            document.getElementById('user-type-display').textContent = data.user.is_admin ? '管理员' : '普通用户';
+            document.getElementById('user-type-display').className = data.user.is_admin ? 'badge bg-danger' : 'badge bg-secondary';
+            
+            // 如果是管理员，显示管理入口
+            if (data.user.is_admin) {
+                const adminItem = document.createElement('li');
+                adminItem.innerHTML = '<a class="dropdown-item" href="/admin">管理后台</a>';
+                document.querySelector('#user-dropdown .dropdown-menu').insertBefore(
+                    adminItem, 
+                    document.querySelector('#user-dropdown .dropdown-divider')
+                );
+            }
+        })
+        .catch(error => {
+            // 用户未登录，跳转到登录页
+            window.location.href = '/login';
+        });
+</script>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const changePasswordForm = document.getElementById('change-password-form');
+        const passwordError = document.getElementById('password-error');
+        const passwordSuccess = document.getElementById('password-success');
+        const logoutBtn = document.getElementById('logout-btn');
+        
+        // 修改密码表单提交
+        changePasswordForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const oldPassword = document.getElementById('old-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmNewPassword = document.getElementById('confirm-new-password').value;
+            
+            // 隐藏之前的错误/成功信息
+            passwordError.classList.add('d-none');
+            passwordSuccess.classList.add('d-none');
+            
+            // 验证密码一致性
+            if (newPassword !== confirmNewPassword) {
+                passwordError.textContent = '两次输入的新密码不一致';
+                passwordError.classList.remove('d-none');
+                return;
+            }
+            
+            // 验证密码长度
+            if (newPassword.length < 8) {
+                passwordError.textContent = '新密码长度至少为8个字符';
+                passwordError.classList.remove('d-none');
+                return;
+            }
+            
+            // 发送修改密码请求
+            fetch('/api/user/change-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    old_password: oldPassword,
+                    new_password: newPassword
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    passwordSuccess.classList.remove('d-none');
+                    changePasswordForm.reset();
+                    
+                    // 3秒后隐藏成功信息
+                    setTimeout(function() {
+                        passwordSuccess.classList.add('d-none');
+                    }, 3000);
+                } else {
+                    passwordError.textContent = data.message || '密码修改失败，请重试';
+                    passwordError.classList.remove('d-none');
+                }
+            })
+            .catch(error => {
+                passwordError.textContent = '密码修改请求失败，请稍后重试';
+                passwordError.classList.remove('d-none');
+                console.error('Change password error:', error);
+            });
+        });
+        
+        // 退出登录
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+            });
+        }
+        
+        function logout() {
+            fetch('/api/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.location.href = '/login';
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

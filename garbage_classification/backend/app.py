@@ -20,7 +20,14 @@ def create_app():
 
     # init extensions
     db.init_app(app)
-    cors.init_app(app)
+    cors.init_app(app, supports_credentials=True, resources={
+        r"/api/*": {
+            "origins": ["*"],
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"],
+            "max_age": 3600
+        }
+    })
 
     # uploads dir
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)

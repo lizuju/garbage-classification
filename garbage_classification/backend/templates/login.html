@@ -1,183 +1,166 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>登录 - 垃圾分类识别系统</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
-    <style>
-        .auth-container {
-            max-width: 450px;
-            margin: 80px auto;
-        }
-        .auth-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .auth-card {
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        .auth-toggle {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .navbar-brand {
-            font-weight: bold;
-        }
-        .footer {
-            background-color: #212529;
-            color: white;
-            padding: 20px 0;
-            margin-top: 100px;
-        }
-    </style>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/">垃圾分类识别系统</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">首页</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/detect">开始识别</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/about">关于项目</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/login">登录/注册</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+{% extends "base.html" %}
 
-    <div class="container auth-container">
-        <div class="auth-header">
-            <h2>用户登录</h2>
-            <p class="text-muted">登录您的账户以使用所有功能</p>
-        </div>
+{% block title %}登录 - 垃圾分类识别系统{% endblock %}
 
-        <div class="card auth-card">
-            <div class="card-body p-4">
-                <div id="login-error" class="alert alert-danger d-none mb-3" role="alert"></div>
+{% block nav_login %}active{% endblock %}
 
-                <form id="login-form">
-                    <div class="mb-3">
-                        <label for="username" class="form-label">用户名</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-person"></i></span>
-                            <input type="text" class="form-control" id="username" name="username" required>
-                        </div>
+{% block extra_head %}
+<style>
+    .auth-container {
+        max-width: 450px;
+        margin: 80px auto;
+    }
+    .auth-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .auth-card {
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    .auth-toggle {
+        text-align: center;
+        margin-top: 20px;
+    }
+    .navbar-brand {
+        font-weight: bold;
+    }
+    .footer {
+        background-color: #212529;
+        color: white;
+        padding: 20px 0;
+        margin-top: 100px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container auth-container">
+    <div class="auth-header">
+        <h2>用户登录</h2>
+        <p class="text-muted">登录您的账户以使用所有功能</p>
+    </div>
+
+    <div class="card auth-card">
+        <div class="card-body p-4">
+            <div id="login-error" class="alert alert-danger d-none mb-3" role="alert"></div>
+
+            <form id="login-form">
+                <div class="mb-3">
+                    <label for="username" class="form-label">用户名</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                        <input type="text" class="form-control" id="login-username" name="username" required>
                     </div>
+                </div>
 
-                    <div class="mb-3">
-                        <label for="password" class="form-label">密码</label>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                            <input type="password" class="form-control" id="password" name="password" required>
-                        </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">密码</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                        <input type="password" class="form-control" id="password" name="password" required>
                     </div>
+                </div>
 
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="remember-me">
-                        <label class="form-check-label" for="remember-me">记住我</label>
-                    </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="remember-me">
+                    <label class="form-check-label" for="remember-me">记住我</label>
+                </div>
 
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg">登录</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <div class="auth-toggle">
-            <p>还没有账户？ <a href="/register">立即注册</a></p>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">登录</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>垃圾分类识别系统</h5>
-                    <p>基于YOLOv5的垃圾智能识别系统，帮助您正确分类垃圾，保护环境，共建绿色家园。</p>
-                </div>
-                <div class="col-md-3">
-                    <h5>链接</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="/" class="text-white">首页</a></li>
-                        <li><a href="/detect" class="text-white">开始识别</a></li>
-                        <li><a href="/about" class="text-white">关于项目</a></li>
-                    </ul>
-                </div>
-                <div class="col-md-3">
-                    <h5>联系我们</h5>
-                    <ul class="list-unstyled">
-                        <li><i class="bi bi-envelope me-2"></i> contact@example.com</li>
-                        <li><i class="bi bi-telephone me-2"></i> (123) 456-7890</li>
-                    </ul>
-                </div>
-            </div>
-            <hr>
-            <div class="text-center">
-                <p>&copy; 2023 垃圾分类识别系统. 保留所有权利.</p>
-            </div>
-        </div>
-    </footer>
+    <div class="auth-toggle">
+        <p>还没有账户？ <a href="/register">立即注册</a></p>
+    </div>
+</div>
+{% endblock %}
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const loginForm = document.getElementById('login-form');
-            const loginError = document.getElementById('login-error');
+{% block extra_scripts %}
+<script>
+    function setupLoginForm() {
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        
+        if (!loginForm) {
+            console.error('登录表单未找到');
+            return;
+        }
+        
+        console.log('✓ 登录表单已加载');
+        
+            loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            console.log('✓ 表单提交事件触发');
             
-            loginForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-                
-                // 隐藏之前的错误信息
-                loginError.classList.add('d-none');
-                
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            // 前端验证
+            if (!username || !password) {
+                loginError.textContent = '请输入用户名和密码';
+                loginError.classList.remove('d-none');
+                console.warn('⚠ 用户名或密码为空');
+                return;
+            }
+            
+            // 隐藏之前的错误信息
+            loginError.classList.add('d-none');
+            
+            // 准备请求数据
+            const requestData = {
+                username: username,
+                password: password
+            };
+            
+            console.log('→ 发送登录请求:', requestData);
+            
+            try {
                 // 发送登录请求
-                fetch('/api/login', {
+                const response = await fetch('/api/login', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     },
-                    body: JSON.stringify({
-                        username: username,
-                        password: password
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        // 登录成功，跳转到首页
-                        window.location.href = '/';
-                    } else {
-                        // 显示错误信息
-                        loginError.textContent = data.message || '登录失败，请重试';
-                        loginError.classList.remove('d-none');
-                    }
-                })
-                .catch(error => {
-                    loginError.textContent = '登录请求失败，请稍后重试';
-                    loginError.classList.remove('d-none');
-                    console.error('Login error:', error);
+                    body: JSON.stringify(requestData)
                 });
-            });
+                
+                console.log('← 响应状态:', response.status);
+                const data = await response.json();
+                console.log('← 响应数据:', data);
+                
+                if (data.status === 'success') {
+                    console.log('✓ 登录成功，跳转中...');
+                    // 登录成功，跳转到首页
+                    window.location.href = '/';
+                } else {
+                    // 显示错误信息
+                    let errorMsg = data.message || '登录失败，请重试';
+                    loginError.textContent = errorMsg;
+                    loginError.classList.remove('d-none');
+                    console.warn('✗ 登录失败:', errorMsg);
+                }
+            } catch (error) {
+                loginError.textContent = '登录请求失败，请稍后重试';
+                loginError.classList.remove('d-none');
+                console.error('✗ 请求异常:', error);
+            }
         });
-    </script>
-</body>
-</html> 
+    }
+    
+    // 多种方式确保表单加载后执行
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupLoginForm);
+    } else {
+        setupLoginForm();
+    }
+    
+    // 备用方案：延迟执行
+    setTimeout(setupLoginForm, 500);
+</script>
+{% endblock %}
