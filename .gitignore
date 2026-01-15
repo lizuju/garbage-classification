@@ -53,3 +53,10 @@ data/images/
 data/labels/
 *.zip
 *.tar
+
+# --- 图片与模型权重 ---
+*.jpg
+*.png
+*.jpeg
+*.gif
+*.pt

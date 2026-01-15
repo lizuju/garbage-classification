@@ -27,3 +27,8 @@ def detect_page():
 def history_page():
     return render_template('history.html')
 
+
+@pages_bp.route('/profile')
+def profile_page():
+    return render_template('profile.html')
+
