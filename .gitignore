@@ -1,0 +1,55 @@
+# .gitignore
+
+# --- 编辑器与系统 (你之前要求的) ---
+.idea/
+.vscode/
+.DS_Store
+
+# --- Python 运行缓存 ---
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --- 虚拟环境 (非常重要，不要上传) ---
+venv/
+env/
+.venv/
+ENV/
+bin/
+lib/
+include/
+
+# --- 依赖打包与分发 ---
+dist/
+build/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# --- 单元测试与覆盖率 ---
+htmlcov/
+.tox/
+.nox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# --- 本地环境变量 (包含 API 密钥等敏感信息) ---
+.env
+.venv
+.secret
+
+# --- 日志文件 ---
+node_modules/
+
+# --- 数据文件与模型权重 ---
+datasets/
+data/images/
+data/labels/
+*.zip
+*.tar
