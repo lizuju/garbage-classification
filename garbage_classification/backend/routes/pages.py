@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template
 
+from ..services.auth_service import login_required
+
 pages_bp = Blueprint('pages', __name__)
 
 
@@ -29,6 +31,7 @@ def history_page():
 
 
 @pages_bp.route('/profile')
+@login_required
 def profile_page():
     return render_template('profile.html')
 
