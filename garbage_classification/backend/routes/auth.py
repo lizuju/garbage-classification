@@ -48,7 +48,7 @@ def register():
         data = {}
 
     # 验证必要字段
-    email = data.get('email', '').strip()
+    email = data.get('email', '').strip().lower()  # 邮箱转小写，统一处理
     password = data.get('password', '').strip()
     username = data.get('username', '').strip()
     
@@ -68,11 +68,20 @@ def register():
                 'has_data': bool(request.data)
             }
         }), 400
+    
+    # 验证密码长度至少8个字符
+    if len(password) < 8:
+        return jsonify({
+            'status': 'error', 
+            'message': '密码长度至少为8个字符'
+        }), 400
 
     if User.query.filter_by(username=username).first():
         return jsonify({'status': 'error', 'message': '用户名已存在'}), 400
 
-    if User.query.filter_by(email=email).first():
+    # 检查邮箱是否已注册（使用小写比较防止大小写重复）
+    existing_user = User.query.filter(User.email.ilike(email)).first()
+    if existing_user:
         return jsonify({'status': 'error', 'message': '邮箱已被注册'}), 400
 
     user = User(username=username, email=email)
@@ -81,10 +90,18 @@ def register():
     db.session.add(user)
     try:
         db.session.commit()
-        log_action('user_action', f'用户注册: {username}')
+        print(f"✓ 用户注册成功: {username} ({email})")
+        
+        # 注册成功后再记录，如果失败不影响注册结果
+        try:
+            log_action('user_action', f'用户注册: {username}')
+        except Exception as log_err:
+            print(f"日志记录失败: {log_err}")
+        
         return jsonify({'status': 'success', 'message': '注册成功', 'user': user.to_dict()}), 201
     except Exception as e:
         db.session.rollback()
+        print(f"✗ 注册失败异常: {str(e)}")
         return jsonify({'status': 'error', 'message': f'注册失败: {str(e)}'}), 500
 
 
@@ -149,9 +166,12 @@ def login():
     
     if user and user.check_password(password):
         session['user_id'] = user.id
+        print(f"✓ 登录成功: {user.username} (id={user.id})")
+        print(f"✓ Session 已设置: user_id={session.get('user_id')}")
         log_action('user_action', f'用户登录: {user.username}', user.id)
         return jsonify({'status': 'success', 'message': '登录成功', 'user': user.to_dict()}), 200
 
+    print(f"✗ 登录失败: {login_id} - 用户名/邮箱或密码错误")
     return jsonify({'status': 'error', 'message': '用户名/邮箱或密码错误'}), 401
 
 
@@ -169,13 +189,22 @@ def logout():
 @auth_bp.route('/user', methods=['GET'])
 def get_user():
     user_id = session.get('user_id')
+    print(f"→ 检查用户状态: session={dict(session)} (user_id={user_id})")
+    
     if not user_id:
+        print(f"✗ 未登录")
         return jsonify({'status': 'error', 'message': '未登录'}), 401
 
     user = db.session.get(User, user_id)
     if not user:
         session.pop('user_id', None)
+        print(f"✗ 用户不存在: id={user_id}")
         return jsonify({'status': 'error', 'message': '用户不存在'}), 404
 
-    return jsonify({'status': 'success', 'user': user.to_dict()}), 200
+    user_data = user.to_dict()
+    print(f"✓ 用户已登录: {user.username} (id={user.id})")
+    print(f"✓ 返回数据: {user_data}")
+    response = jsonify({'status': 'success', 'user': user_data})
+    print(f"✓ 响应头: {dict(response.headers)}")
+    return response, 200
 

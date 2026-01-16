@@ -152,15 +152,21 @@
 
 {% block user_status_check %}
 <script>
-    fetch('/api/user')
+    console.log('→ detect.html: 检查用户登录状态...');
+    fetch('/api/user', {
+        credentials: 'include'
+    })
         .then(response => {
+            console.log('← detect.html: 响应状态', response.status);
             if (response.ok) {
                 return response.json();
             }
             throw new Error('未登录');
         })
         .then(data => {
+            console.log('← detect.html: 响应数据', data);
             if (data.status === 'success' && data.user) {
+                console.log('✓ detect.html: 用户已登录:', data.user.username);
                 // 用户已登录
                 document.getElementById('login-item').classList.add('d-none');
                 document.getElementById('user-dropdown').classList.remove('d-none');
@@ -169,24 +175,28 @@
                 
                 // 如果是管理员，显示管理入口
                 if (data.user.is_admin) {
-                    const adminItem = document.createElement('li');
-                    adminItem.innerHTML = '<a class="dropdown-item" href="/admin">管理后台</a>';
-                    document.querySelector('#user-dropdown .dropdown-menu').insertBefore(
-                        adminItem, 
-                        document.querySelector('#user-dropdown .dropdown-divider')
-                    );
+                    const dropdownMenu = document.querySelector('#user-dropdown .dropdown-menu');
+                    const divider = document.querySelector('#user-dropdown .dropdown-divider');
+                    if (dropdownMenu && divider) {
+                        const adminItem = document.createElement('li');
+                        adminItem.innerHTML = '<a class="dropdown-item" href="/admin">管理后台</a>';
+                        dropdownMenu.insertBefore(adminItem, divider);
+                        console.log('✓ detect.html: 管理员菜单已添加');
+                    } else {
+                        console.warn('✗ detect.html: 找不到dropdown-menu或dropdown-divider元素');
+                    }
                 }
+                
+                // 绑定 logout 事件
+                UserManager.bindLogoutEvent();
             } else {
                 // 用户未登录
-                document.getElementById('login-item').classList.remove('d-none');
-                document.getElementById('user-dropdown').classList.add('d-none');
+                console.warn('✗ detect.html: 用户未登录');
                 document.getElementById('login-warning').classList.remove('d-none');
             }
         })
         .catch(error => {
-            // 用户未登录
-            document.getElementById('login-item').classList.remove('d-none');
-            document.getElementById('user-dropdown').classList.add('d-none');
+            console.error('✗ detect.html: 检查用户状态失败:', error);
             document.getElementById('login-warning').classList.remove('d-none');
         });
 </script>
@@ -208,7 +218,8 @@
     const resultsList = document.getElementById('results-list');
     const errorAlert = document.getElementById('error-alert');
     const errorMessage = document.getElementById('error-message');
-    const logoutBtn = document.getElementById('logout-btn');
+    
+    // 注意：logout-btn 的事件绑定已由 base.html 中的 UserManager 统一处理
     
     // 上传区域点击事件
     uploadArea.addEventListener('click', () => {
@@ -253,13 +264,7 @@
         }
     });
     
-    // 退出登录
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            logout();
-        });
-    }
+    // 上传区域和文件处理的其他事件已在上面绑定
     
     // 处理选择的文件
     function handleFile(file) {
@@ -323,6 +328,7 @@
         // 发送识别请求
         fetch('/api/detect', {
             method: 'POST',
+            credentials: 'include',
             body: formData
         })
         .then(response => {
@@ -400,22 +406,6 @@
                 resultsList.appendChild(item);
             });
         }
-    }
-    
-    // 退出登录
-    function logout() {
-        fetch('/api/logout', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                window.location.reload();
-            }
-        });
     }
 </script>
 {% endblock %}

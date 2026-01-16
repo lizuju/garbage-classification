@@ -72,6 +72,7 @@
                         <input type="password" class="form-control" id="password" name="password" required>
                     </div>
                     <div class="form-text">密码长度至少为8个字符，建议包含字母、数字和特殊字符</div>
+                    <small id="password-length-hint" class="text-danger d-none">密码长度至少为8个字符</small>
                 </div>
 
                 <div class="mb-3">
@@ -168,6 +169,9 @@
         const registerForm = document.getElementById('register-form');
         const registerError = document.getElementById('register-error');
         const registerSuccess = document.getElementById('register-success');
+        const passwordInput = document.getElementById('password');
+        const passwordHint = document.getElementById('password-length-hint');
+        let isSubmitting = false;
         
         if (!registerForm) {
             console.error('注册表单未找到');
@@ -176,8 +180,25 @@
         
         console.log('✓ 注册表单已加载');
         
-            registerForm.addEventListener('submit', async function(e) {
+        // 实时检查密码长度
+        if (passwordInput) {
+            passwordInput.addEventListener('input', function() {
+                if (this.value.length < 8 && this.value.length > 0) {
+                    passwordHint.classList.remove('d-none');
+                } else {
+                    passwordHint.classList.add('d-none');
+                }
+            });
+        }
+        
+        registerForm.addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            if (isSubmitting) {
+                console.warn('⚠ 正在提交，请勿重复点击');
+                return;
+            }
+            
             console.log('✓ 表单提交事件触发');
             
             const username = document.getElementById('register-username').value.trim();
@@ -186,11 +207,9 @@
             const confirmPassword = document.getElementById('confirm-password').value;
             const terms = document.getElementById('terms').checked;
             
-            // 隐藏之前的错误/成功信息
             registerError.classList.add('d-none');
             registerSuccess.classList.add('d-none');
             
-            // 前端验证
             if (!username || !email || !password || !confirmPassword) {
                 registerError.textContent = '请填写所有必填项';
                 registerError.classList.remove('d-none');
@@ -198,7 +217,13 @@
                 return;
             }
             
-            // 验证密码一致性
+            if (password.length < 8) {
+                registerError.textContent = '密码长度至少为8个字符';
+                registerError.classList.remove('d-none');
+                console.warn('⚠ 密码长度不足8个字符，实际长度:', password.length);
+                return;
+            }
+            
             if (password !== confirmPassword) {
                 registerError.textContent = '两次输入的密码不一致';
                 registerError.classList.remove('d-none');
@@ -219,6 +244,7 @@
                 password: password
             };
             
+            isSubmitting = true;
             console.log('→ 发送注册请求:', requestData);
             
             try {
@@ -227,6 +253,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
+                    credentials: 'include',
                     body: JSON.stringify(requestData)
                 });
                 
@@ -236,37 +263,36 @@
                 
                 if (data.status === 'success') {
                     console.log('✓ 注册成功，即将跳转...');
-                    // 注册成功
+                    registerError.classList.add('d-none');  // 隐藏错误
                     registerSuccess.classList.remove('d-none');
                     registerForm.reset();
+                    if (passwordHint) passwordHint.classList.add('d-none');
                     
-                    // 3秒后跳转到登录页面
                     setTimeout(function() {
                         window.location.href = '/login';
                     }, 3000);
                 } else {
-                    // 显示错误信息
                     const errorMsg = data.message || '注册失败，请重试';
                     registerError.textContent = errorMsg;
                     registerError.classList.remove('d-none');
                     console.warn('✗ 注册失败:', errorMsg);
+                    isSubmitting = false;
                 }
             } catch (error) {
                 registerError.textContent = '注册请求失败，请稍后重试';
                 registerError.classList.remove('d-none');
                 console.error('✗ 请求异常:', error);
+                isSubmitting = false;
             }
         });
     }
     
-    // 多种方式确保表单加载后执行
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', setupRegisterForm);
     } else {
         setupRegisterForm();
     }
     
-    // 备用方案：延迟执行
     setTimeout(setupRegisterForm, 500);
 </script>
 {% endblock %}

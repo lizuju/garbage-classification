@@ -35,3 +35,8 @@ def history_page():
 def profile_page():
     return render_template('profile.html')
 
+
+@pages_bp.route('/about')
+def about_page():
+    return render_template('about.html')
+

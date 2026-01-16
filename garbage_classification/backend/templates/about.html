@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+
+{% block title %}关于项目 - 垃圾分类识别系统{% endblock %}
+
+{% block style %}
+<style>
+    .about-section {
+        padding: 60px 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .about-section h1 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .about-section p {
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 0 auto;
+        opacity: 0.95;
+    }
+
+    .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 30px;
+        margin: 40px 0;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        margin: 0 auto 15px;
+        color: white;
+    }
+
+    .feature-card h3 {
+        color: #333;
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+
+    .feature-card p {
+        color: #666;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .tech-stack {
+        background: #f8f9fa;
+        padding: 40px 20px;
+        border-radius: 10px;
+        margin: 40px 0;
+    }
+
+    .tech-stack h2 {
+        color: #333;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .tech-items {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 20px;
+    }
+
+    .tech-item {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+        border-left: 4px solid #667eea;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .tech-item h4 {
+        color: #667eea;
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+
+    .tech-item p {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .team-section {
+        padding: 40px 20px;
+    }
+
+    .team-section h2 {
+        color: #333;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .contact-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px 20px;
+        border-radius: 10px;
+        text-align: center;
+        margin-top: 40px;
+    }
+
+    .contact-section h2 {
+        margin-bottom: 20px;
+    }
+
+    .contact-section p {
+        margin-bottom: 15px;
+        font-size: 1.05rem;
+    }
+
+    .btn-contact {
+        background: white;
+        color: #667eea;
+        padding: 10px 30px;
+        border-radius: 25px;
+        text-decoration: none;
+        display: inline-block;
+        margin-top: 20px;
+        font-weight: 600;
+        transition: transform 0.3s ease;
+    }
+
+    .btn-contact:hover {
+        transform: scale(1.05);
+        color: #667eea;
+    }
+
+    .timeline {
+        position: relative;
+        padding: 20px 0;
+    }
+
+    .timeline-item {
+        margin-bottom: 30px;
+        position: relative;
+        padding-left: 40px;
+    }
+
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 5px;
+        width: 20px;
+        height: 20px;
+        background: #667eea;
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 0 0 3px #667eea;
+    }
+
+    .timeline-item h4 {
+        color: #333;
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+
+    .timeline-item p {
+        color: #666;
+        margin: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid about-section">
+    <div class="container">
+        <h1><i class="bi bi-info-circle me-2"></i>关于项目</h1>
+        <p>智能垃圾分类识别系统 - 利用人工智能和计算机视觉技术，快速准确地识别和分类垃圾</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- 项目简介 -->
+    <section class="py-5">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h2 class="mb-4" style="color: #333;">项目简介</h2>
+                <p style="color: #666; line-height: 1.8; font-size: 1.05rem;">
+                    本项目是一个基于YOLOv5深度学习模型的垃圾分类识别系统。通过拍摄或上传垃圾图片，
+                    系统能够自动识别垃圾类型，并提供分类建议，帮助用户更好地进行垃圾分类。
+                </p>
+                <p style="color: #666; line-height: 1.8; font-size: 1.05rem;">
+                    系统支持多种垃圾类型识别，包括可回收物、有害垃圾、湿垃圾和干垃圾等，
+                    准确率达到95%以上，可广泛应用于社区、学校、商务等场景。
+                </p>
+                <a href="/detect" class="btn btn-primary btn-lg mt-3">
+                    <i class="bi bi-camera me-2"></i>开始识别
+                </a>
+            </div>
+            <div class="col-md-6">
+                <div class="alert alert-info" role="alert">
+                    <h5 class="alert-heading"><i class="bi bi-star me-2"></i>项目亮点</h5>
+                    <ul class="mb-0">
+                        <li>基于YOLOv5的先进深度学习模型</li>
+                        <li>支持实时图片识别和分析</li>
+                        <li>完整的用户管理和历史记录功能</li>
+                        <li>响应式设计，支持各种设备</li>
+                        <li>准确率高达95%以上</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 核心功能 -->
+    <section class="py-5">
+        <h2 class="text-center mb-5" style="color: #333;">核心功能</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-camera-fill"></i>
+                </div>
+                <h3>智能识别</h3>
+                <p>上传或拍摄垃圾图片，系统立即进行智能识别，提供准确的分类结果。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-file-earmark-text"></i>
+                </div>
+                <h3>详细分析</h3>
+                <p>提供详细的识别结果，包括垃圾类型、置信度、建议等信息。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <h3>历史记录</h3>
+                <p>自动保存用户的识别历史，方便查看和回顾之前的识别结果。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                <h3>用户管理</h3>
+                <p>提供安全的用户登录和个人信息管理，保护用户隐私。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-graph-up"></i>
+                </div>
+                <h3>数据统计</h3>
+                <p>统计用户的识别数据，提供识别趋势分析。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="bi bi-phone"></i>
+                </div>
+                <h3>响应式设计</h3>
+                <p>完美适配各种设备，提供最佳的用户体验。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 技术栈 -->
+    <section class="tech-stack">
+        <h2>技术栈</h2>
+        <div class="tech-items">
+            <div class="tech-item">
+                <h4>后端框架</h4>
+                <p>Flask</p>
+            </div>
+            <div class="tech-item">
+                <h4>深度学习</h4>
+                <p>YOLOv5 + PyTorch</p>
+            </div>
+            <div class="tech-item">
+                <h4>数据库</h4>
+                <p>SQLite</p>
+            </div>
+            <div class="tech-item">
+                <h4>前端框架</h4>
+                <p>Bootstrap 5</p>
+            </div>
+            <div class="tech-item">
+                <h4>前端脚本</h4>
+                <p>Vanilla JavaScript</p>
+            </div>
+            <div class="tech-item">
+                <h4>ORM框架</h4>
+                <p>SQLAlchemy</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 项目发展 -->
+    <section class="team-section">
+        <h2>项目发展时间线</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <h4>2026年1月 - 项目初期</h4>
+                <p>完成项目基础架构搭建和数据库设计</p>
+            </div>
+            <div class="timeline-item">
+                <h4>2026年1月 - 功能开发</h4>
+                <p>实现用户认证、图片上传、YOLOv5模型集成</p>
+            </div>
+            <div class="timeline-item">
+                <h4>2026年1月 - 前端完善</h4>
+                <p>完成前端界面设计和响应式布局</p>
+            </div>
+            <div class="timeline-item">
+                <h4>2026年1月 - 项目完成</h4>
+                <p>完整的垃圾分类识别系统交付</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 联系我们 -->
+    <section class="contact-section">
+        <h2><i class="bi bi-envelope me-2"></i>联系我们</h2>
+        <p>如有任何问题或建议，欢迎联系我们</p>
+        <p>
+            <i class="bi bi-envelope me-2"></i>
+            <a href="mailto:contact@example.com" style="color: white; text-decoration: none;">
+                contact@example.com
+            </a>
+        </p>
+        <p>
+            <i class="bi bi-telephone me-2"></i>(123) 456-7890
+        </p>
+        <a href="/detect" class="btn-contact">开始使用系统</a>
+    </section>
+</div>
+
+{% endblock %}

@@ -127,6 +127,7 @@
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
+                    credentials: 'include',  // 重要：发送和保存 Cookie
                     body: JSON.stringify(requestData)
                 });
                 
