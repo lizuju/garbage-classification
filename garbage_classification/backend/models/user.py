@@ -22,11 +22,24 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
 
     def to_dict(self):
+        """
+        转换用户对象为字典
+        支持所有用户类型（包括管理员）的序列化
+        """
         return {
             'id': self.id,
             'username': self.username,
             'email': self.email,
-            'is_admin': self.is_admin,
-            'created_at': self.created_at.isoformat()
+            'is_admin': bool(self.is_admin),  # 显式转换为 bool，确保管理员标志正确
+            'created_at': self.created_at.isoformat() if self.created_at else None
         }
+    
+    def is_valid_for_session(self):
+        """
+        验证用户是否可以建立会话
+        确保用户数据的完整性
+        """
+        return (self.id is not None and 
+                self.username is not None and 
+                self.email is not None)
 

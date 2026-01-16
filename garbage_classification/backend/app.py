@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, session
 
 from .config import Config
 from .extensions import db, cors
@@ -30,6 +30,11 @@ def create_app():
         }
     })
 
+    # 为所有请求启用永久会话
+    @app.before_request
+    def make_session_permanent():
+        session.permanent = True
+
     # uploads dir
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     os.makedirs(os.path.join(app.config['UPLOAD_FOLDER'], 'results'), exist_ok=True)
@@ -52,12 +57,30 @@ def create_app():
     # init db & default admin
     with app.app_context():
         db.create_all()
+        
+        # 检查管理员用户是否存在
         admin = User.query.filter_by(username='admin').first()
+        
         if not admin:
-            admin = User(username='admin', email='admin@example.com', is_admin=True)
-            admin.set_password('admin123')
-            db.session.add(admin)
-            db.session.commit()
+            print("→ 创建默认管理员用户...")
+            try:
+                admin = User(username='admin', email='admin@example.com', is_admin=True)
+                admin.set_password('admin123')
+                db.session.add(admin)
+                db.session.commit()
+                print(f"✓ 管理员用户已创建: username=admin, email=admin@example.com, is_admin=True")
+                
+                # 验证管理员用户是否正确创建
+                admin = User.query.filter_by(username='admin').first()
+                if admin:
+                    print(f"✓ 管理员用户验证成功: {admin.to_dict()}")
+                else:
+                    print(f"✗ 管理员用户验证失败")
+            except Exception as e:
+                print(f"✗ 创建管理员用户失败: {str(e)}")
+                db.session.rollback()
+        else:
+            print(f"✓ 管理员用户已存在: {admin.to_dict()}")
 
     return app
 

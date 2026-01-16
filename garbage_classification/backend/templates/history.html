@@ -379,49 +379,19 @@
 
 {% block user_status_check %}
 <script>
-    fetch('/api/user/profile', {
-        credentials: 'include'
-    })
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            }
-            throw new Error('未登录');
-        })
-        .then(data => {
-            // 用户已登录
-            document.getElementById('login-alert').classList.add('d-none');
-            document.getElementById('login-item').classList.add('d-none');
-            document.getElementById('user-dropdown').classList.remove('d-none');
-            document.getElementById('username').textContent = data.user.username;
-            
-            // 如果是管理员，显示管理入口
-            if (data.user.is_admin) {
-                const dropdownMenu = document.querySelector('#user-dropdown .dropdown-menu');
-                const divider = document.querySelector('#user-dropdown .dropdown-divider');
-                if (dropdownMenu && divider) {
-                    const adminItem = document.createElement('li');
-                    adminItem.innerHTML = '<a class="dropdown-item" href="/admin">管理后台</a>';
-                    dropdownMenu.insertBefore(adminItem, divider);
-                    console.log('✓ history.html: 管理员菜单已添加');
-                } else {
-                    console.warn('✗ history.html: 找不到dropdown-menu或dropdown-divider元素');
-                }
-            }
-            
-            // 绑定 logout 事件（由 base.html 的 UserManager 提供）
-            UserManager.bindLogoutEvent();
-            
+    // 为 history 页面定制用户状态检查
+    UserManager.checkLoginStatus({
+        onSuccess: function(user) {
+            console.log('✓ history.html: 用户已认证，准备加载历史记录');
             // 加载历史记录
             loadHistory(1);
-        })
-        .catch(error => {
-            // 用户未登录
-            document.getElementById('loading-spinner').style.display = 'none';
+        },
+        onFailure: function() {
+            console.warn('✗ history.html: 用户未登录，显示登录提示');
+            document.getElementById('loading-spinner').classList.add('d-none');
             document.getElementById('login-alert').classList.remove('d-none');
-            document.getElementById('login-item').classList.remove('d-none');
-            document.getElementById('user-dropdown').classList.add('d-none');
-        });
+        }
+    });
 </script>
 {% endblock %}
 
@@ -439,7 +409,6 @@
         const detailsResultImage = document.getElementById('details-result-image');
         const detailsTableBody = document.getElementById('details-table-body');
         const downloadDetailsBtn = document.getElementById('download-details-btn');
-        const logoutBtn = document.getElementById('logout-btn');
         
         // 模态框
         const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
@@ -452,11 +421,9 @@
         let selectedDetailsData = null;
         
         // 绑定事件
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', logout);
-        }
-        
         downloadDetailsBtn.addEventListener('click', downloadDetailsResult);
+        
+        // 注意：logout-btn 的事件绑定已由 base.html 中的 UserManager 统一处理
         
         function loadHistory(page) {
             loadingSpinner.style.display = 'block';

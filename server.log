@@ -1,0 +1,42 @@
+/Users/giovanni/UniversityDocuments/Senior/毕业设计/代码/Garbage_classification_Yolov5/yolov5-6.2/models/experimental.py:80: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  ckpt = torch.load(attempt_download(w), map_location='cpu')  # load
+Fusing layers... 
+YOLOv5s summary: 213 layers, 7020913 parameters, 0 gradients, 15.8 GFLOPs
+✅ YOLOv5 路径: /Users/giovanni/UniversityDocuments/Senior/毕业设计/代码/Garbage_classification_Yolov5/yolov5-6.2
+✅ 模型文件: /Users/giovanni/UniversityDocuments/Senior/毕业设计/代码/Garbage_classification_Yolov5/yolov5-6.2/best.pt
+✅ 推理设备: mps
+✓ 管理员用户已存在: {'id': 1, 'username': 'admin', 'email': 'admin@example.com', 'is_admin': True, 'created_at': '2026-01-16T06:39:28.428186'}
+ * Serving Flask app 'app'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.31.190:5001
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+/Users/giovanni/UniversityDocuments/Senior/毕业设计/代码/Garbage_classification_Yolov5/yolov5-6.2/models/experimental.py:80: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  ckpt = torch.load(attempt_download(w), map_location='cpu')  # load
+Fusing layers... 
+YOLOv5s summary: 213 layers, 7020913 parameters, 0 gradients, 15.8 GFLOPs
+ * Debugger is active!
+ * Debugger PIN: 113-421-686
+Traceback (most recent call last):
+  File "/Users/giovanni/miniforge3/envs/yolov5_env/lib/python3.8/runpy.py", line 194, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/Users/giovanni/miniforge3/envs/yolov5_env/lib/python3.8/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+  File "/Users/giovanni/UniversityDocuments/Senior/毕业设计/代码/Garbage_classification_Yolov5/garbage_classification/backend/app.py", line 90, in <module>
+    app.run(debug=True, host='0.0.0.0', port=5001)
+  File "/Users/giovanni/miniforge3/envs/yolov5_env/lib/python3.8/site-packages/flask/app.py", line 1191, in run
+    run_simple(t.cast(str, host), port, self, **options)
+  File "/Users/giovanni/miniforge3/envs/yolov5_env/lib/python3.8/site-packages/werkzeug/serving.py", line 1115, in run_simple
+    run_with_reloader(
+  File "/Users/giovanni/miniforge3/envs/yolov5_env/lib/python3.8/site-packages/werkzeug/_reloader.py", line 459, in run_with_reloader
+    ensure_echo_on()
+  File "/Users/giovanni/miniforge3/envs/yolov5_env/lib/python3.8/site-packages/werkzeug/_reloader.py", line 439, in ensure_echo_on
+    termios.tcsetattr(sys.stdin, termios.TCSANOW, attributes)
+termios.error: (4, 'Interrupted system call')
+✅ YOLOv5 路径: /Users/giovanni/UniversityDocuments/Senior/毕业设计/代码/Garbage_classification_Yolov5/yolov5-6.2
+✅ 模型文件: /Users/giovanni/UniversityDocuments/Senior/毕业设计/代码/Garbage_classification_Yolov5/yolov5-6.2/best.pt
+✅ 推理设备: mps
+✓ 管理员用户已存在: {'id': 1, 'username': 'admin', 'email': 'admin@example.com', 'is_admin': True, 'created_at': '2026-01-16T06:39:28.428186'}

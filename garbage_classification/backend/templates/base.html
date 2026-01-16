@@ -99,7 +99,7 @@
         // 面向对象设计：统一处理所有用户相关操作
         const UserManager = {
             // 检查登录状态
-            checkLoginStatus: function() {
+            checkLoginStatus: function(callbacks = {}) {
                 console.log('→ 开始检查用户登录状态...');
                 fetch('/api/user', {
                     credentials: 'include'
@@ -110,19 +110,20 @@
                     })
                     .then(data => {
                         console.log('← 响应数据:', data);
-                        if (data.status === 'success') {
-                            this.handleLoginSuccess(data.user);
+                        if (data.status === 'success' && data.user) {
+                            this.handleLoginSuccess(data.user, callbacks.onSuccess);
                         } else {
-                            console.warn('✗ 未登录或出错:', data.message);
+                            this.handleLoginFailure(callbacks.onFailure);
                         }
                     })
                     .catch(error => {
                         console.error('✗ 检查用户状态失败:', error);
+                        this.handleLoginFailure(callbacks.onFailure);
                     });
             },
 
             // 处理登录成功
-            handleLoginSuccess: function(user) {
+            handleLoginSuccess: function(user, onSuccess) {
                 console.log('✓ 用户已登录:', user.username, '(管理员:', user.is_admin, ')');
                 
                 // 更新UI显示
@@ -149,6 +150,36 @@
                 
                 // 绑定退出登录事件
                 this.bindLogoutEvent();
+                
+                // 调用自定义成功回调
+                if (typeof onSuccess === 'function') {
+                    try {
+                        onSuccess(user);
+                    } catch (e) {
+                        console.error('✗ 自定义成功回调执行失败:', e);
+                    }
+                }
+            },
+
+            // 处理登录失败
+            handleLoginFailure: function(onFailure) {
+                console.warn('✗ 用户未登录');
+                
+                // 隐藏用户下拉菜单
+                const loginItem = document.getElementById('login-item');
+                const userDropdown = document.getElementById('user-dropdown');
+                
+                if (loginItem) loginItem.classList.remove('d-none');
+                if (userDropdown) userDropdown.classList.add('d-none');
+                
+                // 调用自定义失败回调
+                if (typeof onFailure === 'function') {
+                    try {
+                        onFailure();
+                    } catch (e) {
+                        console.error('✗ 自定义失败回调执行失败:', e);
+                    }
+                }
             },
 
             // 添加管理后台菜单
@@ -171,7 +202,11 @@
             bindLogoutEvent: function() {
                 const logoutBtn = document.getElementById('logout-btn');
                 if (logoutBtn) {
-                    logoutBtn.addEventListener('click', (e) => {
+                    // 移除已存在的事件监听器，防止重复绑定
+                    const newLogoutBtn = logoutBtn.cloneNode(true);
+                    logoutBtn.parentNode.replaceChild(newLogoutBtn, logoutBtn);
+                    
+                    newLogoutBtn.addEventListener('click', (e) => {
                         e.preventDefault();
                         this.logout();
                     });

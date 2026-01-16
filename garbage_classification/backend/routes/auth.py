@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify, request, session
 from ..extensions import db
 from ..models import User
 from ..services.log_service import log_action
+from ..services.auth_service import AuthManager
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -157,53 +158,62 @@ def login():
             'received': list(data.keys()) if data else '无数据'
         }), 400
 
-    # 先尝试用username查询
-    user = User.query.filter_by(username=login_id).first()
+    # 使用 AuthManager 验证用户
+    user = AuthManager.verify_user_by_credentials(login_id, password)
     
-    # 如果没找到，尝试用email查询
-    if not user:
-        user = User.query.filter_by(email=login_id).first()
-    
-    if user and user.check_password(password):
-        session['user_id'] = user.id
-        print(f"✓ 登录成功: {user.username} (id={user.id})")
-        print(f"✓ Session 已设置: user_id={session.get('user_id')}")
-        log_action('user_action', f'用户登录: {user.username}', user.id)
-        return jsonify({'status': 'success', 'message': '登录成功', 'user': user.to_dict()}), 200
-
-    print(f"✗ 登录失败: {login_id} - 用户名/邮箱或密码错误")
-    return jsonify({'status': 'error', 'message': '用户名/邮箱或密码错误'}), 401
+    if user:
+        # 创建会话
+        if AuthManager.create_session(user):
+            # 记录日志
+            try:
+                log_action('user_action', f'用户登录: {user.username}', user.id)
+            except Exception as log_err:
+                print(f"日志记录失败: {log_err}")
+            
+            # 返回用户数据
+            user_data = AuthManager.get_user_data(user)
+            return jsonify({'status': 'success', 'message': '登录成功', 'user': user_data}), 200
+        else:
+            return jsonify({'status': 'error', 'message': '会话创建失败，请重试'}), 500
+    else:
+        print(f"✗ 登录失败: {login_id} - 用户名/邮箱或密码错误")
+        return jsonify({'status': 'error', 'message': '用户名/邮箱或密码错误'}), 401
 
 
 @auth_bp.route('/logout', methods=['POST'])
 def logout():
-    user_id = session.get('user_id')
-    if user_id:
-        user = User.query.get(user_id)
-        if user:
-            log_action('user_action', f'用户登出: {user.username}', user_id)
-    session.pop('user_id', None)
+    # 获取当前用户，用于日志记录
+    user = AuthManager.get_current_user()
+    if user:
+        try:
+            log_action('user_action', f'用户登出: {user.username}', user.id)
+        except Exception as log_err:
+            print(f"日志记录失败: {log_err}")
+    
+    # 销毁会话
+    AuthManager.destroy_session()
+    
     return jsonify({'status': 'success', 'message': '注销成功'}), 200
 
 
 @auth_bp.route('/user', methods=['GET'])
 def get_user():
-    user_id = session.get('user_id')
-    print(f"→ 检查用户状态: session={dict(session)} (user_id={user_id})")
+    print(f"→ 检查用户状态: session={dict(session)}")
     
-    if not user_id:
-        print(f"✗ 未登录")
-        return jsonify({'status': 'error', 'message': '未登录'}), 401
-
-    user = db.session.get(User, user_id)
+    # 使用 AuthManager 获取当前用户
+    user = AuthManager.get_current_user()
+    
     if not user:
-        session.pop('user_id', None)
-        print(f"✗ 用户不存在: id={user_id}")
-        return jsonify({'status': 'error', 'message': '用户不存在'}), 404
-
-    user_data = user.to_dict()
-    print(f"✓ 用户已登录: {user.username} (id={user.id})")
-    print(f"✓ 返回数据: {user_data}")
+        print(f"✗ 未登录或用户不存在")
+        return jsonify({'status': 'error', 'message': '未登录'}), 401
+    
+    # 获取用户数据
+    user_data = AuthManager.get_user_data(user)
+    
+    if not user_data:
+        print(f"✗ 用户数据生成失败")
+        return jsonify({'status': 'error', 'message': '用户数据获取失败'}), 500
+    
     response = jsonify({'status': 'success', 'user': user_data})
     print(f"✓ 响应头: {dict(response.headers)}")
     return response, 200

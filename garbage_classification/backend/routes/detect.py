@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 
 from ..extensions import db
 from ..models import Image, DetectionHistory, User
-from ..services.auth_service import login_required
+from ..services.auth_service import login_required, AuthManager
 from ..services.log_service import log_action
 from ..utils.file import allowed_file, resolve_stored_path
 
@@ -45,18 +45,19 @@ def detect():
             result_img.save(result_path)
 
         result_json = json.dumps(results, ensure_ascii=False) if results else "[]"
+        user = AuthManager.get_current_user()
         image = Image(
             filename=unique_filename,
             original_path=file_path,
             result_path=result_path,
             result_data=result_json,
-            user_id=session['user_id']
+            user_id=user.id
         )
         db.session.add(image)
 
         confidence = max([item.get('confidence', 0) for item in results]) if results else 0
         history = DetectionHistory(
-            user_id=session['user_id'],
+            user_id=user.id,
             image_path=file_path,
             result=result_json,
             confidence=confidence
@@ -64,7 +65,7 @@ def detect():
         db.session.add(history)
         db.session.commit()
 
-        log_action('user_action', f'Detection finished: {len(results)} objects', session['user_id'])
+        log_action('user_action', f'Detection finished: {len(results)} objects', user.id)
 
         return jsonify({
             'status': 'success',
@@ -78,7 +79,8 @@ def detect():
 
     except Exception as e:
         db.session.rollback()
-        log_action('error', f'识别错误: {str(e)}', session.get('user_id'))
+        current_user = AuthManager.get_current_user()
+        log_action('error', f'识别错误: {str(e)}', current_user.id if current_user else None)
         return jsonify({'status': 'error', 'message': f'处理图像时出错: {str(e)}'}), 500
 
 
@@ -87,7 +89,8 @@ def detect():
 def get_original_image(image_id):
     image = Image.query.get_or_404(image_id)
 
-    if image.user_id != session['user_id'] and not User.query.get(session['user_id']).is_admin:
+    user = AuthManager.get_current_user()
+    if image.user_id != user.id and not user.is_admin:
         return jsonify({'status': 'error', 'message': '无权访问此图像'}), 403
 
     resolved = resolve_stored_path(
@@ -105,7 +108,8 @@ def get_original_image(image_id):
 def get_result_image(image_id):
     image = Image.query.get_or_404(image_id)
 
-    if image.user_id != session['user_id'] and not User.query.get(session['user_id']).is_admin:
+    user = AuthManager.get_current_user()
+    if image.user_id != user.id and not user.is_admin:
         return jsonify({'status': 'error', 'message': '无权访问此图像'}), 403
 
     resolved = resolve_stored_path(
