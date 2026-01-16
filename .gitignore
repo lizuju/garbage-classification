@@ -60,3 +60,12 @@ data/labels/
 *.jpeg
 *.gif
 *.pt
+
+# 忽略所有 txt 格式的 cookie 文件
+cookies.txt
+# 如果你在不同文件夹下都有，可以写成 **/cookies.txt
+**/cookies.txt
+
+# 忽略日志文件
+*.log
+server.log
