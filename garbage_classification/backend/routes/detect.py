@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 
 from ..extensions import db
 from ..models import Image, DetectionHistory, User
-from ..services.auth_service import login_required, AuthManager
+from ..services.jwt_service import jwt_required
 from ..services.log_service import log_action
 from ..utils.file import allowed_file, resolve_stored_path
 
@@ -15,8 +15,11 @@ detect_bp = Blueprint('detect', __name__)
 
 
 @detect_bp.route('/detect', methods=['POST'])
-@login_required
+@jwt_required
 def detect():
+    payload = request.jwt_payload
+    user_id = payload['user_id']
+    
     if 'file' not in request.files:
         return jsonify({'status': 'error', 'message': '没有文件'}), 400
 
@@ -45,7 +48,10 @@ def detect():
             result_img.save(result_path)
 
         result_json = json.dumps(results, ensure_ascii=False) if results else "[]"
-        user = AuthManager.get_current_user()
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'status': 'error', 'message': '用户不存在'}), 404
+            
         image = Image(
             filename=unique_filename,
             original_path=file_path,
@@ -79,18 +85,21 @@ def detect():
 
     except Exception as e:
         db.session.rollback()
-        current_user = AuthManager.get_current_user()
-        log_action('error', f'识别错误: {str(e)}', current_user.id if current_user else None)
+        print(f"✗ 识别错误: {str(e)}")
+        log_action('error', f'识别错误: {str(e)}', user_id)
         return jsonify({'status': 'error', 'message': f'处理图像时出错: {str(e)}'}), 500
 
 
 @detect_bp.route('/images/<int:image_id>/original')
-@login_required
+@jwt_required
 def get_original_image(image_id):
+    payload = request.jwt_payload
+    user_id = payload['user_id']
+    
     image = Image.query.get_or_404(image_id)
 
-    user = AuthManager.get_current_user()
-    if image.user_id != user.id and not user.is_admin:
+    user = User.query.get(user_id)
+    if not user or (image.user_id != user.id and not user.is_admin):
         return jsonify({'status': 'error', 'message': '无权访问此图像'}), 403
 
     resolved = resolve_stored_path(
@@ -104,12 +113,15 @@ def get_original_image(image_id):
 
 
 @detect_bp.route('/images/<int:image_id>/result')
-@login_required
+@jwt_required
 def get_result_image(image_id):
+    payload = request.jwt_payload
+    user_id = payload['user_id']
+    
     image = Image.query.get_or_404(image_id)
 
-    user = AuthManager.get_current_user()
-    if image.user_id != user.id and not user.is_admin:
+    user = User.query.get(user_id)
+    if not user or (image.user_id != user.id and not user.is_admin):
         return jsonify({'status': 'error', 'message': '无权访问此图像'}), 403
 
     resolved = resolve_stored_path(

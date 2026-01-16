@@ -29,6 +29,10 @@ class Config:
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5MB
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
+    # JWT 配置
+    JWT_SECRET = os.environ.get('JWT_SECRET', 'jwt-dev-key-should-be-changed')
+    JWT_EXPIRATION = 24 * 60 * 60  # 24小时
+
     # 上传目录：统一走项目根 uploads
     UPLOAD_FOLDER = str(ROOT / 'uploads')
 

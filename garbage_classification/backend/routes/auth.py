@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request, session
 from ..extensions import db
 from ..models import User
 from ..services.log_service import log_action
-from ..services.auth_service import AuthManager
+from ..services.jwt_service import JWTManager, jwt_required
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -147,74 +147,85 @@ def login():
     if not data:
         data = {}
 
-    # 获取登陆凭证（可能是username或email）
-    login_id = data.get('username') or data.get('email')
+    # 获取登陆凭证（可能是login_id、username或email）
+    login_id = data.get('login_id') or data.get('username') or data.get('email')
     password = data.get('password', '')
     
     if not login_id or not password:
         return jsonify({
             'status': 'error', 
-            'message': '缺少必要字段: username/email 和 password',
+            'message': '缺少必要字段: login_id/username/email 和 password',
             'received': list(data.keys()) if data else '无数据'
         }), 400
 
-    # 使用 AuthManager 验证用户
-    user = AuthManager.verify_user_by_credentials(login_id, password)
-    
-    if user:
-        # 创建会话
-        if AuthManager.create_session(user):
+    # 验证用户凭证
+    try:
+        # 尝试用 username 查询
+        user = User.query.filter_by(username=login_id).first()
+        
+        # 如果没找到，尝试用 email 查询（邮箱需要小写比较）
+        if not user:
+            user = User.query.filter(User.email.ilike(login_id)).first()
+        
+        # 验证密码
+        if user and user.check_password(password):
+            print(f"✓ 用户验证成功: {user.username} (is_admin={user.is_admin})")
+            
+            # 生成 JWT token
+            token = JWTManager.encode_token(user.id, user.username, user.is_admin)
+            
+            if not token:
+                return jsonify({'status': 'error', 'message': 'Token 生成失败'}), 500
+            
             # 记录日志
             try:
                 log_action('user_action', f'用户登录: {user.username}', user.id)
             except Exception as log_err:
                 print(f"日志记录失败: {log_err}")
             
-            # 返回用户数据
-            user_data = AuthManager.get_user_data(user)
-            return jsonify({'status': 'success', 'message': '登录成功', 'user': user_data}), 200
+            # 返回用户数据和 token
+            user_data = user.to_dict()
+            return jsonify({
+                'status': 'success',
+                'message': '登录成功',
+                'user': user_data,
+                'token': token  # 前端需要保存这个 token
+            }), 200
         else:
-            return jsonify({'status': 'error', 'message': '会话创建失败，请重试'}), 500
-    else:
-        print(f"✗ 登录失败: {login_id} - 用户名/邮箱或密码错误")
-        return jsonify({'status': 'error', 'message': '用户名/邮箱或密码错误'}), 401
+            print(f"✗ 登录失败: {login_id} - 用户名/邮箱或密码错误")
+            return jsonify({'status': 'error', 'message': '用户名/邮箱或密码错误'}), 401
+                
+    except Exception as e:
+        print(f"✗ 登录异常: {str(e)}")
+        return jsonify({'status': 'error', 'message': f'登录失败: {str(e)}'}), 500
 
 
 @auth_bp.route('/logout', methods=['POST'])
 def logout():
-    # 获取当前用户，用于日志记录
-    user = AuthManager.get_current_user()
-    if user:
-        try:
-            log_action('user_action', f'用户登出: {user.username}', user.id)
-        except Exception as log_err:
-            print(f"日志记录失败: {log_err}")
-    
-    # 销毁会话
-    AuthManager.destroy_session()
-    
+    # JWT 方式无需做任何事，客户端删除 token 即可
     return jsonify({'status': 'success', 'message': '注销成功'}), 200
 
 
 @auth_bp.route('/user', methods=['GET'])
+@jwt_required
 def get_user():
-    print(f"→ 检查用户状态: session={dict(session)}")
+    """获取当前用户信息（使用 JWT 认证）"""
+    payload = request.jwt_payload
+    user_id = payload['user_id']
     
-    # 使用 AuthManager 获取当前用户
-    user = AuthManager.get_current_user()
-    
-    if not user:
-        print(f"✗ 未登录或用户不存在")
-        return jsonify({'status': 'error', 'message': '未登录'}), 401
-    
-    # 获取用户数据
-    user_data = AuthManager.get_user_data(user)
-    
-    if not user_data:
-        print(f"✗ 用户数据生成失败")
-        return jsonify({'status': 'error', 'message': '用户数据获取失败'}), 500
-    
-    response = jsonify({'status': 'success', 'user': user_data})
-    print(f"✓ 响应头: {dict(response.headers)}")
-    return response, 200
+    try:
+        user = User.query.get(user_id)
+        
+        if not user:
+            print(f"✗ 用户不存在: {user_id}")
+            return jsonify({'status': 'error', 'message': '用户不存在'}), 404
+        
+        user_data = user.to_dict()
+        print(f"✓ 用户数据已返回: {user_data}")
+        
+        return jsonify({'status': 'success', 'user': user_data}), 200
+        
+    except Exception as e:
+        print(f"✗ 获取用户信息失败: {str(e)}")
+        return jsonify({'status': 'error', 'message': '获取用户信息失败'}), 500
 

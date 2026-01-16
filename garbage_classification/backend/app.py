@@ -22,7 +22,7 @@ def create_app():
     db.init_app(app)
     cors.init_app(app, supports_credentials=True, resources={
         r"/api/*": {
-            "origins": ["http://localhost:5001", "http://127.0.0.1:5001", "http://192.168.31.190:5001"],
+            "origins": ["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:5001", "http://127.0.0.1:5001", "http://192.168.31.190:5001"],
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
             "supports_credentials": True,
@@ -87,4 +87,4 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    app.run(debug=False, host='0.0.0.0', port=5001)

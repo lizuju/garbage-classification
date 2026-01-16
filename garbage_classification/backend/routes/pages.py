@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template
 
-from ..services.auth_service import login_required
+from ..services.jwt_service import jwt_required as login_required
 
 pages_bp = Blueprint('pages', __name__)
 

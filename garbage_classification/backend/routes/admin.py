@@ -3,8 +3,8 @@ from datetime import datetime
 
 from flask import Blueprint, jsonify, request
 
-from ..models import User, Image, SystemLog
-from ..services.auth_service import admin_required
+from ..models import User, Image, SystemLog, DetectionHistory
+from ..services.jwt_service import admin_required
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -63,6 +63,22 @@ def get_stats():
         Image.created_at >= datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
     ).count()
 
+    # 计算平均信心度
+    avg_confidence = 0.0
+    if total_images > 0:
+        confidences = []
+        for image in Image.query.all():
+            if image.result_data:
+                try:
+                    results = json.loads(image.result_data)
+                    for result in results:
+                        if 'confidence' in result:
+                            confidences.append(result['confidence'])
+                except Exception:
+                    pass
+        if confidences:
+            avg_confidence = sum(confidences) / len(confidences)
+
     class_names = ['可回收', '有害', '厨余', '其他']
     class_counts = {name: 0 for name in class_names}
     for image in Image.query.all():
@@ -78,8 +94,15 @@ def get_stats():
 
     return jsonify({
         'status': 'success',
-        'users': {'total': total_users, 'new_today': new_users_today},
-        'images': {'total': total_images, 'new_today': images_today},
-        'classes': class_counts
+        'stats': {
+            'total_users': total_users,
+            'total_detections': total_images,
+            'avg_confidence': avg_confidence,
+            'daily_active': new_users_today + images_today,
+            'new_users_today': new_users_today,
+            'images_today': images_today,
+            'class_distribution': class_counts
+        }
     }), 200
+
 
