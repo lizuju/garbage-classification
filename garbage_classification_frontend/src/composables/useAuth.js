@@ -121,12 +121,12 @@ export function useAuth() {
     }
   }
 
-  const updateProfile = async (email, password, newPassword) => {
+  const updateProfile = async (email, password, newPassword, confirmPassword) => {
     try {
       const response = await fetch(`${API_BASE}/api/user/profile`, {
         method: 'PUT',
         headers: getHeaders(),
-        body: JSON.stringify({ email, password, new_password: newPassword }),
+        body: JSON.stringify({ email, password, new_password: newPassword, confirm_password: confirmPassword }),
       })
       
       const data = await response.json()

@@ -1,10 +1,10 @@
 <template>
   <!-- 英雄 Header -->
   <div class="hero-section">
-    <div class="hero-content">
-      <h1 class="hero-title">🗑️ 垃圾分类智能识别系统</h1>
-      <p class="hero-subtitle">上传图片，AI 帮您快速识别垃圾类别</p>
-      <p class="hero-description">使用深度学习和计算机视觉技术，让垃圾分类变得简单高效</p>
+    <div class="hero-content d-flex flex-column align-items-center">
+      <h1 class="hero-title text-center">🗑️ 基于YOLOv5的垃圾分类识别系统</h1>
+      <p class="hero-subtitle text-center">上传图片，AI 帮您快速识别垃圾类别</p>
+      <p class="hero-description text-center">使用深度学习和计算机视觉技术，让垃圾分类变得简单高效</p>
       <router-link
         :to="isLoggedIn ? '/user/detect' : '/login'"
         class="btn btn-lg btn-success hero-btn"
@@ -156,7 +156,7 @@
         <!-- 可回收物 -->
         <div class="col-lg-6">
           <div class="guide-card recyclable">
-            <div class="guide-header">
+            <div class="guide-header d-flex justify-content-center align-items-center">
               <i class="bi bi-recycle" style="font-size: 30px;"></i>
               <h5>可回收物</h5>
             </div>
@@ -193,7 +193,7 @@
         <!-- 有害垃圾 -->
         <div class="col-lg-6">
         <div class="guide-card harmful">
-            <div class="guide-header">
+            <div class="guide-header d-flex justify-content-center align-items-center">
             <i class="bi bi-radioactive" style="font-size: 30px;"></i>
             <h5>有害垃圾</h5>
             </div>
@@ -231,7 +231,7 @@
         <!-- 厨余垃圾 -->
         <div class="col-lg-6">
         <div class="guide-card kitchen">
-            <div class="guide-header">
+            <div class="guide-header d-flex justify-content-center align-items-center">
             <i class="bi bi-egg-fried" style="font-size: 30px;"></i>
             <h5>厨余垃圾</h5>
             </div>
@@ -269,7 +269,7 @@
         <!-- 其他垃圾 -->
         <div class="col-lg-6">
         <div class="guide-card other">
-            <div class="guide-header">
+            <div class="guide-header d-flex justify-content-center align-items-center">
             <i class="bi bi-trash" style="font-size: 30px;"></i>
             <h5>其他垃圾</h5>
             </div>

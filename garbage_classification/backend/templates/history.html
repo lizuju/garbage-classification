@@ -426,22 +426,21 @@
         // 注意：logout-btn 的事件绑定已由 base.html 中的 UserManager 统一处理
         
         function loadHistory(page) {
-            loadingSpinner.style.display = 'block';
-            historyList.classList.add('d-none');
-            emptyState.classList.add('d-none');
+            // 统一用 classList 控制
+            loadingSpinner.classList.remove('d-none'); // 显示加载
+            historyList.classList.add('d-none');      // 隐藏列表
+            emptyState.classList.add('d-none');       // 隐藏空状态
             
             fetch(`/api/user/history?page=${page}&per_page=10`)
                 .then(response => {
-                    if (!response.ok) {
-                        throw new Error('加载失败');
-                    }
+                    if (!response.ok) throw new Error('加载失败');
                     return response.json();
                 })
                 .then(data => {
-                    loadingSpinner.style.display = 'none';
+                    loadingSpinner.classList.add('d-none'); // 核心：加载完一定要隐藏！
                     currentHistoryData = data;
                     
-                    if (data.history.length === 0) {
+                    if (!data.history || data.history.length === 0) {
                         emptyState.classList.remove('d-none');
                     } else {
                         renderHistoryTable(data.history);
@@ -450,8 +449,9 @@
                     }
                 })
                 .catch(error => {
-                    loadingSpinner.style.display = 'none';
+                    loadingSpinner.classList.add('d-none'); // 报错也要隐藏，否则卡死
                     console.error('Error loading history:', error);
+                    alert("加载失败，请检查网络连接");
                 });
         }
         

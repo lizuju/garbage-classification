@@ -8,7 +8,7 @@
       <div class="col-md-12">
         <div class="card">
           <div class="card-body">
-            <h4 class="card-title">识别历史</h4>
+            <h3 class="card-title mb-2 text-center">识别历史</h3>
 
             <div v-if="message" :class="`alert alert-${messageType} mb-3`">
               {{ message }}
@@ -83,10 +83,13 @@ const loadHistory = async () => {
   isLoading.value = true
   try {
     const result = await getHistory()
+    console.log('【HistoryPage】后端返回的历史数据:', result);
+
     if (result.data) {
       history.value = result.data
     }
   } catch (error) {
+    console.error('【HistoryPage】加载出错:', error);
     message.value = error.message || '加载失败'
     messageType.value = 'danger'
   } finally {
@@ -113,6 +116,7 @@ const formatDate = (dateString) => {
 }
 
 onMounted(() => {
+  console.log('【HistoryPage】组件已挂载，开始加载历史');
   loadHistory()
 })
 </script>

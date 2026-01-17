@@ -42,10 +42,17 @@ def user_profile():
         user.email = data['email'].lower()
     
     # 更新密码（可选）
-    if 'new_password' in data:
-        if len(data['new_password']) < 8:
+    if 'new_password' in data and data['new_password']:
+        # 1. 获取新密码和确认密码
+        new_pwd = data.get('new_password')
+        confirm_pwd = data.get('confirm_password') # 新增：获取确认密码字段
+        # 2. 校验长度
+        if len(new_pwd) < 8:
             return jsonify({'status': 'error', 'message': '新密码长度至少 8 个字符'}), 400
-        user.set_password(data['new_password'])
+        # 3. 校验一致性
+        if new_pwd != confirm_pwd:
+            return jsonify({'status': 'error', 'message': '两次输入的密码不一致'}), 400
+        user.set_password(new_pwd)
     
     try:
         db.session.commit()
