@@ -95,8 +95,8 @@
                 <h5 class="card-title">识别结果</h5>
 
                 <!-- 结果图 -->
-                <div v-if="results.result_url" class="mb-3">
-                  <img :src="results.result_url" :alt="results.result_url" class="img-fluid rounded" />
+                <div v-if="results.result_url_base64" class="mb-3">
+                  <img :src="results.result_url_base64" alt="detection result" class="img-fluid rounded" />
                 </div>
 
                 <!-- 检测到的物品 -->

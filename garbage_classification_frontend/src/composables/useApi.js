@@ -15,6 +15,31 @@ export function useApi() {
     return response
   }
 
+  // 将图片 URL 转换为 base64 数据 URL（支持带认证的图片加载）
+  const convertImageToBase64 = async (imageUrl) => {
+    try {
+      const token = localStorage.getItem('auth_token')
+      const headers = {}
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
+      const response = await fetch(imageUrl, { headers })
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+      
+      const blob = await response.blob()
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(reader.result)
+        reader.onerror = reject
+        reader.readAsDataURL(blob)
+      })
+    } catch (error) {
+      console.error('转换图片失败:', error)
+      return null
+    }
+  }
+
   const detect = async (file) => {
     try {
       const formData = new FormData()
@@ -34,6 +59,11 @@ export function useApi() {
       
       const data = await response.json()
       if (data.status === 'success') {
+        // 将结果图片 URL 转换为 base64（支持认证）
+        if (data.result_url) {
+          const fullUrl = `${API_BASE}${data.result_url}`
+          data.result_url_base64 = await convertImageToBase64(fullUrl)
+        }
         return data
       }
       throw new Error(data.message || '检测失败')
