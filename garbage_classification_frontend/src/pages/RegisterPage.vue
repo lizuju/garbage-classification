@@ -68,9 +68,11 @@
                     :disabled="isLoading"
                   />
                 </div>
-                <small class="form-text text-muted">密码长度至少为8个字符，建议包含字母、数字和特殊字符</small>
-                <div v-if="formData.password.length > 0 && formData.password.length < 8" class="text-danger small mt-1">
-                  <i class="bi bi-exclamation-circle me-1"></i>密码长度至少为 8 个字符
+                <div class="d-flex justify-content-between mt-1">
+                  <small class="form-text text-muted">密码长度至少为8个字符，建议包含字母、数字和特殊字符</small>
+                    <div v-if="formData.password.length > 0 && formData.password.length < 8" class="text-danger small fw-bold">
+                      <i class="bi bi-exclamation-circle me-1"></i>长度不足
+                    </div>
                 </div>
               </div>
 
