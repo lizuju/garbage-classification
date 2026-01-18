@@ -31,7 +31,7 @@
                 <label for="email" class="form-label fw-bold text-secondary small">邮箱地址</label>
                 <div class="input-group">
                   <span class="input-group-text bg-light border-0"><i class="bi bi-envelope text-muted"></i></span>
-                  <input id="email" v-model="formData.email" type="email" class="form-control border-0 bg-light" disabled />
+                  <input id="email" :value="user.email" type="email" class="form-control border-0 bg-light" disabled />
                 </div>
               </div>
 
@@ -168,8 +168,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, nextTick } from 'vue'
+import { ref, onMounted, computed, nextTick, onUnmounted } from 'vue'
 import { useAuth } from '../composables/useAuth'
+
+let errorTimer = null;
+let noticeTimer = null;
 
 const { user, isLoggedIn, updateProfile } = useAuth()
 
@@ -219,13 +222,14 @@ const userTypeBadgeClass = computed(() => {
 })
 
 const showNotice = (text, type = 'info') => {
+  if (noticeTimer) clearTimeout(noticeTimer)
   actionNotice.value = text
   noticeType.value = type
-  
-  // 3秒后自动清空
-  setTimeout(() => {
-    actionNotice.value = ''
-    noticeType.value = ''
+
+  noticeTimer = setTimeout(() => {
+    actionNotice.value = '';
+    noticeType.value = '';
+    noticeTimer = null;
   }, 3000)
 }
 
@@ -243,12 +247,18 @@ const cancelEdit = () => {
   showNotice('已取消修改')
 }
 
-// 定义一个专业的报错辅助函数
+// 定义一个报错辅助函数
 const showError = (text, type = 'danger') => {
   clearMessage()
+  if (errorTimer) clearTimeout(errorTimer);
+  message.value = '';
   nextTick(() => {
     message.value = text
     messageType.value = type
+
+    errorTimer = setTimeout(() => {
+      message.value = '';
+    }, 3000)
   })
 }
 
@@ -278,28 +288,43 @@ const verifyCurrentPassword = async () => {
   
 const handleUpdate = async () => {
   clearMessage()
+
+  const { email, password, newPassword, confirmPassword } = formData.value;
+
   // 1. 验证当前密码
-  if (!formData.value.password) {
+  if (!password) {
     showError('请输入当前密码以进行验证', 'warning')
     return
   }
 
-  // 1.只有当用户输入了新密码时才进行此检查
-  if (formData.value.newPassword) {
+  // 2. 验证邮箱格式
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (email === user.value.email && !newPassword) {
+  showError('您没有修改任何信息', 'warning')
+  return
+  }
+
+  if (!emailPattern.test(email)) {
+    showError('请输入有效的邮箱地址', 'danger')
+    return
+  }
+
+  // 只有当用户输入了新密码时才进行此检查
+  if (newPassword) {
     // 2. 验证新密码长度
-    if (formData.value.newPassword.length > 0 && formData.value.newPassword.length < 8) {
+    if (newPassword.length > 0 && newPassword.length < 8) {
       showError('新密码长度至少需要 8 个字符', 'danger')
       return
     }
 
     // 3. 检查新旧密码是否相同
-    if (formData.value.password === formData.value.newPassword) {
+    if (password === newPassword) {
       showError('新密码不能与当前密码相同', 'danger')
       return
     }
 
     // 4. 验证两次密码是否一致
-    if (formData.value.newPassword && formData.value.newPassword !== formData.value.confirmPassword) {
+    if (newPassword && newPassword !== confirmPassword) {
       showError('两次输入的密码不一致', 'danger')
       return
     }
@@ -307,13 +332,13 @@ const handleUpdate = async () => {
 
   isLoading.value = true
   try {
-    await updateProfile(formData.value.email, formData.value.password, formData.value.newPassword, formData.value.confirmPassword)
-    showError('个人资料已更新', 'success')
+    await updateProfile(email, password, newPassword, confirmPassword)
     cancelEdit()
     showNotice('已保存所有修改！')
   } catch (error) {
-    console.log('捕获到的错误详情:', error);
-    showError(error.message || '更新失败', 'danger')
+    console.log('捕获到的错误详情:', error)
+    const serverMessage = error.response?.data?.message || error.message || '更新失败'
+    showError(serverMessage, 'danger')
   } finally {
     isLoading.value = false
   }
@@ -325,6 +350,25 @@ onMounted(() => {
   if (user.value) {
     formData.value.email = user.value.email
   }
+})
+
+onUnmounted(() => {
+  // 组件卸载时清除定时器，防止内存泄漏
+  if (errorTimer) {
+    clearTimeout(errorTimer)
+    errorTimer = null
+  }
+  if (noticeTimer) {
+    clearTimeout(noticeTimer)
+    noticeTimer = null
+  }
+
+  message.value = ''
+  actionNotice.value = ''
+  messageType.value = ''
+  noticeType.value = ''
+  showUpdateHint.value = false // 必须加上这个
+  isVerified.value = false     // 彻底重置表单状态
 })
 </script>
 
@@ -368,13 +412,13 @@ onMounted(() => {
 /* 提示框淡出动画 */
 .fade-slide-enter-active,
 .fade-slide-leave-active {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .fade-slide-enter-from,
 .fade-slide-leave-to {
   opacity: 0;
-  transform: translateY(-20px);
+  transform: translateY(-10px);
   margin-bottom: -58px; /* 消失时自动收缩空间，不留白 */
 }
 
@@ -385,10 +429,10 @@ onMounted(() => {
 
 /* 专属弹窗动画：弹跳感更强 */
 .zoom-fade-enter-active {
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 .zoom-fade-leave-active {
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 .zoom-fade-enter-from {
   opacity: 0;

@@ -31,7 +31,7 @@ def user_profile():
         return jsonify({'status': 'error', 'message': '需要提供当前密码进行验证'}), 400
     
     if not user.check_password(data['password']):
-        return jsonify({'status': 'error', 'message': '当前密码错误'}), 401
+        return jsonify({'status': 'error', 'message': '密码验证失败，请重试'}), 401
     
     # 更新邮箱（可选）
     if 'email' in data:
