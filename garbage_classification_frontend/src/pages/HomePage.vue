@@ -430,6 +430,7 @@ const { isLoggedIn } = useAuth()
   /* 消除渐变对 Emoji 的影响，确保它们五颜六色 */
   background: none;
   -webkit-background-clip: initial;
+  background-clip: initial;
   -webkit-text-fill-color: initial;
 }
 
