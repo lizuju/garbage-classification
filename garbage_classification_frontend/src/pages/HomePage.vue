@@ -2,15 +2,17 @@
   <!-- 英雄 Header -->
   <div class="hero-section">
     <div class="hero-content d-flex flex-column align-items-center">
-      <h1 class="hero-title text-center">🗑️ 基于YOLOv5的垃圾分类识别系统</h1>
-      <p class="hero-subtitle text-center">上传图片，AI 帮您快速识别垃圾类别</p>
-      <p class="hero-description text-center">使用深度学习和计算机视觉技术，让垃圾分类变得简单高效</p>
-      <router-link
-        :to="isLoggedIn ? '/user/detect' : '/login'"
-        class="btn btn-lg btn-success hero-btn"
-      >
-        <i class="bi bi-play-circle me-2"></i>{{ isLoggedIn ? '立即开始识别' : '登录开始使用' }}
-      </router-link>
+      <h1 class="hero-title text-center hero-fade-in anim-delay-1">🗑️ 基于YOLOv5的垃圾分类识别系统</h1>
+      <p class="hero-subtitle text-center hero-fade-in anim-delay-2">上传图片，AI 帮您快速识别垃圾类别</p>
+      <p class="hero-description text-center hero-fade-in anim-delay-3">使用深度学习和计算机视觉技术，让垃圾分类变得简单高效</p>
+      <div class="hero-fade-in anim-delay-4">
+        <router-link
+          :to="isLoggedIn ? '/user/detect' : '/login'"
+          class="btn btn-lg btn-success hero-btn"
+        >
+          <i class="bi bi-play-circle me-2 icon-move"></i>{{ isLoggedIn ? '立即开始识别' : '登录开始使用' }}
+        </router-link>
+      </div>
     </div>
   </div>
 
@@ -368,65 +370,153 @@ const { isLoggedIn } = useAuth()
 <style scoped>
 /* 英雄部分 */
 .hero-section {
-  /* 这里的路径根据你的图片实际存放位置调整 */
-  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
-                    url('../assets/hero-bg.jpg');
-  
-  /* 核心配置：确保背景图效果 */
-  background-size: cover;      /* 图片等比例缩放铺满 */
-  background-position: center; /* 图片居中对齐 */
-  background-repeat: no-repeat;
-  
   /* 必须有高度，内容才能撑开背景 */
-  min-height: 500px;           
+  /* min-height: 500px; */
+  width: 100%;
+  height: calc(100vh - 60px);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;                /* 背景变深后，文字通常改为白色 */
-
   position: relative; /* 必须加这一行，否则伪元素和子元素定位会乱 */
   overflow: hidden;   /* 防止装饰性波浪线溢出 */
+  background: #1a1a1a;
+}
+
+/* 使用伪元素承载背景图，实现只缩放背景而不影响文字 */
+.hero-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  
+  /* 你的背景图配置 */
+  background-color: #1a1a1a;
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+                    url('../assets/hero-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  
+  /* 绑定动画：持续10秒，平滑过渡，无限循环，来回播放 */
+  animation: kenburns 10s ease-in-out infinite alternate;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
 }
 
 .hero-content {
   position: relative;
   z-index: 1;
+  text-align: center;
 }
 
+/* 英雄文字 */
 .hero-title {
-  font-size: 3rem;
-  font-weight: bold;
-  margin-bottom: 15px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  font-size: 3.8rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 24px;
+  display: block;
+
+  color: #ffffff; 
+
+  text-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.5),      /* 基础投影 */
+    0 0 20px rgba(40, 167, 69, 0.2);   /* 微弱的成功绿光晕，呼应你的主题色 */
+    
+  /* 消除渐变对 Emoji 的影响，确保它们五颜六色 */
+  background: none;
+  -webkit-background-clip: initial;
+  -webkit-text-fill-color: initial;
 }
 
 .hero-subtitle {
-  font-size: 1.5rem;
-  margin-bottom: 10px;
-  opacity: 0.95;
+  font-size: 1.8rem;
+  font-weight: 300; /* 使用细体字增加高级感 */
+  letter-spacing: 4px; /* 拉开字间距，显得大气 */
+  margin-bottom: 15px;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase; /* 英文如果包含在内会变大写，中文则增加稳重感 */
 }
 
 .hero-description {
   font-size: 1.1rem;
-  margin-bottom: 30px;
-  opacity: 0.85;
+  font-weight: 400;
+  max-width: 600px;
+  line-height: 1.8;
+  margin-bottom: 40px;
+  color: rgba(255, 255, 255, 0.65);
+  border-left: 3px solid #28a745; 
+  padding-left: 20px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
+/* 按钮、卡片 */
+/* 核心英雄按钮 */
 .hero-btn {
-  padding: 15px 40px;
-  font-size: 1.1rem;
-  background: white;
-  color: #667eea;
+  position: relative;
+  padding: 18px 50px;
+  font-size: 1.25rem;
+  color: #fff !important; /* 字体颜色 */
+  background: linear-gradient(45deg, #28a745, #11998e, #28a745);    /* 你的成功绿基础色 */
+  background-size: 200% auto; /* 放大背景图，让它有移动空间 */
+  transition: all 0.4s ease;
   border: none;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  display: inline-block;
+  border-radius: 50px;
+  overflow: hidden;       /* 必须，为了遮住内部的光影 */
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); /* 使用贝塞尔曲线让缩放更丝滑 */
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+  z-index: 1;
 }
 
+/* 高级感核心：掠过的一道光影 */
+.hero-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transition: none;
+  z-index: -1;
+}
+
+/* 悬停时的变化 */
 .hero-btn:hover {
-  background: #f8f9fa;
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  transform: translateY(-5px) scale(1.03); /* 向上漂浮并微扩 */
+  box-shadow: 0 12px 25px rgba(40, 167, 69, 0.4);
+  background: linear-gradient(45deg, #34ce57, #14b5a9);
+  background-position: right center;
+}
+
+/* 悬停时触发掠影动画 */
+.hero-btn:hover::after {
+  left: 100%;
+  transition: all 0.7s ease; /* 0.7秒内完成掠影 */
+}
+
+/* 激活（点击）瞬间的反馈 */
+.hero-btn:active {
+  transform: translateY(2px) scale(0.92); /* 点击时轻微下沉收缩，像真实按键 */
+  box-shadow: inset 0 2px 5px rgba(40, 167, 69, 0.2);
+  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 鼠标移入时，小图标往右移动 3 像素 */
+.hero-btn:hover .icon-move {
+  display: inline-block;
+  transform: translateX(3px);
+  transition: transform 0.3s ease;
 }
 
 /* 识别卡片 */
@@ -514,6 +604,26 @@ const { isLoggedIn } = useAuth()
   font-size: 1.5rem;  
   letter-spacing: 2px;
 }
+
+/* 动画逻辑 */
+.hero-fade-in {
+  opacity: 0;
+  transform: translateY(30px);
+  /* forwards 确保动画结束后停留在最后一帧，不会弹回去 */
+  animation: heroTextUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+[class^="animate-"] {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* 设置交错延迟，让文字一行行出来 */
+.anim-delay-1 { animation-delay: 0.3s; }
+.anim-delay-2 { animation-delay: 0.6s; }
+.anim-delay-3 { animation-delay: 0.9s; }
+/* .anim-delay-4 { animation-delay: 1.2s; } */
 
 .recyclable .guide-header {
   background: linear-gradient(135deg, #0052D4 0%, #4364F7 50%, #6FB1FC 100%);
@@ -699,22 +809,44 @@ const { isLoggedIn } = useAuth()
   font-weight: 600;
 }
 
+@keyframes heroTextUp {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+    text-shadow: 0 0 20px rgba(255, 255, 255, 1);
+    color: rgba(255, 255, 255, 0); /* 初始文字设为透明，只看阴影 */
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    /* 结束时恢复正常阴影或无阴影 */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* 定义 Ken Burns 缩放动画 */
+@keyframes kenburns {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.12);
+  }
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* 响应式 */
 @media (max-width: 768px) {
-  .hero-title {
-    font-size: 2rem;
-  }
-
-  .hero-subtitle {
-    font-size: 1.2rem;
-  }
-
-  .hero-description {
-    font-size: 1rem;
-  }
-
-  .guide-card {
-    margin-bottom: 20px;
-  }
+  .hero-section { height: 100vh; }
+  .hero-title { font-size: 2.2rem; }
+  .hero-subtitle { font-size: 1.2rem; letter-spacing: 2px; }
+  .hero-description { border-left: none; padding-left: 0; text-align: center; }
+  .guide-card { margin-bottom: 20px; }
 }
 </style>
