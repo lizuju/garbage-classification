@@ -81,66 +81,54 @@
     </div>
 
     <!-- 功能模块区 - 3 列并排 -->
-    <div class="container mb-5">
-      <h3 class="text-center mb-4">探索更多功能</h3>
-      <div class="row g-4">
-        <!-- 模块 1：查看历史 -->
-        <div class="col-lg-4 col-md-6">
-          <div class="card feature-card h-100">
-            <div class="card-body text-center">
-              <i class="bi bi-clock-history feature-icon text-info mb-3"></i>
-              <h5 class="card-title">查看历史记录</h5>
-              <p class="card-text text-muted">浏览所有识别历史，追踪您的识别成果</p>
-              <router-link
-                to="/user/history"
-                v-if="isLoggedIn"
-                class="btn btn-sm btn-info mt-3"
-              >
-                查看历史
-              </router-link>
-              <router-link
-                to="/login"
-                v-else
-                class="btn btn-sm btn-info mt-3"
-              >
-                登录查看
+    <div class="container-fluid feature-scroll-section py-5">
+      <h1 class="section-title hero-fade-in anim-delay-1">探索更多功能</h1>
+      
+      <div class="feature-scroll-container">
+        <div class="feature-item">
+          <div class="card feature-card card-bg-1"> <div class="card-overlay"></div>
+            <div class="card-body d-flex flex-column justify-content-center align-items-center p-5">
+              <div class="icon-box mb-4">
+                <i class="bi bi-clock-history feature-icon text-info"></i>
+              </div>
+              <h3 class="feature-description">
+                每一次识别都会被自动保存，清晰呈现您的环保足迹，<br>
+                让改变看得见。
+              </h3>
+              <router-link :to="isLoggedIn ? '/user/history' : '/login'" class="btn btn-info btn-lg mt-4 px-5 rounded-pill text-white">
+                {{ isLoggedIn ? '立即进入历史' : '登录查看历史' }}
               </router-link>
             </div>
           </div>
         </div>
 
-        <!-- 模块 2：了解指南 -->
-        <div class="col-lg-4 col-md-6">
-          <div class="card feature-card h-100">
-            <div class="card-body text-center">
-              <i class="bi bi-book feature-icon text-success mb-3"></i>
-              <h5 class="card-title">垃圾分类指南</h5>
-              <p class="card-text text-muted">了解四大垃圾分类标准和分类知识</p>
-              <a href="#classification-guide" class="btn btn-sm btn-success mt-3">查看指南</a>
+        <div class="feature-item">
+          <div class="card feature-card card-bg-2"> <div class="card-overlay"></div>
+            <div class="card-body d-flex flex-column justify-content-center align-items-center p-5">
+              <div class="icon-box mb-4">
+                <i class="bi bi-book feature-icon text-success"></i>
+              </div>
+              <h3 class="feature-description">
+                覆盖全面的分类百科，快速找到每一件物品的正确去向，<br>
+                简单而准确。
+              </h3>
+              <a href="#classification-guide" class="btn btn-success btn-lg mt-4 px-5 rounded-pill">了解分类指南</a>
             </div>
           </div>
         </div>
 
-        <!-- 模块 3：个人资料 -->
-        <div class="col-lg-4 col-md-6">
-          <div class="card feature-card h-100">
-            <div class="card-body text-center">
-              <i class="bi bi-person feature-icon text-primary mb-3"></i>
-              <h5 class="card-title">个人资料</h5>
-              <p class="card-text text-muted">管理账户信息和系统设置</p>
-              <router-link
-                to="/user/profile"
-                v-if="isLoggedIn"
-                class="btn btn-sm btn-primary mt-3"
-              >
-                前往管理
-              </router-link>
-              <router-link
-                to="/login"
-                v-else
-                class="btn btn-sm btn-primary mt-3"
-              >
-                登录管理
+        <div class="feature-item">
+          <div class="card feature-card card-bg-3"> <div class="card-overlay"></div>
+            <div class="card-body d-flex flex-column justify-content-center align-items-center p-5">
+              <div class="icon-box mb-4">
+                <i class="bi bi-person feature-icon text-primary"></i>
+              </div>
+              <h3 class="feature-description">
+                根据您的习惯进行个性化设置，统一管理账户信息与安全，<br>
+                一切井然有序。
+              </h3>
+              <router-link :to="isLoggedIn ? '/user/profile' : '/login'" class="btn btn-primary btn-lg mt-4 px-5 rounded-pill">
+                {{ isLoggedIn ? '前往个人管理' : '登录管理资料' }}
               </router-link>
             </div>
           </div>
@@ -544,21 +532,102 @@ const { isLoggedIn } = useAuth()
 }
 
 /* 功能卡片 */
-.feature-card {
-  border: none;
-  border-radius: 12px;
-  transition: all 0.3s ease;
-  background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+.section-title {
+  height: 10vh;
+  margin-left: 5vw;
+  margin-top: 1.5vh;
+  margin-bottom: 1.5vh;
+  /* 字号放大 */
+  font-size: 2.7rem; 
+  font-weight: 800;
+  text-align: left !important; 
+  color: #1d1d1f;
+  letter-spacing: -1.5px;
+  text-shadow: none !important;
+  -webkit-font-smoothing: antialiased;
 }
 
-.feature-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+.feature-description {
+  font-size: 1.6rem;    /* 稍微调小一点，确保长句子的精致感 */
+  line-height: 1.5;     /* 增加行间距，提高可读性 */
+  font-weight: 700 !important;
+  text-align: center;
+  max-width: 80%;       /* 限制宽度，让文字自动换行，不要横跨整个屏幕 */
+  color: #1d1d1f;
+  margin-top: 24px;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
 }
+
+.icon-box {
+  background: rgba(0,0,0,0.03);
+  padding: 30px;
+  border-radius: 30px;
+}
+
+.feature-card {
+  /* 基础布局 */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background-size: cover;    /* 核心：图片覆盖整个卡片 */
+  background-position: center;
+  padding: 40px;
+  /* background: white; */
+  border-radius: 40px; /* 统一使用超大圆角 */
+  box-shadow: none !important;
+  /* border: 1px solid rgba(0, 0, 0, 0.08) !important; */
+  border: none !important;
+  transform: none !important; 
+  opacity: 1;
+  transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.card-bg-1 { background-image: url('../assets/card-history-bg.png'); }
+.card-bg-2 { background-image: url('../assets/card-2-bg.png'); }
+.card-bg-3 { background-image: url('../assets/card-3-bg.png'); }
 
 .feature-icon {
-  font-size: 2.5rem;
+  font-size: 8rem; /* 极大图标 */
+  transition: transform 0.4s ease;
+}
+
+.feature-item {
+  flex: 0 0 85vw;
+  height: 87vh;
+  scroll-snap-align: center;
+}
+
+.feature-scroll-section {
+  height: 100vh;           /* 强制等于一个屏幕高度 */
+  display: flex;
+  flex-direction: column;  /* 标题和卡片垂直排列 */
+  justify-content: center; /* 垂直居中，这是防止晃动的关键 */
+  overflow: hidden;        /* 关键：锁死垂直方向，不准滚动 */
+  padding: 0 !important;   /* 清除可能撑开高度的 padding */
+  margin-bottom: 12vh !important;
+  /* background-color: #f0f2f5; */
+}
+
+.feature-scroll-container {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  touch-action: pan-x;
+  gap: 20px;
+  padding: 0 5vw;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;
+}
+
+.feature-scroll-container::-webkit-scrollbar {
+  display: none; /* 隐藏 Chrome 滚动条 */
 }
 
 /* 分类指南卡片 */
@@ -845,9 +914,33 @@ const { isLoggedIn } = useAuth()
 /* 响应式 */
 @media (max-width: 768px) {
   .hero-section { height: 100vh; }
-  .hero-title { font-size: 2.2rem; }
-  .hero-subtitle { font-size: 1.2rem; letter-spacing: 2px; }
-  .hero-description { border-left: none; padding-left: 0; text-align: center; }
+  .hero-title { font-size: 2rem; line-height: 1.3; }
+  .hero-subtitle { font-size: 1.1rem; letter-spacing: 2px; margin-bottom: 10px; }
+  .hero-description { border-left: none; padding-left: 0; text-align: center; font-size: 0.95rem; margin-bottom: 30px; }
+  .guide-card { margin-bottom: 20px !important; }
+  .section-title {
+    /* 手机端稍微缩小字号，防止溢出，但依然保持大字体风格 */
+    font-size: 2.5rem;
+    margin-left: 10vw;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.5px;
+  }
+  .feature-item {
+    flex: 0 0 88vw;
+    height: 80vh;
+    margin-right: 15px;
+  }
+  .feature-card {
+    padding: 40px 20px;
+    border-radius: 30px;
+  }
+  .feature-icon {
+    font-size: 4.5rem;
+  }
+  .icon-box {
+    padding: 20px;
+    margin-bottom: 20px;
+  }
   .guide-card { margin-bottom: 20px; }
 }
 </style>
