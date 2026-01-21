@@ -6,12 +6,14 @@
       <p class="hero-subtitle text-center hero-fade-in anim-delay-2">上传图片，AI 帮您快速识别垃圾类别</p>
       <p class="hero-description text-center hero-fade-in anim-delay-3">使用深度学习和计算机视觉技术，让垃圾分类变得简单高效</p>
       <div class="hero-fade-in anim-delay-4">
-        <router-link
+        <CommonButton
           :to="isLoggedIn ? '/user/detect' : '/login'"
-          class="btn btn-lg btn-success hero-btn"
+          theme="success"
+          size="lg"
         >
-          <i class="bi bi-play-circle me-2 icon-move"></i>{{ isLoggedIn ? '立即开始识别' : '登录开始使用' }}
-        </router-link>
+          <i class="bi bi-play-circle me-2 icon-move"></i>
+          {{ isLoggedIn ? '立即开始识别' : '登录开始使用' }}
+        </CommonButton>
       </div>
     </div>
   </div>
@@ -82,7 +84,7 @@
 
     <!-- 功能模块区 - 3 列并排 -->
     <div class="container-fluid feature-scroll-section py-5">
-      <h1 class="section-title hero-fade-in anim-delay-1">探索更多功能</h1>
+      <h1 class="section-title hero-fade-in anim-delay-2">探索更多功能</h1>
       
       <div class="feature-scroll-container">
         <div class="feature-item">
@@ -95,9 +97,13 @@
                 每一次识别都会被自动保存，清晰呈现您的环保足迹，<br>
                 让改变看得见。
               </h3>
-              <router-link :to="isLoggedIn ? '/user/history' : '/login'" class="btn btn-info btn-lg mt-4 px-5 rounded-pill text-white">
+              <common-button
+                :to="isLoggedIn ? '/user/history' : '/login'"
+                theme="info"
+                size="md"
+              >
                 {{ isLoggedIn ? '立即进入历史' : '登录查看历史' }}
-              </router-link>
+              </common-button>
             </div>
           </div>
         </div>
@@ -112,7 +118,14 @@
                 覆盖全面的分类百科，快速找到每一件物品的正确去向，<br>
                 简单而准确。
               </h3>
-              <a href="#classification-guide" class="btn btn-success btn-lg mt-4 px-5 rounded-pill">了解分类指南</a>
+              <common-button
+                :href="'#classification-guide'"
+                theme="success"
+                size="md"
+                @click="handleAnchorScroll"
+              >
+                了解分类指南
+              </common-button>
             </div>
           </div>
         </div>
@@ -127,9 +140,13 @@
                 根据您的习惯进行个性化设置，统一管理账户信息与安全，<br>
                 一切井然有序。
               </h3>
-              <router-link :to="isLoggedIn ? '/user/profile' : '/login'" class="btn btn-primary btn-lg mt-4 px-5 rounded-pill">
+              <common-button 
+                :to="isLoggedIn ? '/user/profile' : '/login'" 
+                theme="primary"
+                size="md"
+              >
                 {{ isLoggedIn ? '前往个人管理' : '登录管理资料' }}
-              </router-link>
+              </common-button>
             </div>
           </div>
         </div>
@@ -350,7 +367,8 @@
 </template>
 
 <script setup>
-import { useAuth } from '../composables/useAuth'
+import { useAuth } from '@/composables/useAuth'
+import CommonButton from '@/components/CommonButton.vue';
 
 const { isLoggedIn } = useAuth()
 </script>
@@ -444,70 +462,6 @@ const { isLoggedIn } = useAuth()
   margin-right: auto;
 }
 
-/* 按钮、卡片 */
-/* 核心英雄按钮 */
-.hero-btn {
-  position: relative;
-  padding: 18px 50px;
-  font-size: 1.25rem;
-  color: #fff !important; /* 字体颜色 */
-  background: linear-gradient(45deg, #28a745, #11998e, #28a745);    /* 你的成功绿基础色 */
-  background-size: 200% auto; /* 放大背景图，让它有移动空间 */
-  transition: all 0.4s ease;
-  border: none;
-  border-radius: 50px;
-  overflow: hidden;       /* 必须，为了遮住内部的光影 */
-  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); /* 使用贝塞尔曲线让缩放更丝滑 */
-  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
-  z-index: 1;
-}
-
-/* 高级感核心：掠过的一道光影 */
-.hero-btn::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.4) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  transition: none;
-  z-index: -1;
-}
-
-/* 悬停时的变化 */
-.hero-btn:hover {
-  transform: translateY(-5px) scale(1.03); /* 向上漂浮并微扩 */
-  box-shadow: 0 12px 25px rgba(40, 167, 69, 0.4);
-  background: linear-gradient(45deg, #34ce57, #14b5a9);
-  background-position: right center;
-}
-
-/* 悬停时触发掠影动画 */
-.hero-btn:hover::after {
-  left: 100%;
-  transition: all 0.7s ease; /* 0.7秒内完成掠影 */
-}
-
-/* 激活（点击）瞬间的反馈 */
-.hero-btn:active {
-  transform: translateY(2px) scale(0.92); /* 点击时轻微下沉收缩，像真实按键 */
-  box-shadow: inset 0 2px 5px rgba(40, 167, 69, 0.2);
-  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* 鼠标移入时，小图标往右移动 3 像素 */
-.hero-btn:hover .icon-move {
-  display: inline-block;
-  transform: translateX(3px);
-  transition: transform 0.3s ease;
-}
-
 /* 识别卡片 */
 .detection-card {
   border: none;
@@ -555,14 +509,16 @@ const { isLoggedIn } = useAuth()
   max-width: 80%;       /* 限制宽度，让文字自动换行，不要横跨整个屏幕 */
   color: #1d1d1f;
   margin-top: 24px;
+  margin-bottom: 30px;
   letter-spacing: -0.01em;
   -webkit-font-smoothing: antialiased;
 }
 
 .icon-box {
-  background: rgba(0,0,0,0.03);
+  background: transparent;
   padding: 30px;
   border-radius: 30px;
+  box-shadow: none !important;
 }
 
 .feature-card {
@@ -586,13 +542,49 @@ const { isLoggedIn } = useAuth()
   transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-.card-bg-1 { background-image: url('../assets/card-history-bg.png'); }
-.card-bg-2 { background-image: url('../assets/card-2-bg.png'); }
-.card-bg-3 { background-image: url('../assets/card-3-bg.png'); }
+.feature-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* 白色中心径向渐变：中间白，四周透明 */
+  background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.1) 90%);
+  z-index: 0; /* 放在背景图之上，文字图标之下 */
+}
+
+.icon-box, .feature-description, .common-button {
+  position: relative;
+  z-index: 1;
+}
+
+.card-bg-1 { background-image: url('../assets/card-history-bg.jpg'); }
+.card-bg-2 { background-image: url('../assets/card-category-bg.jpg'); }
+.card-bg-3 { background-image: url('../assets/card-profile-bg.jpg'); }
 
 .feature-icon {
-  font-size: 8rem; /* 极大图标 */
-  transition: transform 0.4s ease;
+  font-size: 8.8rem;
+  -webkit-text-stroke: 1.5px currentColor;
+  font-weight: 800;
+  transform: scale(0.909) translateZ(0);            /* 强制触发 3D 加速，避免 2D 缩放模糊 */
+  backface-visibility: hidden;         /* 隐藏背面，减少渲染杂质 */
+  perspective: 1000px;                 /* 增加视距，让 3D 转换更平滑 */
+  -webkit-font-smoothing: antialiased;
+  transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+    
+  display: inline-block;
+  will-change: transform, -webkit-text-stroke;
+}
+
+/* 悬停时的非线性变化 */
+.feature-card:hover .feature-icon {
+  /* 1. 缩放 */
+  transform: scale(1.2) translateZ(0);
+  
+  -webkit-text-stroke: 2px currentColor; 
+  
+  text-shadow: 0 0 0.5px currentColor;
 }
 
 .feature-item {
@@ -607,6 +599,8 @@ const { isLoggedIn } = useAuth()
   flex-direction: column;  /* 标题和卡片垂直排列 */
   justify-content: center; /* 垂直居中，这是防止晃动的关键 */
   overflow: hidden;        /* 关键：锁死垂直方向，不准滚动 */
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
   padding: 0 !important;   /* 清除可能撑开高度的 padding */
   margin-bottom: 12vh !important;
   /* background-color: #f0f2f5; */

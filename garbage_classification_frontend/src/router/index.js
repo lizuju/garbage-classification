@@ -64,7 +64,7 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(),
-  routes,
+  routes
 })
 
 // 路由守护：检查认证

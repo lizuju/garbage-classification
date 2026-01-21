@@ -350,6 +350,8 @@ onMounted(() => {
   if (user.value) {
     formData.value.email = user.value.email
   }
+
+  window.scrollTo(0, 0);
 })
 
 onUnmounted(() => {
