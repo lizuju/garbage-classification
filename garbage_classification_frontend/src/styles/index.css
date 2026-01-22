@@ -1,4 +1,5 @@
-/* 全局样式 - 融合旧 HTML 和新 Vue 设计 */
+@import "./typography.css";
+@import "./animations.css";
 
 :root {
   --primary-color: #28a745;

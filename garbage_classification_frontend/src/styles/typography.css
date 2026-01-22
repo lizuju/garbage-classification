@@ -1,0 +1,37 @@
+/**
+ * 页面标题组件化样式
+ * 专门处理类似“探索更多功能”的大标题
+ */
+
+.section-title {
+  height: 10vh;
+  margin-left: 3vw !important;
+  margin-top: 1.5vh !important;
+  margin-bottom: 1.5vh;
+  
+  /* 核心排版 */
+  font-size: 2.7rem; 
+  font-weight: 800;
+  text-align: left !important; 
+  color: #1d1d1f;
+  letter-spacing: -1.5px;
+  
+  /* 渲染优化 */
+  text-shadow: none !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 进场动画补丁（如果需要与原有的 hero-fade-in 配合） */
+.section-title.hero-fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: titleReveal 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+@keyframes titleReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
