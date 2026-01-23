@@ -1,116 +1,25 @@
+/* index.css */
+
+/* 1. 变量与重置 (基础) */
+@import "./variables.css";
+@import "./base.css";
 @import "./typography.css";
+
+/* 2. 动画 (方法) */
 @import "./animations.css";
 
-:root {
-  --primary-color: #28a745;
-  --secondary-color: #6c757d;
-  --danger-color: #dc3545;
-  --warning-color: #fd7e14;
-  --info-color: #0dcaf0;
-  --success-color: #198754;
-}
+/* 3. 通用对象 (组件与布局) */
+@import "./layout.css";
+@import "./components.css";
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* 4. 具体的业务逻辑 */
+@import "./business.css";
 
-html, body {
-  height: 100%;
-}
+/* 5. 响应式补丁 (如果不想分散在各处，可以统一放在这里) */
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background-color: #f8f9fa;
-  color: #333;
-}
 
-#app {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
 
-main {
-  flex: 1;
-  padding-bottom: 2rem;
-}
 
-/* Navbar 样式 */
-.navbar {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background: linear-gradient(135deg, #1f3c3c 0%, #2d5a5a 100%);
-}
-
-.navbar-brand {
-  font-size: 1.5rem;
-  font-weight: bold;
-  letter-spacing: 1px;
-}
-
-.nav-link {
-  transition: color 0.3s ease;
-  position: relative;
-}
-
-.nav-link:hover {
-  color: var(--primary-color) !important;
-}
-
-.nav-link.active::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 3px;
-  background: var(--primary-color);
-}
-
-/* Footer 样式 */
-footer {
-  background: #2c3e50;
-  color: #ecf0f1;
-  padding: 40px 0 20px;
-  margin-top: auto;
-  border-top: 1px solid #34495e;
-}
-
-footer a {
-  color: #ecf0f1;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-footer a:hover {
-  color: var(--primary-color);
-}
-
-footer h5 {
-  color: white;
-  margin-bottom: 15px;
-  font-weight: 600;
-}
-
-/* 页面头部样式 */
-.page-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 40px 0;
-  margin-bottom: 30px;
-}
-
-.page-header h1 {
-  font-size: 2.5rem;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.page-header .lead {
-  font-size: 1.2rem;
-  opacity: 0.9;
-}
 
 /* 上传区域样式 - 从旧 HTML 迁移 */
 .upload-area {
@@ -184,21 +93,13 @@ footer h5 {
   font-size: 0.875rem;
 }
 
-.category-label.recyclable {
-  background-color: #28a745;
-}
+.category-label.recyclable { background-color: var(--color-recyclable); }
 
-.category-label.harmful {
-  background-color: #dc3545;
-}
+.category-label.harmful { background-color: var(--color-harmful); }
 
-.category-label.kitchen {
-  background-color: #fd7e14;
-}
+.category-label.kitchen { background-color: var(--color-kitchen); }
 
-.category-label.other {
-  background-color: #6c757d;
-}
+.category-label.other { background-color: var(--color-other); }
 
 /* 加载器 */
 .loader {
@@ -278,16 +179,6 @@ footer h5 {
   font-weight: 500;
   transition: all 0.3s ease;
   border: none;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
 .btn-success {

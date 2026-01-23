@@ -1,0 +1,81 @@
+/* layout.css */
+
+main {
+  flex: 1;
+  padding-bottom: 2rem;
+}
+
+/* Navbar 样式 */
+.navbar {
+  box-shadow: var(--shadow-standard);
+  background: var(--nav-gradient);
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.nav-link {
+  transition: var(--transition-standard);
+  position: relative;
+}
+
+.nav-link:hover {
+  color: var(--primary-color) !important;
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--primary-color);
+}
+
+/* Footer 样式 */
+footer {
+  background: var(--footer-bg);
+  color: var(--footer-text);
+  border-top: 1px solid var(--footer-border);
+  padding: 40px 0 20px;
+  margin-top: auto;
+}
+
+footer a {
+  color: var(--footer-text);
+  text-decoration: none;
+  transition: var(--transition-standard);
+}
+
+footer a:hover {
+  color: var(--primary-color);
+}
+
+footer h5 {
+  color: var(--white);
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+/* 页面头部样式 */
+.page-header {
+  background: var(--page-header-gradient);
+  color: var(--text-white);
+  padding: 40px 0;
+  margin-bottom: 30px;
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.page-header .lead {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}

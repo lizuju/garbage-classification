@@ -37,14 +37,6 @@ const currentYear = ref(new Date().getFullYear())
 </script>
 
 <style scoped>
-footer {
-  background: #2c3e50;
-  color: #ecf0f1;
-  padding: 40px 0 20px;
-  margin-top: auto;
-  border-top: 1px solid #34495e;
-}
-
 footer a {
   color: #ecf0f1;
   text-decoration: none;

@@ -4,7 +4,7 @@
       <div class="col-md-8 offset-md-2">
         <div class="card">
           <div class="card-body">
-            <h2 class="card-title">关于项目</h2>
+            <h2 id="about-project" class="card-title">关于项目</h2>
             <p class="lead">垃圾分类智能识别系统</p>
 
             <h4 class="mt-4">项目概述</h4>

@@ -11,7 +11,7 @@
           theme="success"
           size="lg"
         >
-          <i class="bi bi-play-circle me-2 icon-move"></i>
+          <i class="bi bi-play-circle me-2"></i>
           {{ isLoggedIn ? '立即开始识别' : '登录开始使用' }}
         </CommonButton>
       </div>
@@ -63,7 +63,7 @@
                 :href="'#classification-guide'"
                 theme="success"
                 size="md"
-                @click="handleAnchorScroll"
+                @click="handleHashClick"
               >
                 了解分类指南
               </common-button>
@@ -302,6 +302,16 @@
                 <h6>可持续发展</h6>
                 <p>为子孙后代留下更洁净的环境与更稳定的未来，<br>共同创造一个更加美好的世界。</p>
               </div>
+            </div>
+            
+            <div class="hero-fade-in d-flex justify-content-center mt-5">
+             <common-button
+                to="/about#about-project"
+                theme="gold"
+                size="md"
+              >
+                关于我们
+              </common-button>
             </div>
           </div>
         </div>
@@ -865,8 +875,6 @@ onMounted(() => {
   background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 70%);
   z-index: -1;
   pointer-events: none;
-  /* 绑定呼吸动画 */
-  animation: whiteBreath 6s ease-in-out infinite;
 }
 
 .why-card-title {

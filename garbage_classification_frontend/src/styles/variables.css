@@ -1,0 +1,39 @@
+/* variables.css */
+
+:root {
+  /* 基础色 */
+  --white: #ffffff;
+  --black: #000000;
+  --text-white: #f8f9fa;
+  --text-dark: #343a40;
+  --primary-color: #28a745;
+  --secondary-color: #6c757d;
+  --success-color: #198754;
+
+  /* 通知与警告色 */
+  --danger-color: #dc3545;
+  --warning-color: #fd7e14;
+  --info-color: #0dcaf0;
+
+  /* 垃圾分类色 */
+  --color-recyclable: #3576ca;
+  --color-harmful: #dc3545;
+  --color-kitchen: #28a745;
+  --color-other: #6c757d;
+
+  /* 导航与页脚色 */
+  --nav-gradient: linear-gradient(135deg, #1f3c3c 0%, #2d5a5a 100%);
+  --footer-bg: #2c3e50;
+  --footer-text: #ecf0f1;
+  --footer-border: #34495e;
+
+  /* 提取出的页面头部渐变 */
+  --page-header-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+  /* 提取出的阴影 */
+  --shadow-standard: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.15);
+
+  /* 核心基础过渡效果 */
+  --transition-standard: all 0.3s ease;
+}

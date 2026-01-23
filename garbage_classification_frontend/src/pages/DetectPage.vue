@@ -64,15 +64,15 @@
               </div>
 
               <div class="d-grid gap-2 mt-3">
-                <button
-                  type="button"
-                  class="btn btn-primary"
+                <common-button
+                  theme="primary"
+                  size="sm"
                   :disabled="!selectedFile || isLoading"
                   @click="handleDetect"
                 >
                   <i class="bi bi-search me-1"></i>
                   {{ isLoading ? '识别中...' : '开始识别' }}
-                </button>
+                </common-button>
               </div>
             </div>
           </div>
@@ -159,6 +159,7 @@
 import { ref, onMounted } from 'vue'
 import { useAuth } from '../composables/useAuth'
 import { useApi } from '../composables/useApi'
+import CommonButton from '@/components/CommonButton.vue'
 
 const { isLoggedIn } = useAuth()
 const { detect } = useApi()
@@ -249,13 +250,6 @@ const getCategoryClass = (className) => {
 </script>
 
 <style scoped>
-.page-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 40px 0;
-  margin-bottom: 30px;
-}
-
 .page-header h1 {
   font-size: 2.5rem;
   font-weight: bold;

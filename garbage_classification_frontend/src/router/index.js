@@ -64,7 +64,49 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
+  scrollBehavior(to, from, savedPosition) {
+    // 禁用浏览器自动滚动恢复
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual'
+    }
+
+    // 优先处理 hash 锚点（Home 页内部或跨页面）
+    if (to.hash) {
+      return new Promise(resolve => {
+        // 等 DOM 渲染稳定后再滚动
+        setTimeout(() => {
+          const el = document.querySelector(to.hash)
+          if (el) {
+            resolve({
+              el: to.hash,
+              behavior: 'smooth'
+            })
+          } else {
+            resolve({ top: 0 })
+          }
+        }, 100) // 延迟 100ms，可以根据页面复杂度调整
+      })
+    }
+
+    // 跨页面跳转（例如 Home → About），没有 hash，滚到顶部
+    if (from.path !== to.path) {
+      return new Promise(resolve => {
+        // 等 DOM 渲染稳定
+        setTimeout(() => {
+          resolve({ top: 0 })
+        }, 50) // 小延迟，页面刚渲染完就滚动
+      })
+    }
+
+    // 浏览器前进/后退，保持滚动位置
+    if (savedPosition) {
+      return savedPosition
+    }
+
+    // 默认滚动到顶部
+    return { top: 0 }
+  }
 })
 
 // 路由守护：检查认证
