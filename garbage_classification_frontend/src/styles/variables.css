@@ -7,13 +7,31 @@
   --text-white: #f8f9fa;
   --text-dark: #343a40;
   --primary-color: #28a745;
+  --primary-rgb: 40, 167, 69;
   --secondary-color: #6c757d;
   --success-color: #198754;
+  --third-color: #dee2e6;
+  --fourth-color: #e9ecef;
 
-  /* 通知与警告色 */
-  --danger-color: #dc3545;
-  --warning-color: #fd7e14;
+  /* 通知色 */
   --info-color: #0dcaf0;
+  --info-bg-color: #cfe2ff;
+  --info-color-text: #084298;
+
+  /* 提示色 */
+  --warning-color: #fd7e14;
+  --warning-bg-color: #fff3cd;
+  --warning-color-text: #664d03;
+
+  /* 警告色 */
+  --danger-color: #dc3545;
+  --danger-bg-color: #f8d7da;
+  --danger-color-text: #842029;
+
+  /* 成功色 */
+  --success-color: #28a745;
+  --success-bg-color: #d1e7dd;
+  --success-color-text: #0f5132;
 
   /* 垃圾分类色 */
   --color-recyclable: #3576ca;
@@ -27,12 +45,28 @@
   --footer-text: #ecf0f1;
   --footer-border: #34495e;
 
-  /* 提取出的页面头部渐变 */
+  /* 页面头部渐变 */
   --page-header-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 
-  /* 提取出的阴影 */
-  --shadow-standard: 0 2px 4px rgba(0, 0, 0, 0.1);
-  --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.15);
+  /* 边框色 */
+  --dashed-border: #ddd;
+
+  /* 阴影 */
+  --box-shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+  --shadow-standard: 0 8px 24px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.12);
+
+  /* 间距标准 */
+  --spacing-xs: 5px;
+  --spacing-sm: 15px;
+  --spacing-md: 20px;
+  --spacing-lg: 30px;
+
+  /* 圆角 */
+  --border-radius-sm: 6px;
+  --border-radius-md: 8px;
+  --border-radius: 12px;
+
 
   /* 核心基础过渡效果 */
   --transition-standard: all 0.3s ease;

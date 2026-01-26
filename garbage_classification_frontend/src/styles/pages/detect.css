@@ -1,0 +1,194 @@
+/* detect.css */
+
+/* 上传区域样式 */
+.upload-area {
+  border: 2px dashed var(--dashed-border);
+  border-radius: var(--border-radius-md);
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition-standard);
+  background-color: var(--text-white);
+  min-height: 250px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-area:hover {
+  border-color: var(--primary-color);
+  background-color: rgba(var(--primary-rgb), 0.05);
+  transform: translateY(-5px) scale(1.03);
+}
+
+.upload-area.drag-over {
+  border-color: var(--primary-color);
+  background-color: rgba(var(--primary-rgb), 0.1);
+  border-style: solid;
+}
+
+.upload-icon {
+  font-size: 60px;
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* 预览容器 */
+.preview-container {
+  position: relative;
+  margin-top: var(--spacing-md);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-standard);
+  object-fit: cover;
+}
+
+.remove-btn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 2px solid var(--white);
+  background-color: var(--danger-color);
+  color: var(--white);
+  box-shadow: var(--box-shadow-sm);
+  cursor: pointer;
+  z-index: 10;
+  transition: var(--transition-standard);
+}
+
+.remove-btn:hover {
+  transform: scale(1.15); /* 悬停时稍微放大，交互感更强 */
+}
+
+/* 分类标签样式 */
+.category-label {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  color: var(--white);
+  font-weight: 600;
+  margin-right: 8px;
+  font-size: 0.875rem;
+  box-shadow: var(--box-shadow-sm);
+}
+
+.category-label.recyclable { background-color: var(--color-recyclable); }
+
+.category-label.harmful { background-color: var(--color-harmful); }
+
+.category-label.kitchen { background-color: var(--color-kitchen); }
+
+.category-label.other { background-color: var(--color-other); }
+
+/* 加载器 */
+.loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg);
+  color: var(--primary-color);
+}
+
+.spinner {
+  font-size: 3rem;
+}
+
+/* 结果容器 */
+.result-container {
+  animation: slideIn 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* 卡片样式 */
+.card {
+  border: none;
+  box-shadow: var(--shadow-standard);
+  border-radius: var(--border-radius-md);
+  transition: var(--transition-standard);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-hover);
+}
+
+.card-title {
+  color: var(--text-dark);
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+}
+
+/* 表格样式 */
+.table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.table thead {
+  background-color: var(--text-white);
+  border-bottom: 2px solid var(--third-color);
+}
+
+.table th {
+  font-weight: 600;
+  color: var(--text-dark);
+  padding: 12px;
+}
+
+.table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--third-color);
+}
+
+.table tbody tr:hover {
+  background-color: var(--text-white);
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .page-header h1 {
+    font-size: 2rem;
+  }
+
+  .upload-area {
+    padding: 20px;
+    min-height: 200px;
+  }
+
+  .upload-icon {
+    font-size: 40px;
+  }
+
+  .category-label {
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  main {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+}

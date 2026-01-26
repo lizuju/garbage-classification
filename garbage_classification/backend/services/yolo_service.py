@@ -139,15 +139,15 @@ class YoloService:
                     x1, y1, x2, y2 = [int(x) for x in xyxy]
 
                     if c == 0:
-                        color = (0, 200, 0)
+                        color = (53, 118, 202)
                     elif c == 1:
-                        color = (255, 0, 0)
+                        color = (220, 53, 69)
                     elif c == 2:
-                        color = (255, 165, 0)
+                        color = (40, 167, 69)
                     else:
-                        color = (128, 128, 128)
+                        color = (108, 117, 125)
 
-                    draw.rectangle([(x1, y1), (x2, y2)], outline=color, width=2)
+                    draw.rectangle([(x1, y1), (x2, y2)], outline=color, width=3)
 
                     label = f"{self.class_names[c]} {conf:.2f}"
                     label_size = draw.textbbox((0, 0), label, font=font)[2:]

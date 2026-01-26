@@ -29,7 +29,7 @@
             <div class="card-body">
               <h5 class="card-title">上传图片</h5>
 
-              <!-- 上传区域 - 整合旧 HTML 样式 -->
+              <!-- 上传区域 -->
               <div
                 class="upload-area"
                 :class="{ 'drag-over': isDragOver }"
@@ -53,14 +53,15 @@
 
               <!-- 预览图 -->
               <div v-if="preview" class="preview-container">
-                <img :src="preview" alt="preview" class="preview-image" />
-                <button
-                  type="button"
-                  class="btn btn-danger btn-sm remove-btn"
-                  @click="resetUpload"
-                >
-                  <i class="bi bi-x-lg"></i>
-                </button>
+                <div class="image-wrapper"> <img :src="preview" alt="preview" class="preview-image" />
+                  <button
+                    type="button"
+                    class="btn-danger remove-btn"
+                    @click="resetUpload"
+                  >
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                </div>
               </div>
 
               <div class="d-grid gap-2 mt-3">
@@ -250,115 +251,5 @@ const getCategoryClass = (className) => {
 </script>
 
 <style scoped>
-.page-header h1 {
-  font-size: 2.5rem;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.page-header .lead {
-  font-size: 1.2rem;
-  opacity: 0.9;
-}
-
-.upload-area {
-  border: 2px dashed #ddd;
-  border-radius: 8px;
-  padding: 40px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background-color: #f8f9fa;
-  min-height: 250px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.upload-area:hover {
-  border-color: #28a745;
-  background-color: #f1f9f1;
-  transform: scale(1.02);
-}
-
-.upload-area.drag-over {
-  border-color: #28a745;
-  background-color: #e8f5e9;
-}
-
-.upload-icon {
-  font-size: 60px;
-  color: #28a745;
-  margin-bottom: 15px;
-}
-
-.preview-container {
-  position: relative;
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-}
-
-.preview-image {
-  max-width: 100%;
-  max-height: 300px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.remove-btn {
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-}
-
-.category-label {
-  display: inline-block;
-  padding: 6px 14px;
-  border-radius: 20px;
-  color: white;
-  font-weight: bold;
-  margin-right: 8px;
-  font-size: 0.875rem;
-}
-
-.category-label.recyclable {
-  background-color: #28a745;
-}
-
-.category-label.harmful {
-  background-color: #dc3545;
-}
-
-.category-label.kitchen {
-  background-color: #fd7e14;
-}
-
-.category-label.other {
-  background-color: #6c757d;
-}
-
-.loader {
-  padding: 40px;
-  text-align: center;
-}
-
-.result-container {
-  animation: slideIn 0.3s ease;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+@import "@/styles/pages/detect.css";
 </style>

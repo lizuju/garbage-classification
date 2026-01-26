@@ -1,0 +1,35 @@
+/* dropdowns.css */
+
+.dropdown-menu {
+  border: none;
+  box-shadow: var(--box-shadow-sm);
+  border-radius: var(--border-radius-sm);
+  padding: 0.5rem 0;
+  list-style: none;
+  animation: dropdownFadeIn 0.2s ease-out;
+}
+
+.dropdown-item {
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: var(--transition-standard);
+  color: var(--text-dark);
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-item:hover {
+  background-color: var(--white);
+  color: var(--primary-color);
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

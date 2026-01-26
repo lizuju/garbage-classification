@@ -1,0 +1,30 @@
+/* buttons.css */
+
+/* 按钮样式 */
+.btn {
+  border-radius: var(--border-radius-sm);
+  font-weight: 500;
+  transition: var(--transition-standard);
+  border: none;
+  cursor: pointer;
+}
+
+.btn-success {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-success:hover {
+  filter: brightness(90%); 
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  color: white
+}
+
+.btn-danger:hover {
+  filter: brightness(90%);
+}
