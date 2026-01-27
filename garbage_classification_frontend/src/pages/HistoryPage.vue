@@ -120,23 +120,3 @@ onMounted(() => {
   loadHistory()
 })
 </script>
-
-<style scoped>
-.card {
-  border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.table {
-  margin-bottom: 0;
-}
-
-.table tbody tr:hover {
-  background-color: #f8f9fa;
-}
-
-.btn-sm {
-  padding: 0.4rem 0.8rem;
-  font-size: 0.875rem;
-}
-</style>

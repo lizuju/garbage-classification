@@ -1,0 +1,133 @@
+/* common-button.css */
+
+/* 1. 核心基础样式 */
+.base-custom-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  border: none;
+  border-radius: 50px;
+  overflow: hidden;
+  color: var(--white) !important;
+  font-weight: 600;
+  cursor: pointer;
+  z-index: 1;
+  background-size: 200% auto;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+  letter-spacing: 0.2px;
+}
+
+/* 2. 尺寸定义 */
+.btn-lg { padding: 18px 50px; font-size: 1.25rem; }
+.btn-md { padding: 12px 35px; font-size: 1.05rem; }
+.btn-sm { padding: 8px 20px; font-size: 0.9rem; }
+
+/* 3. 扫光特效 */
+.base-custom-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transition: none;
+  z-index: -1;
+}
+
+/* 4. 交互状态：悬停与激活 */
+.base-custom-btn:not(:disabled):hover {
+  transform: translateY(-5px) scale(1.03);
+  background-position: right center;
+}
+
+.base-custom-btn:not(:disabled):hover::after {
+  left: 100%;
+  transition: all 0.7s ease;
+}
+
+.base-custom-btn:active {
+  transform: translateY(2px) scale(0.92);
+  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 5. 禁用状态 */
+.base-custom-btn:disabled {
+  cursor: not-allowed;
+  filter: grayscale(0.6);
+  opacity: 0.7;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* 6. 图标位移动画 */
+.base-custom-btn:hover:not(:disabled) i,
+.base-custom-btn:hover:not(:disabled) span,
+.base-custom-btn:hover:not(:disabled) .bi {
+  display: inline-block;
+  transform: translateX(4px);
+}
+i, span, .bi { transition: var(--transition-standard); }
+
+/* 颜色主题配置 */
+/* 1. 成功绿 (森林翠绿：更深邃，带微妙明暗差) */
+.btn-success {
+  background: linear-gradient(180deg, #16a34a 0%, #15803d 100%);
+  box-shadow: 0 4px 14px 0 rgba(22, 163, 74, 0.3);
+}
+.btn-success:hover {
+  background: linear-gradient(180deg, #15803d 0%, #166534 100%);
+  box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4);
+}
+
+/* 2. 信息蓝 (调淡版：通透的湖蓝色渐变) */
+.btn-info {
+  /* 调淡了起始色，增加了呼吸感 */
+  background: linear-gradient(180deg, #38bdf8 0%, #0ea5e9 100%); 
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.3);
+}
+.btn-info:hover {
+  background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%);
+  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+}
+
+/* 3. 主题蓝 (深邃交互蓝：比之前的黑色更有科技感) */
+.btn-primary {
+  background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+}
+.btn-primary:hover {
+  background: linear-gradient(180deg, #2563eb 0%, #1e40af 100%);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+/* 4. 金色主题 (流动金属质感) */
+.btn-gold {
+  background: linear-gradient(180deg, #fff4d6 0%, #d4c391 100%);
+  box-shadow: 0 4px 14px rgba(183, 140, 31, 0.3);
+}
+.btn-gold:hover {
+  background: linear-gradient(180deg, #fff8e6 0%, #dbc88f 100%);
+  box-shadow: 0 6px 20px rgba(184, 134, 11, 0.4);
+}
+
+/* 额外增加一个：半透明毛玻璃质感 (如果背景很复杂时使用) */
+.btn-glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--white) !important;
+  box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.1);
+}
+.btn-glass:hover {
+  background: rgba(255, 255, 255, 0.2);
+}

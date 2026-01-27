@@ -93,16 +93,3 @@ onMounted(async () => {
   }
 })
 </script>
-
-<style scoped>
-.card {
-  border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.card-body h3 {
-  color: #28a745;
-  font-weight: bold;
-  margin: 10px 0;
-}
-</style>

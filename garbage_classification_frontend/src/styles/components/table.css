@@ -1,0 +1,27 @@
+/* table.css */
+
+.table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.table thead {
+  background-color: var(--text-white);
+  border-bottom: 2px solid var(--third-color);
+}
+
+.table th {
+  font-weight: 600;
+  color: var(--text-dark);
+  padding: 12px;
+}
+
+.table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--third-color);
+}
+
+.table tbody tr:hover {
+  background-color: var(--text-white);
+}

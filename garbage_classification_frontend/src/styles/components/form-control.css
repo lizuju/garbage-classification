@@ -1,0 +1,16 @@
+/* form-control.css */
+
+/* 输入框聚焦效果 */
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.1);
+  background-color: var(--white) !important;
+}
+
+.input-group-text {
+  border: 1px solid var(--formcontrol-color);
+}
+
+.form-control {
+  border: 1px solid var(--formcontrol-color);
+}

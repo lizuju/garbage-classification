@@ -1,0 +1,26 @@
+/* about.css */
+
+.about-page-wrapper .category-label {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 20px;
+  color: var(--white);
+  font-weight: bold;
+  font-size: 0.875rem;
+}
+
+.about-page-wrapper .category-label.recyclable { background-color: var(--color-recyclable); }
+
+.about-page-wrapper .category-label.harmful { background-color: var(--color-harmful); }
+
+.about-page-wrapper .category-label.kitchen { background-color: var(--color-kitchen); }
+
+.about-page-wrapper .category-label.other { background-color: var(--color-other); }
+
+.about-page-wrapper h4 {
+  color: #2c3e50;
+  font-weight: 600;
+  margin-top: var(--spacing-md);
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 10px;
+}

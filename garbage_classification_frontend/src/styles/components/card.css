@@ -1,0 +1,24 @@
+/* card.css */
+
+.card {
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-radius: var(--border-radius-md);
+  transition: var(--transition-standard);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-hover);
+}
+
+.card-title {
+  color: var(--text-dark);
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+}
+
+.card-body h3 {
+  color: var(--primary-color);
+  font-weight: bold;
+  margin: 10px 0;
+}

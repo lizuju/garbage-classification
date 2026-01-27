@@ -1,0 +1,71 @@
+/* alert.css */
+
+.alert {
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  border: none;
+  border-left: 4px solid;
+  border-radius: var(--border-radius-sm);
+  backdrop-filter: blur(4px);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.alert-info {
+  border-left-color: var(--info-color);
+  background-color: var(--info-bg-color);
+  color: var(--info-color-text);
+}
+
+.alert-warning {
+  border-left-color: var(--warning-color);
+  background-color: var(--warning-bg-color);
+  color: var(--warning-color-text);
+}
+
+.alert-danger {
+  border-left-color: var(--danger-color);
+  background-color: var(--danger-bg-color);
+  color: var(--danger-color-text);
+}
+
+.alert-success {
+  border-left-color: var(--success-color);
+  background-color: var(--success-bg-color);
+  color: var(--success-color-text);
+}
+
+.custom-alert {
+  z-index: 10;
+  position: relative;
+}
+
+/* 提示框淡出动画 */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+  margin-bottom: -58px; /* 消失时自动收缩空间，不留白 */
+}
+
+/* 专属弹窗动画：弹跳感更强 */
+.zoom-fade-enter-active {
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.zoom-fade-leave-active {
+  transition: all 0.2s ease;
+}
+.zoom-fade-enter-from {
+  opacity: 0;
+  transform: scale(0.8) translateY(-10px);
+}
+.zoom-fade-leave-to {
+  opacity: 0;
+  transform: scale(1.1); /* 消失时轻微变大，给人“炸开”消失的感觉 */
+}

@@ -1,7 +1,7 @@
 /* detect.css */
 
 /* 上传区域样式 */
-.upload-area {
+.detect-page-wrapper .upload-area {
   border: 2px dashed var(--dashed-border);
   border-radius: var(--border-radius-md);
   padding: 40px;
@@ -16,26 +16,26 @@
   justify-content: center;
 }
 
-.upload-area:hover {
+.detect-page-wrapper .upload-area:hover {
   border-color: var(--primary-color);
   background-color: rgba(var(--primary-rgb), 0.05);
   transform: translateY(-5px) scale(1.03);
 }
 
-.upload-area.drag-over {
+.detect-page-wrapper .upload-area.drag-over {
   border-color: var(--primary-color);
   background-color: rgba(var(--primary-rgb), 0.1);
   border-style: solid;
 }
 
-.upload-icon {
+.detect-page-wrapper .upload-icon {
   font-size: 60px;
   color: var(--primary-color);
   margin-bottom: var(--spacing-sm);
 }
 
 /* 预览容器 */
-.preview-container {
+.detect-page-wrapper .preview-container {
   position: relative;
   margin-top: var(--spacing-md);
   display: flex;
@@ -43,12 +43,12 @@
   align-items: center;
 }
 
-.image-wrapper {
+.detect-page-wrapper .image-wrapper {
   position: relative;
   display: inline-block;
 }
 
-.preview-image {
+.detect-page-wrapper .preview-image {
   max-width: 100%;
   max-height: 300px;
   border-radius: var(--border-radius-md);
@@ -56,7 +56,7 @@
   object-fit: cover;
 }
 
-.remove-btn {
+.detect-page-wrapper .remove-btn {
   position: absolute;
   top: -10px;
   right: -10px;
@@ -76,12 +76,12 @@
   transition: var(--transition-standard);
 }
 
-.remove-btn:hover {
+.detect-page-wrapper .remove-btn:hover {
   transform: scale(1.15); /* 悬停时稍微放大，交互感更强 */
 }
 
 /* 分类标签样式 */
-.category-label {
+.detect-page-wrapper .category-label {
   display: inline-block;
   padding: 6px 14px;
   border-radius: 20px;
@@ -92,16 +92,16 @@
   box-shadow: var(--box-shadow-sm);
 }
 
-.category-label.recyclable { background-color: var(--color-recyclable); }
+.detect-page-wrapper .category-label.recyclable { background-color: var(--color-recyclable); }
 
-.category-label.harmful { background-color: var(--color-harmful); }
+.detect-page-wrapper .category-label.harmful { background-color: var(--color-harmful); }
 
-.category-label.kitchen { background-color: var(--color-kitchen); }
+.detect-page-wrapper .category-label.kitchen { background-color: var(--color-kitchen); }
 
-.category-label.other { background-color: var(--color-other); }
+.detect-page-wrapper .category-label.other { background-color: var(--color-other); }
 
 /* 加载器 */
-.loader {
+.detect-page-wrapper .loader {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -110,84 +110,40 @@
   color: var(--primary-color);
 }
 
-.spinner {
+.detect-page-wrapper .spinner {
   font-size: 3rem;
 }
 
 /* 结果容器 */
-.result-container {
+.detect-page-wrapper .result-container {
   animation: slideIn 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-/* 卡片样式 */
-.card {
-  border: none;
-  box-shadow: var(--shadow-standard);
-  border-radius: var(--border-radius-md);
-  transition: var(--transition-standard);
-}
-
-.card:hover {
-  box-shadow: var(--shadow-hover);
-}
-
-.card-title {
-  color: var(--text-dark);
-  font-weight: 600;
-  margin-bottom: var(--spacing-md);
-}
-
-/* 表格样式 */
-.table {
-  border-collapse: collapse;
-  width: 100%;
-}
-
-.table thead {
-  background-color: var(--text-white);
-  border-bottom: 2px solid var(--third-color);
-}
-
-.table th {
-  font-weight: 600;
-  color: var(--text-dark);
-  padding: 12px;
-}
-
-.table td {
-  padding: 12px;
-  border-bottom: 1px solid var(--third-color);
-}
-
-.table tbody tr:hover {
-  background-color: var(--text-white);
-}
-
-.fade-in {
+.detect-page-wrapper .fade-in {
   animation: fadeIn 0.3s ease;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .page-header h1 {
+   .detect-page-wrapper .page-header h1 {
     font-size: 2rem;
   }
 
-  .upload-area {
+  .detect-page-wrapper .upload-area {
     padding: 20px;
     min-height: 200px;
   }
 
-  .upload-icon {
+  .detect-page-wrapper .upload-icon {
     font-size: 40px;
   }
 
-  .category-label {
+  .detect-page-wrapper .category-label {
     display: block;
     margin-bottom: 8px;
   }
 
-  main {
+  .detect-page-wrapper {
     padding-top: 1rem;
     padding-bottom: 1rem;
   }

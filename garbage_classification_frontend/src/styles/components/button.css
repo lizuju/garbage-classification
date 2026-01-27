@@ -1,4 +1,4 @@
-/* buttons.css */
+/* button.css */
 
 /* 按钮样式 */
 .btn {
@@ -9,9 +9,18 @@
   cursor: pointer;
 }
 
+.btn-sm {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.875rem;
+}
+
 .btn-success {
   background-color: var(--primary-color);
-  color: white;
+  color: var(--white);
+  border: none;
+  padding: 0.6rem 1rem;
+  font-weight: 500;
+  transition: var(--transition-standard);
 }
 
 .btn-success:hover {
@@ -20,9 +29,13 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+.btn-success:disabled {
+  background-color: var(--secondary-color);
+}
+
 .btn-danger {
   background-color: var(--danger-color);
-  color: white
+  color: var(--white)
 }
 
 .btn-danger:hover {

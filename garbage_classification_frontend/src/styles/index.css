@@ -3,16 +3,22 @@
 /* 1. 变量与重置 (基础) */
 @import "./variables.css";
 @import "./base.css";
-@import "./typography.css";
 
 /* 2. 动画 (方法) */
 @import "./animations.css";
 
-/* 3. 通用对象 (组件与布局) */
+/* 3. 布局样式 (整体结构) */
 @import "./layout.css";
-@import "./components/buttons.css";
-@import "./components/alerts.css";
-@import "./components/dropdowns.css";
+
+/* 4. 页面级样式 (特定页面) */
+@import "./components/entrance-reveal.css";
+@import "./components/button.css";
+@import "./components/common-button.css";
+@import "./components/alert.css";
+@import "./components/dropdown.css";
 @import "./components/progress.css";
+@import "./components/card.css";
+@import "./components/table.css";
+@import "./components/form-control.css";
 
 /* 5. 响应式补丁 */

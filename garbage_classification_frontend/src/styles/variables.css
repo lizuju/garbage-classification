@@ -12,6 +12,7 @@
   --success-color: #198754;
   --third-color: #dee2e6;
   --fourth-color: #e9ecef;
+  --formcontrol-color: #ced4da;
 
   /* 通知色 */
   --info-color: #0dcaf0;
@@ -66,7 +67,6 @@
   --border-radius-sm: 6px;
   --border-radius-md: 8px;
   --border-radius: 12px;
-
 
   /* 核心基础过渡效果 */
   --transition-standard: all 0.3s ease;

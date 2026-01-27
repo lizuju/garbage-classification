@@ -1,0 +1,10 @@
+/* login.css */
+
+.login-page-wrapper a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.login-page-wrapper a:hover {
+  text-decoration: underline;
+}

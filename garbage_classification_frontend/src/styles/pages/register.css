@@ -1,0 +1,10 @@
+/* register.css */
+
+.register-page-wrapper a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.register-page-wrapper a:hover {
+  text-decoration: underline;
+}
