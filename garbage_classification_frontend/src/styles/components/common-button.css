@@ -119,6 +119,17 @@ i, span, .bi { transition: var(--transition-standard); }
   box-shadow: 0 6px 20px rgba(184, 134, 11, 0.4);
 }
 
+/* 4. 垃圾桶复古蓝 */
+.btn-secondary {
+  background: linear-gradient(180deg, #4c86b6 0%, #2d6399 100%);
+  box-shadow: 0 4px 14px 0 rgba(62, 109, 156, 0.3);
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(180deg, #30659a 0%, #1b4879 100%);
+  box-shadow: 0 6px 20px rgba(62, 109, 156, 0.4);
+}
+
 /* 额外增加一个：半透明毛玻璃质感 (如果背景很复杂时使用) */
 .btn-glass {
   background: rgba(255, 255, 255, 0.1);
