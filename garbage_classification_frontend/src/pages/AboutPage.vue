@@ -1,35 +1,19 @@
 <template>
   <div class="about-page-wrapper">
     <!-- Hero Section -->
-    <div class="about-hero-section">
-      <div class="about-hero-content d-flex flex-column align-items-center">
-        <img 
-          src="@/assets/icons/apple-touch-icon.png" 
-          alt="App Icon" 
-          class="about-hero-icon hero-fade-in anim-delay-1"
-        />
-        <h1 class="about-hero-title text-center hero-fade-in anim-delay-2">关于项目</h1>
-        <p class="about-hero-subtitle text-center hero-fade-in anim-delay-3">基于YOLOv5的垃圾分类识别系统</p>
-        <div class="hero-fade-in anim-delay-4">
-          <CommonButton
-            href="#project-overview"
-            theme="secondary"
-            size="lg"
-            @click="handleScrollToOverview"
-          >
-            <i class="bi bi-arrow-down-circle me-2"></i>
-            开始了解
-          </CommonButton>
-        </div>
-      </div>
-    </div>
+    <PageHero
+      title="关于项目"
+      subtitle="基于YOLOv5的垃圾分类识别系统"
+      ctaText="开始了解"
+      ctaLink="#project-overview"
+    />
 
     <!-- Main Content -->
     <div class="container-fluid">
       <!-- Content wrapper for alignment -->
       <div class="about-content">
         <!-- 项目概述 -->
-        <h2 id="project-overview" class="section-title hero-fade-in">项目概述</h2>
+        <h2 v-reveal id="project-overview" class="section-title hero-fade-in anim-delay-1">项目概述</h2>
         <div class="about-guide-card overview-card">
           <div class="about-card-content overview-split">
             <div class="overview-image">
@@ -44,7 +28,7 @@
         </div>
 
         <!-- 主要功能 -->
-        <h2 class="section-title hero-fade-in">主要功能</h2>
+        <h2 v-reveal class="section-title hero-fade-in anim-delay-1">主要功能</h2>
         <div class="about-guide-card features-card">
           <div class="about-card-content features-split">
             <div class="features-text">
@@ -59,7 +43,7 @@
         </div>
 
         <!-- 技术架构 -->
-        <h2 class="section-title hero-fade-in">技术架构</h2>
+        <h2 v-reveal class="section-title hero-fade-in anim-delay-1">技术架构</h2>
         <div class="about-guide-card tech-card">
           <div class="about-card-content tech-split">
             <div class="tech-image">
@@ -74,7 +58,7 @@
         </div>
 
         <!-- 分类体系 -->
-        <h2 class="section-title hero-fade-in">分类体系</h2>
+        <h2 v-reveal class="section-title hero-fade-in anim-delay-1">分类体系</h2>
         
         <div class="row g-4">
           <!-- 可回收物 -->
@@ -230,15 +214,15 @@
         </div>
 
         <!-- 联系我们 -->
-        <h2 class="section-title hero-fade-in">联系我们</h2>
-        <div class="contact-important-card hero-fade-in">
+        <h2 v-reveal class="section-title hero-fade-in anim-delay-1">联系我们</h2>
+        <div v-reveal class="contact-important-card hero-fade-in">
           <h3 class="contact-card-title">
             <i class="bi bi-chat-dots-fill text-danger me-2"></i>如有问题或建议，欢迎联系
           </h3>
           
           <div class="row g-5 justify-content-center">
             <!-- Email -->
-            <div class="col-6 hero-fade-in anim-delay-1">
+            <div v-reveal class="col-6 hero-fade-in anim-delay-1">
               <div class="contact-item">
                 <div class="contact-icon-box bg-white">
                   <i class="bi bi-envelope-fill text-primary"></i>
@@ -249,7 +233,7 @@
             </div>
 
             <!-- Phone -->
-            <div class="col-6 hero-fade-in anim-delay-2">
+            <div v-reveal class="col-6 hero-fade-in anim-delay-2">
               <div class="contact-item">
                 <div class="contact-icon-box bg-white">
                   <i class="bi bi-telephone-fill text-success"></i>
@@ -261,7 +245,7 @@
           </div>
 
           <!-- Toggle Button -->
-          <div class="hero-fade-in d-flex justify-content-center mt-5">
+          <div v-reveal class="hero-fade-in d-flex justify-content-center mt-5">
             <CommonButton 
               @click="toggleContact" 
               theme="gold"
@@ -288,17 +272,9 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import CommonButton from '@/components/CommonButton.vue';
+import PageHero from '@/components/PageHero.vue';
 import '../styles/pages/about.css';
 import '../styles/components/entrance-reveal.css';
-
-// Smooth scroll to overview section
-const handleScrollToOverview = (e) => {
-  e.preventDefault();
-  const element = document.getElementById('project-overview');
-  if (element) {
-    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-};
 
 // Contact expansion state
 const isContactExpanded = ref(false);
@@ -306,17 +282,4 @@ const isContactExpanded = ref(false);
 const toggleContact = () => {
   isContactExpanded.value = !isContactExpanded.value;
 };
-
-// Intersection observer for fade-in animations
-onMounted(() => {
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('active');
-      }
-    });
-  }, { threshold: 0.1 });
-
-  document.querySelectorAll('.hero-fade-in').forEach(el => observer.observe(el));
-});
 </script>

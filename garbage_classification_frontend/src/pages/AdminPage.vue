@@ -1,5 +1,11 @@
 <template>
-  <div class="container-fluid mt-5 mb-5">
+  <div class="admin-page-wrapper">
+    <PageHero
+      title="管理后台"
+      subtitle="系统数据统计与用户管理"
+      compact
+    />
+    <div class="container-fluid mt-5 mb-5">
     <div class="row">
       <div class="col-md-3">
         <div class="card text-center">
@@ -56,12 +62,14 @@
         <p v-else class="text-muted">暂无数据</p>
       </div>
     </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useApi } from '../composables/useApi'
+import PageHero from '@/components/PageHero.vue'
 
 const { getAdminStats } = useApi()
 

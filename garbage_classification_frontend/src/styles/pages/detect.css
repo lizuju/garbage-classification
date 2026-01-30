@@ -1,5 +1,11 @@
 /* detect.css */
 
+.detect-page-wrapper {
+  margin-left: 3vw;
+  margin-right: 3vw;
+  padding-bottom: 5rem;
+}
+
 /* 上传区域样式 */
 .detect-page-wrapper .upload-area {
   border: 2px dashed var(--dashed-border);

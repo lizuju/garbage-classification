@@ -3,12 +3,19 @@
     <div class="alert alert-warning">请先<router-link to="/login">登录</router-link></div>
   </div>
 
-  <div v-else class="container mt-5 mb-5">
+  <div v-else>
+    <PageHero
+      title="识别历史"
+      subtitle="查看您的过往识别记录与分析结果"
+      compact
+    />
+    <div class="container mt-5 mb-5">
+    <h2 v-reveal id="project-overview" class="section-title hero-fade-in anim-delay-1">垃圾识别</h2>
+
     <div class="row">
       <div class="col-md-12">
         <div class="card">
           <div class="card-body">
-            <h3 class="card-title mb-2 text-center">识别历史</h3>
 
             <div v-if="message" :class="`alert alert-${messageType} mb-3`">
               {{ message }}
@@ -64,12 +71,14 @@
       </div>
     </div>
   </div>
+  </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useAuth } from '../composables/useAuth'
 import { useApi } from '../composables/useApi'
+import PageHero from '@/components/PageHero.vue'
 
 const { isLoggedIn } = useAuth()
 const { getHistory, deleteHistory } = useApi()

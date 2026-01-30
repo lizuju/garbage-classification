@@ -3,10 +3,10 @@
     <!-- 英雄 Header -->
     <div class="hero-section">
       <div class="hero-content d-flex flex-column align-items-center">
-        <h1 class="hero-title text-center hero-fade-in anim-delay-2">🗑️ 基于YOLOv5的垃圾分类识别系统</h1>
-        <p class="hero-subtitle text-center hero-fade-in anim-delay-3">上传图片，AI 帮您快速识别垃圾类别</p>
-        <p class="hero-description text-center hero-fade-in anim-delay-4">使用深度学习和计算机视觉技术，让垃圾分类变得简单高效</p>
-        <div class="hero-fade-in">
+        <h1 v-reveal class="hero-title text-center hero-fade-in anim-delay-2">🗑️ 基于YOLOv5的垃圾分类识别系统</h1>
+        <p v-reveal class="hero-subtitle text-center hero-fade-in anim-delay-3">上传图片，AI 帮您快速识别垃圾类别</p>
+        <p v-reveal class="hero-description text-center hero-fade-in anim-delay-4">使用深度学习和计算机视觉技术，让垃圾分类变得简单高效</p>
+        <div v-reveal class="hero-fade-in">
           <CommonButton
             :to="isLoggedIn ? '/user/detect' : '/login'"
             theme="success"
@@ -24,7 +24,7 @@
 
       <!-- 功能模块区 - 3 列并排 -->
       <div class="container-fluid feature-scroll-section py-5">
-        <h1 class="section-title hero-fade-in anim-delay-1">探索更多功能</h1>
+        <h1 v-reveal class="section-title hero-fade-in anim-delay-1">探索更多功能</h1>
         
         <div class="feature-scroll-container">
           <div class="feature-item">
@@ -97,7 +97,7 @@
       </div>
 
       <!-- 垃圾分类指南 -->
-      <h1 id="classification-guide" class="section-title hero-fade-in anim-delay-1">垃圾分类指南</h1>
+      <h1 v-reveal id="classification-guide" class="section-title hero-fade-in anim-delay-1">垃圾分类指南</h1>
 
       <div class="container-fluid classification-guide">
 
@@ -256,16 +256,16 @@
       </div>
 
       <!-- 为什么分类 -->
-      <div class="container-fluid py-5 px-0"> <h1 class="section-title hero-fade-in anim-delay-1">重塑循环之美</h1>
+      <div v-reveal class="container-fluid py-5 px-0"> <h1 class="section-title hero-fade-in anim-delay-1">重塑循环之美</h1>
         
         <div class="why-important-container">
-          <div class="why-important-card hero-fade-in">
+          <div v-reveal class="why-important-card hero-fade-in">
             <h3 class="why-card-title">
               <i class="bi bi-heart-fill text-danger me-2"></i>为什么要进行垃圾分类？
             </h3>
             
             <div class="row g-5 justify-content-center">
-              <div class="col-6 hero-fade-in anim-delay-1">
+              <div v-reveal class="col-6 hero-fade-in anim-delay-1">
                 <div class="why-item">
                   <div class="why-icon-box bg-white">
                     <i class="bi bi-tree-fill text-success"></i>
@@ -275,7 +275,7 @@
                 </div>
               </div>
 
-              <div class="col-6 hero-fade-in anim-delay-2">
+              <div v-reveal class="col-6 hero-fade-in anim-delay-2">
                 <div class="why-item">
                   <div class="why-icon-box bg-white">
                     <i class="bi bi-arrow-repeat text-primary"></i>
@@ -285,7 +285,7 @@
                 </div>
               </div>
 
-              <div class="col-6 hero-fade-in anim-delay-3">
+              <div v-reveal class="col-6 hero-fade-in anim-delay-3">
                 <div class="why-item">
                   <div class="why-icon-box bg-white">
                     <i class="bi bi-heart-pulse-fill" style="color: #764ba2"></i>
@@ -295,7 +295,7 @@
                 </div>
               </div>
 
-              <div class="col-6 hero-fade-in anim-delay-4">
+              <div v-reveal class="col-6 hero-fade-in anim-delay-4">
                 <div class="why-item">
                   <div class="why-icon-box bg-white">
                     <i class="bi bi-globe text-warning"></i>
@@ -305,7 +305,7 @@
                 </div>
               </div>
               
-              <div class="hero-fade-in d-flex justify-content-center mt-5">
+              <div v-reveal class="hero-fade-in d-flex justify-content-center mt-5">
               <common-button
                   to="/about#about-project"
                   theme="gold"
@@ -329,18 +329,4 @@ import CommonButton from '@/components/CommonButton.vue';
 import '../styles/pages/home.css';
 
 const { isLoggedIn } = useAuth()
-
-onMounted(() => {
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      // 如果元素进入视口，添加 active 类触发动画
-      if (entry.isIntersecting) {
-        entry.target.classList.add('active');
-      }
-    });
-  }, { threshold: 0.1 }); // 只要露出 10% 就开始动
-
-  // 扫描所有需要动效的元素
-  document.querySelectorAll('.hero-fade-in').forEach(el => observer.observe(el));
-});
 </script>

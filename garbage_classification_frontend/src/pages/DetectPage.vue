@@ -7,15 +7,16 @@
     </div>
 
     <div v-else>
-      <!-- 页面头部 - 整合旧 HTML 样式 -->
-      <div class="page-header">
-        <div class="container">
-          <h1>垃圾识别</h1>
-          <p class="lead">上传一张包含垃圾的图片，AI 将自动检测并识别垃圾类别</p>
-        </div>
-      </div>
+      <!-- 页面头部 -->
+      <PageHero
+        title="识别检测"
+        subtitle="支持多种识别方式，AI 自动检测并分类垃圾"
+        ctaText="开始识别"
+        ctaLink="#garbage-identification"
+      />
 
-      <div class="container mb-5">
+      <div class="about-content">
+        <h2 v-reveal id="garbage-identification" class="section-title hero-fade-in anim-delay-1">垃圾识别</h2>
         <div class="alert alert-info">
           <i class="bi bi-info-circle-fill me-2"></i>
           支持 JPG、JPEG、PNG 格式的图片，最大 5MB。图片质量越清晰，识别效果越好。<strong>系统使用低置信度阈值(0.1)，可更好地识别垃圾物品。</strong>
@@ -25,7 +26,38 @@
           {{ message }}
         </div>
 
-        <div class="row">
+        <!-- Mode Toggle Tabs -->
+        <div class="mode-tabs mb-4 text-center">
+            <div class="d-flex justify-content-center gap-3">
+                <common-button 
+                  :theme="detectMode === 'upload' ? 'primary' : 'secondary'"
+                  size="md"
+                  :disabled="detectMode === 'upload'"
+                  @click="setMode('upload')"
+                >
+                    <i class="bi bi-cloud-arrow-up me-2"></i>图片上传
+                </common-button>
+                <common-button 
+                  :theme="detectMode === 'camera' ? 'primary' : 'secondary'"
+                  size="md"
+                  :disabled="detectMode === 'camera'"
+                  @click="setMode('camera')"
+                >
+                    <i class="bi bi-camera-video me-2"></i>实时摄像头
+                </common-button>
+            </div>
+        </div>
+
+        <div v-if="detectMode === 'camera'">
+          <div class="card mb-4">
+             <div class="card-body">
+                <h5 class="card-title text-center mb-4">实时摄像头识别</h5>
+                <camera-detect @error="handleCameraError" />
+             </div>
+          </div>
+        </div>
+
+        <div v-else class="row">
           <!-- 左侧：上传区域 -->
           <div class="col-lg-6">
             <div class="card mb-4">
@@ -165,10 +197,14 @@ import { ref, onMounted } from 'vue'
 import { useAuth } from '../composables/useAuth'
 import { useApi } from '../composables/useApi'
 import CommonButton from '@/components/CommonButton.vue'
+import PageHero from '@/components/PageHero.vue'
+import CameraDetect from '@/components/CameraDetect.vue'
 import '../styles/pages/detect.css'
 
 const { isLoggedIn } = useAuth()
 const { detect } = useApi()
+
+const detectMode = ref('upload') // 'upload' or 'camera'
 
 const fileInput = ref(null)
 const selectedFile = ref(null)
@@ -178,6 +214,16 @@ const isLoading = ref(false)
 const isDragOver = ref(false)
 const message = ref('')
 const messageType = ref('')
+
+const setMode = (mode) => {
+  detectMode.value = mode
+  message.value = ''
+}
+
+const handleCameraError = (err) => {
+  message.value = '摄像头启动失败: ' + err.message
+  messageType.value = 'danger'
+}
 
 const triggerFileInput = () => {
   fileInput.value?.click()

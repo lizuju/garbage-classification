@@ -1,53 +1,5 @@
 /* about.css */
 
-/* Hero Section - white background */
-.about-hero-section {
-  width: 100%;
-  min-height: 81vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.about-hero-content {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  padding: 4rem 2rem;
-}
-
-/* Hero Icon */
-.about-hero-icon {
-  width: 140px;
-  height: 140px;
-  margin-bottom: 40px;
-  border-radius: 40px;
-  transition: var(--transition-standard);
-}
-
-/* Hero Title - dark text for white background */
-.about-hero-title {
-  font-size: 3.8rem;
-  font-weight: 800;
-  letter-spacing: -1px;
-  margin-bottom: 24px;
-  display: block;
-  color: #1d1d1f !important;
-  text-shadow: none !important;
-}
-
-/* Hero Subtitle - dark text for white background */
-.about-hero-subtitle {
-  font-size: 1.8rem;
-  font-weight: 300;
-  letter-spacing: 4px;
-  margin-bottom: 50px;
-  color: #333 !important;
-  text-shadow: none !important;
-}
-
 .about-content {
   margin-left: 3vw;
   margin-right: 3vw;
