@@ -53,7 +53,7 @@
   --dashed-border: #ddd;
 
   /* 阴影 */
-  --box-shadow-sm: 0 2px 8px rgba(0,0,0,0.2);
+  --box-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
   --shadow-standard: 0 8px 24px rgba(0, 0, 0, 0.05);
   --shadow-hover: 0 12px 30px rgba(0, 0, 0, 0.12);
 
@@ -70,4 +70,8 @@
 
   /* 核心基础过渡效果 */
   --transition-standard: all 0.3s ease;
+
+  /* Page Alignment Variables */
+  --page-margin: 3vw;
+  --page-margin-mobile: 5vw;
 }

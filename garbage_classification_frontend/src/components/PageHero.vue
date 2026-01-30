@@ -16,7 +16,7 @@
       <div v-reveal v-if="ctaText && ctaLink" class="hero-fade-in">
         <CommonButton
           :href="ctaLink"
-          theme="secondary"
+          :theme="ctaTheme"
           size="lg"
           @click="handleCtaClick"
         >
@@ -56,6 +56,10 @@ const props = defineProps({
   compact: {
     type: Boolean,
     default: false
+  },
+  ctaTheme: {
+    type: String,
+    default: 'secondary'
   }
 });
 </script>

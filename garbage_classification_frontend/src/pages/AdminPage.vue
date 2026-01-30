@@ -5,7 +5,7 @@
       subtitle="系统数据统计与用户管理"
       compact
     />
-    <div class="container-fluid mt-5 mb-5">
+    <div class="admin-content">
     <div class="row">
       <div class="col-md-3">
         <div class="card text-center">
@@ -70,6 +70,7 @@
 import { ref, onMounted } from 'vue'
 import { useApi } from '../composables/useApi'
 import PageHero from '@/components/PageHero.vue'
+import '../styles/pages/admin.css'
 
 const { getAdminStats } = useApi()
 

@@ -22,22 +22,31 @@
     <!-- Controls -->
     <div class="camera-controls text-center">
       <div v-if="!isStreaming" class="start-controls">
-         <common-button theme="primary" @click="startCamera">
+        <common-button
+          theme="primary" 
+          size="md"
+          @click="startCamera"
+        >
            <i class="bi bi-camera-video-fill me-2"></i>开启摄像头
-         </common-button>
+        </common-button>
       </div>
       
       <div v-else class="active-controls">
         <div class="d-flex justify-content-center gap-3 align-items-center">
           <common-button 
             :theme="isDetecting ? 'danger' : 'success'" 
+            size="md"
             @click="toggleDetection"
           >
             <i :class="isDetecting ? 'bi bi-stop-circle-fill' : 'bi bi-play-circle-fill'" class="me-2"></i>
             {{ isDetecting ? '停止识别' : '开始实时识别' }}
           </common-button>
           
-          <common-button theme="secondary" @click="stopCamera">
+          <common-button 
+            theme="cancel" 
+            size="md"
+            @click="stopCamera"
+          >
             <i class="bi bi-camera-video-off-fill me-2"></i>关闭摄像头
           </common-button>
         </div>

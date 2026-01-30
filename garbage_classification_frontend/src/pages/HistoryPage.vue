@@ -9,7 +9,7 @@
       subtitle="查看您的过往识别记录与分析结果"
       compact
     />
-    <div class="container mt-5 mb-5">
+    <div class="history-content">
     <h2 v-reveal id="project-overview" class="section-title hero-fade-in anim-delay-1">垃圾识别</h2>
 
     <div class="row">
@@ -79,6 +79,7 @@ import { ref, onMounted } from 'vue'
 import { useAuth } from '../composables/useAuth'
 import { useApi } from '../composables/useApi'
 import PageHero from '@/components/PageHero.vue'
+import '../styles/pages/history.css'
 
 const { isLoggedIn } = useAuth()
 const { getHistory, deleteHistory } = useApi()

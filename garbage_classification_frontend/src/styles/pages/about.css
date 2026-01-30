@@ -1,23 +1,27 @@
 /* about.css */
 
 .about-content {
-  margin-left: 3vw;
-  margin-right: 3vw;
+  /* Unified horizontal alignment using sidebar margins */
+  margin-left: var(--page-margin);
+  margin-right: var(--page-margin);
   padding-bottom: 5rem;
 }
 
-/* Lead text */
-.about-content .lead {
-  font-size: 1.5rem;
-  color: #666;
-  margin-bottom: 3rem;
-  font-weight: 300;
+/* Mobile Alignment (< 768px) */
+@media (max-width: 768px) {
+  .about-content {
+    margin-left: var(--page-margin-mobile);
+    margin-right: var(--page-margin-mobile);
+  }
 }
 
+/* Ensure title allows text to flow naturally with the container */
 .about-content .section-title {
-  margin-top: 3rem;
-  margin-bottom: 1rem;
+  margin-top: 4rem;
+  margin-bottom: 1.5rem;
   margin-left: 0 !important;
+  /* Force reset to align with container */
+  padding-left: 0;
 }
 
 .about-content .section-title:first-child {
@@ -605,11 +609,6 @@
 
   .about-card-content {
     padding: 25px;
-  }
-
-  .about-content .section-title {
-    font-size: 2rem;
-    margin-left: 0 !important;
   }
 
   /* Stack overview layout on mobile */

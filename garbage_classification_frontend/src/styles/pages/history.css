@@ -1,0 +1,15 @@
+/* history.css */
+
+.history-content {
+    margin-left: var(--page-margin);
+    margin-right: var(--page-margin);
+    padding-bottom: 5rem;
+    padding-top: 3rem;
+}
+
+@media (max-width: 768px) {
+    .history-content {
+        margin-left: var(--page-margin-mobile);
+        margin-right: var(--page-margin-mobile);
+    }
+}

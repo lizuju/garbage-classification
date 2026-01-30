@@ -62,8 +62,8 @@
 /* 5. 禁用状态 */
 .base-custom-btn:disabled {
   cursor: not-allowed;
-  filter: grayscale(0.6);
-  opacity: 0.7;
+  filter: grayscale(0.9);
+  opacity: 0.6;
   transform: none !important;
   box-shadow: none !important;
 }
@@ -109,6 +109,17 @@ i, span, .bi { transition: var(--transition-standard); }
   box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
 }
 
+/* 4. 垃圾桶复古蓝 */
+.btn-secondary {
+  background: linear-gradient(180deg, #4c86b6 0%, #2d6399 100%);
+  box-shadow: 0 4px 14px 0 rgba(62, 109, 156, 0.3);
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(180deg, #30659a 0%, #1b4879 100%);
+  box-shadow: 0 6px 20px rgba(62, 109, 156, 0.4);
+}
+
 /* 4. 金色主题 (流动金属质感) */
 .btn-gold {
   background: linear-gradient(180deg, #fff4d6 0%, #d4c391 100%);
@@ -119,15 +130,26 @@ i, span, .bi { transition: var(--transition-standard); }
   box-shadow: 0 6px 20px rgba(184, 134, 11, 0.4);
 }
 
-/* 4. 垃圾桶复古蓝 */
-.btn-secondary {
-  background: linear-gradient(180deg, #4c86b6 0%, #2d6399 100%);
-  box-shadow: 0 4px 14px 0 rgba(62, 109, 156, 0.3);
+/* 深科技紫 */
+.btn-purple {
+  background: linear-gradient(180deg, #b086e1 0%, #6942a0 100%);
+  box-shadow: 0 4px 14px rgba(123, 95, 163, 0.3);
 }
 
-.btn-secondary:hover {
-  background: linear-gradient(180deg, #30659a 0%, #1b4879 100%);
-  box-shadow: 0 6px 20px rgba(62, 109, 156, 0.4);
+.btn-purple:hover {
+  background: linear-gradient(180deg, #a071e7 0%, #5e3697 100%);
+  box-shadow: 0 6px 20px rgba(123, 95, 163, 0.4);
+}
+
+/* 取消按钮（暖米杏色） */
+.btn-cancel {
+  background: linear-gradient(180deg, #e8a96a 0%, #e29a4e 100%);
+  box-shadow: 0 4px 14px rgba(120, 90, 60, 0.3);
+}
+
+.btn-cancel:hover {
+  background: linear-gradient(180deg, #e49046 0%, #e2882f 100%);
+  box-shadow: 0 6px 20px rgba(120, 90, 60, 0.4);
 }
 
 /* 额外增加一个：半透明毛玻璃质感 (如果背景很复杂时使用) */

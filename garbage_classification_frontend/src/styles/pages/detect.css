@@ -1,9 +1,20 @@
 /* detect.css */
 
-.detect-page-wrapper {
-  margin-left: 3vw;
-  margin-right: 3vw;
+/* .detect-page-wrapper {
+  // Removed, let PageHero dictate full width
+} */
+
+.detect-content {
+  margin-left: var(--page-margin);
+  margin-right: var(--page-margin);
   padding-bottom: 5rem;
+}
+
+@media (max-width: 768px) {
+  .detect-content {
+    margin-left: var(--page-margin-mobile);
+    margin-right: var(--page-margin-mobile);
+  }
 }
 
 /* 上传区域样式 */
@@ -83,7 +94,8 @@
 }
 
 .detect-page-wrapper .remove-btn:hover {
-  transform: scale(1.15); /* 悬停时稍微放大，交互感更强 */
+  transform: scale(1.15);
+  /* 悬停时稍微放大，交互感更强 */
 }
 
 /* 分类标签样式 */
@@ -98,13 +110,21 @@
   box-shadow: var(--box-shadow-sm);
 }
 
-.detect-page-wrapper .category-label.recyclable { background-color: var(--color-recyclable); }
+.detect-page-wrapper .category-label.recyclable {
+  background-color: var(--color-recyclable);
+}
 
-.detect-page-wrapper .category-label.harmful { background-color: var(--color-harmful); }
+.detect-page-wrapper .category-label.harmful {
+  background-color: var(--color-harmful);
+}
 
-.detect-page-wrapper .category-label.kitchen { background-color: var(--color-kitchen); }
+.detect-page-wrapper .category-label.kitchen {
+  background-color: var(--color-kitchen);
+}
 
-.detect-page-wrapper .category-label.other { background-color: var(--color-other); }
+.detect-page-wrapper .category-label.other {
+  background-color: var(--color-other);
+}
 
 /* 加载器 */
 .detect-page-wrapper .loader {
@@ -131,7 +151,7 @@
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-   .detect-page-wrapper .page-header h1 {
+  .detect-page-wrapper .page-header h1 {
     font-size: 2rem;
   }
 

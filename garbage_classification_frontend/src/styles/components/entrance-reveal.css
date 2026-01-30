@@ -2,17 +2,16 @@
 
 .section-title {
   height: 10vh;
-  margin-left: 3vw !important;
-  margin-top: 1.5vh !important;
-  margin-bottom: 1.5vh;
-  
+  /* Removed hardcoded margins to respect parent container padding/margin */
+  margin-bottom: 3rem;
+
   /* 核心排版 */
-  font-size: 2.7rem; 
+  font-size: 2.7rem;
   font-weight: 800;
-  text-align: left !important; 
+  text-align: left !important;
   color: #1d1d1f;
   letter-spacing: -1.5px;
-  
+
   /* 渲染优化 */
   text-shadow: none !important;
   -webkit-font-smoothing: antialiased;
@@ -36,17 +35,40 @@
   animation: heroTextUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
-[class^="animate-"], [class*=" animate-"] {
+[class^="animate-"],
+[class*=" animate-"] {
   opacity: 0;
   transform: translateY(30px);
   animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
 /* 设置交错延迟，让文字一行行出来 */
-.hero-fade-in.active.anim-delay-1 { animation-delay: 0.1s; }
-.hero-fade-in.active.anim-delay-2 { animation-delay: 0.3s; }
-.hero-fade-in.active.anim-delay-3 { animation-delay: 0.6s; }
-.hero-fade-in.active.anim-delay-4 { animation-delay: 0.9s; }
-.hero-fade-in.active.anim-delay-5 { animation-delay: 1.2s; }
-.hero-fade-in.active.anim-delay-6 { animation-delay: 1.5s; }
-.hero-fade-in.active.anim-delay-debug { animation-delay: 6s; }    /* 调试用，方便观察效果 */
+.hero-fade-in.active.anim-delay-1 {
+  animation-delay: 0.1s;
+}
+
+.hero-fade-in.active.anim-delay-2 {
+  animation-delay: 0.3s;
+}
+
+.hero-fade-in.active.anim-delay-3 {
+  animation-delay: 0.6s;
+}
+
+.hero-fade-in.active.anim-delay-4 {
+  animation-delay: 0.9s;
+}
+
+.hero-fade-in.active.anim-delay-5 {
+  animation-delay: 1.2s;
+}
+
+.hero-fade-in.active.anim-delay-6 {
+  animation-delay: 1.5s;
+}
+
+.hero-fade-in.active.anim-delay-debug {
+  animation-delay: 6s;
+}
+
+/* 调试用，方便观察效果 */

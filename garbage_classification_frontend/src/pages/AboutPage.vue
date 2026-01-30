@@ -9,9 +9,7 @@
     />
 
     <!-- Main Content -->
-    <div class="container-fluid">
-      <!-- Content wrapper for alignment -->
-      <div class="about-content">
+    <div class="about-content">
         <!-- 项目概述 -->
         <h2 v-reveal id="project-overview" class="section-title hero-fade-in anim-delay-1">项目概述</h2>
         <div class="about-guide-card overview-card">
@@ -264,7 +262,6 @@
             </div>
           </transition>
         </div>
-      </div>
     </div>
   </div>
 </template>

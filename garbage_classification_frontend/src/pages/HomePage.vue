@@ -20,10 +20,10 @@
     </div>
 
     <!-- 主内容 -->
-    <div class="container-fluid py-5">
+    <div class="home-content-wrapper">
 
       <!-- 功能模块区 - 3 列并排 -->
-      <div class="container-fluid feature-scroll-section py-5">
+      <div class="feature-scroll-section">
         <h1 v-reveal class="section-title hero-fade-in anim-delay-1">探索更多功能</h1>
         
         <div class="feature-scroll-container">
@@ -99,7 +99,7 @@
       <!-- 垃圾分类指南 -->
       <h1 v-reveal id="classification-guide" class="section-title hero-fade-in anim-delay-1">垃圾分类指南</h1>
 
-      <div class="container-fluid classification-guide">
+      <div class="classification-guide">
 
         <div class="row g-4">
           <!-- 可回收物 -->
@@ -256,7 +256,7 @@
       </div>
 
       <!-- 为什么分类 -->
-      <div v-reveal class="container-fluid py-5 px-0"> <h1 class="section-title hero-fade-in anim-delay-1">重塑循环之美</h1>
+      <div v-reveal> <h1 class="section-title hero-fade-in anim-delay-1">重塑循环之美</h1>
         
         <div class="why-important-container">
           <div v-reveal class="why-important-card hero-fade-in">
