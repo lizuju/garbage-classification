@@ -64,7 +64,7 @@
             <div class="guide-card recyclable">
               <div class="guide-header d-flex justify-content-center align-items-center">
                 <i class="bi bi-recycle" style="font-size: 30px;"></i>
-                <h5>可回收物</h5>
+                <h5>可回收垃圾</h5>
               </div>
               <div class="guide-content">
                   <p class="main-desc">

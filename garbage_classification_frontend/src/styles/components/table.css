@@ -15,11 +15,13 @@
   font-weight: 600;
   color: var(--text-dark);
   padding: 12px;
+  vertical-align: middle;
 }
 
 .table td {
   padding: 12px;
   border-bottom: 1px solid var(--third-color);
+  vertical-align: middle;
 }
 
 .table tbody tr:hover {

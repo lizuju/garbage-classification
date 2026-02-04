@@ -4,7 +4,7 @@
     margin-left: var(--page-margin);
     margin-right: var(--page-margin);
     padding-bottom: 5rem;
-    padding-top: 3rem;
+    padding-top: 0 !important;
 }
 
 @media (max-width: 768px) {

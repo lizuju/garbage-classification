@@ -79,7 +79,7 @@ def get_stats():
         if confidences:
             avg_confidence = sum(confidences) / len(confidences)
 
-    class_names = ['可回收', '有害', '厨余', '其他']
+    class_names = ['可回收垃圾', '有害垃圾', '厨余垃圾', '其他垃圾']
     class_counts = {name: 0 for name in class_names}
     for image in Image.query.all():
         if image.result_data:
@@ -87,6 +87,12 @@ def get_stats():
                 results = json.loads(image.result_data)
                 for result in results:
                     class_name = result.get('class_name')
+                    # Backward compatibility for old labels
+                    if class_name == '可回收': class_name = '可回收垃圾'
+                    elif class_name == '有害': class_name = '有害垃圾'
+                    elif class_name == '厨余': class_name = '厨余垃圾'
+                    elif class_name == '其他': class_name = '其他垃圾'
+                    
                     if class_name in class_counts:
                         class_counts[class_name] += 1
             except Exception:

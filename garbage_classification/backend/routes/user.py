@@ -89,6 +89,7 @@ def get_user_history():
                 'id': record.id,
                 'detection_count': detection_count,
                 'confidence': record.confidence,
+                'results': results,
                 'created_at': record.created_at.isoformat() if record.created_at else '',
             })
         except Exception as e:

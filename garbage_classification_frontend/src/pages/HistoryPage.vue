@@ -7,10 +7,11 @@
     <PageHero
       title="识别历史"
       subtitle="查看您的过往识别记录与分析结果"
-      compact
+      ctaText="查看记录"
+      ctaLink="#history-records"
     />
     <div class="history-content">
-    <h2 v-reveal id="project-overview" class="section-title hero-fade-in anim-delay-1">垃圾识别</h2>
+    <h2 v-reveal id="history-records" class="section-title hero-fade-in anim-delay-1">历史记录</h2>
 
     <div class="row">
       <div class="col-md-12">
@@ -31,27 +32,40 @@
               <div class="table-responsive">
                 <table class="table table-hover">
                   <thead>
-                    <tr>
-                      <th>时间</th>
-                      <th>检测到的物品数</th>
-                      <th>平均信心度</th>
-                      <th>操作</th>
-                    </tr>
+                     <tr>
+                       <th>时间</th>
+                       <th>检测记录</th>
+                       <th>识别物品</th>
+                       <th>平均信心度</th>
+                       <th>操作</th>
+                     </tr>
                   </thead>
                   <tbody>
                     <tr v-for="item in history" :key="item.id">
                       <td>{{ formatDate(item.created_at) }}</td>
-                      <td>{{ item.detection_count || 0 }} 个</td>
-                      <td>
-                        <div class="progress" style="height: 20px">
-                          <div
-                            class="progress-bar bg-success"
-                            :style="{ width: `${(item.confidence * 100).toFixed(1)}%` }"
-                          >
-                            {{ (item.confidence * 100).toFixed(1) }}%
-                          </div>
-                        </div>
-                      </td>
+                       <td>{{ item.detection_count || 0 }} 个</td>
+                       <td>
+                         <div class="d-flex flex-wrap gap-1">
+                           <span 
+                             v-for="(res, ridx) in getUniqueCategories(item.results)" 
+                             :key="ridx"
+                             :class="`category-label ${getCategoryClass(res)}`"
+                           >
+                             {{ res }}
+                           </span>
+                         </div>
+                       </td>
+                       <td>
+                         <div v-if="item.confidence && item.confidence > 0" class="gc-progress-container">
+                           <div
+                             class="gc-progress-bar"
+                             :class="getProgressLevelClass(item.confidence)"
+                             :style="{ width: `${(item.confidence * 100).toFixed(1)}%` }"
+                           ></div>
+                           <span class="gc-progress-label">{{ (item.confidence * 100).toFixed(1) }}%</span>
+                         </div>
+                         <span v-else class="text-muted small">无识别数据</span>
+                       </td>
                       <td>
                         <button class="btn btn-sm btn-danger" @click="deleteItem(item.id)">
                           <i class="bi bi-trash"></i> 删除
@@ -80,6 +94,8 @@ import { useAuth } from '../composables/useAuth'
 import { useApi } from '../composables/useApi'
 import PageHero from '@/components/PageHero.vue'
 import '../styles/pages/history.css'
+import '../styles/components/progress.css'
+import '../styles/components/labels.css'
 
 const { isLoggedIn } = useAuth()
 const { getHistory, deleteHistory } = useApi()
@@ -121,8 +137,39 @@ const deleteItem = async (id) => {
   }
 }
 
+const getCategoryClass = (className) => {
+  const classMap = {
+    '可回收垃圾': 'recyclable',
+    '有害垃圾': 'harmful',
+    '厨余垃圾': 'kitchen',
+    '其他垃圾': 'other',
+  }
+  // Backward compatibility also needed here
+  if (className === '可回收') return 'recyclable'
+  if (className === '有害') return 'harmful'
+  if (className === '厨余') return 'kitchen'
+  if (className === '其他') return 'other'
+  
+  return classMap[className] || 'other'
+}
+
+const getUniqueCategories = (results) => {
+  if (!results || !Array.isArray(results)) return []
+  return [...new Set(results.map(r => r.class_name))]
+}
+
+const getProgressLevelClass = (confidence) => {
+  if (confidence >= 0.9) return 'lvl-excellent'
+  if (confidence >= 0.7) return 'lvl-high'
+  if (confidence >= 0.4) return 'lvl-medium'
+  return 'lvl-low'
+}
+
 const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleString('zh-CN')
+  if (!dateString) return ''
+  // If the backend hasn't been restarted yet, this fix ensures it's treated as UTC
+  const utcString = dateString.endsWith('Z') ? dateString : dateString + 'Z'
+  return new Date(utcString).toLocaleString('zh-CN')
 }
 
 onMounted(() => {

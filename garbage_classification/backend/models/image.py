@@ -31,6 +31,6 @@ class DetectionHistory(db.Model):
             'image_path': self.image_path,
             'result': json.loads(self.result),
             'confidence': self.confidence,
-            'created_at': self.created_at.isoformat()
+            'created_at': self.created_at.isoformat() + 'Z'
         }
 

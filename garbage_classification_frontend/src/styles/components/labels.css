@@ -1,0 +1,29 @@
+/* labels.css */
+
+.category-label {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    color: var(--white);
+    font-weight: 600;
+    margin-right: 8px;
+    font-size: 0.875rem;
+    box-shadow: var(--box-shadow-sm);
+    text-align: center;
+}
+
+.category-label.recyclable {
+    background-color: var(--color-recyclable);
+}
+
+.category-label.harmful {
+    background-color: var(--color-harmful);
+}
+
+.category-label.kitchen {
+    background-color: var(--color-kitchen);
+}
+
+.category-label.other {
+    background-color: var(--color-other);
+}

@@ -48,6 +48,13 @@ def detect():
             result_img.save(result_path)
 
         result_json = json.dumps(results, ensure_ascii=False) if results else "[]"
+        print(f"DEBUG: Detection results count: {len(results)}")
+        if results:
+            categories = [r.get('class_name') for r in results]
+            print(f"DEBUG: Categories detected: {categories}")
+            if "其他" in categories:
+                print("DEBUG: 'Other Trash' detected! Proceeding to save...")
+
         user = User.query.get(user_id)
         if not user:
             return jsonify({'status': 'error', 'message': '用户不存在'}), 404
@@ -61,17 +68,30 @@ def detect():
         )
         db.session.add(image)
 
-        confidence = max([item.get('confidence', 0) for item in results]) if results else 0
-        history = DetectionHistory(
-            user_id=user.id,
-            image_path=file_path,
-            result=result_json,
-            confidence=confidence
-        )
-        db.session.add(history)
-        db.session.commit()
-
-        log_action('user_action', f'Detection finished: {len(results)} objects', user.id)
+        if results:
+            confidences = [item.get('confidence', 0) for item in results]
+            confidence = sum(confidences) / len(confidences)
+            
+            print(f"DEBUG: Saving history for user {user.id} with confidence {confidence}")
+            try:
+                history = DetectionHistory(
+                    user_id=user.id,
+                    image_path=file_path,
+                    result=result_json,
+                    confidence=confidence
+                )
+                db.session.add(history)
+                db.session.commit()
+                print(f"DEBUG: Successfully committed history ID: {history.id}")
+                print(f"DEBUG: Saved result_json content: {result_json[:100]}...")
+                log_action('user_action', f'Detection finished: {len(results)} objects', user.id)
+            except Exception as commit_err:
+                print(f"DEBUG: FAILED to commit history: {str(commit_err)}")
+                db.session.rollback()
+                raise commit_err
+        else:
+            db.session.commit() # Save the image record even if no detections
+            print("DEBUG: No objects detected. Skipping history record creation.")
 
         return jsonify({
             'status': 'success',
@@ -79,7 +99,7 @@ def detect():
             'results': results,
             'original_url': f"/api/images/{image.id}/original",
             'result_url': f"/api/images/{image.id}/result",
-            'history_id': history.id,
+            'history_id': history.id if results else None,
             'message': '识别完成' if results else '未检测到垃圾物品'
         }), 200
 

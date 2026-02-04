@@ -3,9 +3,12 @@
     <PageHero
       title="管理后台"
       subtitle="系统数据统计与用户管理"
-      compact
+      ctaText="数据管理"
+      ctaLink="#admin-stats-title"
     />
     <div class="admin-content">
+    <h2 v-reveal id="admin-stats-title" class="section-title hero-fade-in anim-delay-1">后台数据</h2>
+    
     <div v-if="message" :class="`alert alert-${messageType} mb-4`" role="alert">
       {{ message }}
     </div>
@@ -30,7 +33,16 @@
         <div class="card text-center">
           <div class="card-body">
             <h6 class="text-muted">平均信心度</h6>
-            <h3>{{ ((stats.avg_confidence || 0) * 100).toFixed(1) }}%</h3>
+                <div v-if="stats.avg_confidence && stats.avg_confidence > 0" class="gc-progress-container lg mt-2" style="max-width: 280px; margin: 15px auto;">
+                  <div
+                    class="gc-progress-bar"
+                    :class="getProgressLevelClass(stats.avg_confidence)"
+                    :style="{ width: `${(stats.avg_confidence * 100).toFixed(1)}%` }"
+                  ></div>
+                  <span class="gc-progress-label">{{ (stats.avg_confidence * 100).toFixed(1) }}%</span>
+                </div>
+                <div v-else class="text-muted small my-3">暂无统计数据</div>
+                <div class="stat-label">平均识别信心度</div>
           </div>
         </div>
       </div>
@@ -74,6 +86,7 @@ import { ref, onMounted } from 'vue'
 import { useApi } from '../composables/useApi'
 import PageHero from '@/components/PageHero.vue'
 import '../styles/pages/admin.css'
+import '../styles/components/progress.css'
 
 const { getAdminStats } = useApi()
 
@@ -88,12 +101,19 @@ const getTotalCount = () => {
 
 const getColorForClass = (className) => {
   const colorMap = {
-    '可回收': 'success',
-    '有害': 'danger',
-    '厨余': 'warning',
-    '其他': 'secondary',
+    '可回收垃圾': 'success',
+    '有害垃圾': 'danger',
+    '厨余垃圾': 'warning',
+    '其他垃圾': 'secondary',
   }
   return colorMap[className] || 'primary'
+}
+
+const getProgressLevelClass = (confidence) => {
+  if (confidence >= 0.9) return 'lvl-excellent'
+  if (confidence >= 0.7) return 'lvl-high'
+  if (confidence >= 0.4) return 'lvl-medium'
+  return 'lvl-low'
 }
 
 onMounted(async () => {

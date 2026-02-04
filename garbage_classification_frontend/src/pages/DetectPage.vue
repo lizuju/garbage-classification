@@ -44,7 +44,7 @@
                     :disabled="detectMode === 'camera'"
                     @click="setMode('camera')"
                   >
-                      <i class="bi bi-camera-video me-2"></i>实时摄像头
+                      <i class="bi bi-camera-video me-2"></i>实时检测
                   </common-button>
               </div>
           </div>
@@ -159,14 +159,15 @@
                                 </span>
                               </td>
                               <td>
-                                <div class="progress" style="height: 20px">
+                                <div v-if="item.confidence && item.confidence > 0" class="gc-progress-container">
                                   <div
-                                    class="progress-bar bg-success"
+                                    class="gc-progress-bar"
+                                    :class="getProgressLevelClass(item.confidence)"
                                     :style="{ width: `${(item.confidence * 100).toFixed(1)}%` }"
-                                  >
-                                    {{ (item.confidence * 100).toFixed(1) }}%
-                                  </div>
+                                  ></div>
+                                  <span class="gc-progress-label">{{ (item.confidence * 100).toFixed(1) }}%</span>
                                 </div>
+                                <span v-else class="text-muted small">无法识别</span>
                               </td>
                               <td>
                                 {{
@@ -201,6 +202,8 @@ import CommonButton from '@/components/CommonButton.vue'
 import PageHero from '@/components/PageHero.vue'
 import CameraDetect from '@/components/CameraDetect.vue'
 import '../styles/pages/detect.css'
+import '../styles/components/progress.css'
+import '../styles/components/labels.css'
 
 const { isLoggedIn } = useAuth()
 const { detect } = useApi()
@@ -291,12 +294,19 @@ const resetUpload = () => {
   }
 }
 
+const getProgressLevelClass = (confidence) => {
+  if (confidence >= 0.9) return 'lvl-excellent'
+  if (confidence >= 0.7) return 'lvl-high'
+  if (confidence >= 0.4) return 'lvl-medium'
+  return 'lvl-low'
+}
+
 const getCategoryClass = (className) => {
   const classMap = {
-    '可回收': 'recyclable',
-    '有害': 'harmful',
-    '厨余': 'kitchen',
-    '其他': 'other',
+    '可回收垃圾': 'recyclable',
+    '有害垃圾': 'harmful',
+    '厨余垃圾': 'kitchen',
+    '其他垃圾': 'other',
   }
   return classMap[className] || 'other'
 }

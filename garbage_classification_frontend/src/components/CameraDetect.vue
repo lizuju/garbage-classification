@@ -84,14 +84,15 @@
                     </span>
                   </td>
                   <td>
-                    <div class="progress" style="height: 18px">
+                    <div v-if="item.confidence && item.confidence > 0" class="gc-progress-container">
                       <div
-                        :class="['progress-bar', getProgressBarColor(item.confidence)]"
+                        class="gc-progress-bar"
+                        :class="getProgressLevelClass(item.confidence)"
                         :style="{ width: `${(item.confidence * 100).toFixed(1)}%` }"
-                      >
-                        {{ (item.confidence * 100).toFixed(1) }}%
-                      </div>
+                      ></div>
+                      <span class="gc-progress-label">{{ (item.confidence * 100).toFixed(1) }}%</span>
                     </div>
+                    <span v-else class="text-muted small">极低信心度</span>
                   </td>
                   <td class="text-muted font-monospace small">
                     {{
@@ -118,6 +119,8 @@
 import { ref, onUnmounted, computed, watch } from 'vue';
 import CommonButton from '@/components/CommonButton.vue';
 import { useApi } from '@/composables/useApi';
+import '../styles/components/progress.css';
+import '../styles/components/labels.css';
 
 const props = defineProps({
   detectionInterval: {
@@ -146,17 +149,27 @@ let offscreenCanvas = null;
 
 // Categories for classification labels
 const getCategoryClass = (className) => {
-  if (className.includes('可回收')) return 'recyclable';
-  if (className.includes('有害')) return 'harmful';
-  if (className.includes('厨余')) return 'kitchen';
-  return 'other';
-};
+  const classMap = {
+    '可回收垃圾': 'recyclable',
+    '有害垃圾': 'harmful',
+    '厨余垃圾': 'kitchen',
+    '其他垃圾': 'other',
+  }
+  // Backward compatibility
+  if (className === '可回收') return 'recyclable'
+  if (className === '有害') return 'harmful'
+  if (className === '厨余') return 'kitchen'
+  if (className === '其他') return 'other'
+
+  return classMap[className] || 'other'
+}
 
 // Progress bar color based on confidence
-const getProgressBarColor = (confidence) => {
-  if (confidence > 0.8) return 'bg-success';
-  if (confidence > 0.5) return 'bg-info';
-  return 'bg-warning';
+const getProgressLevelClass = (confidence) => {
+  if (confidence >= 0.9) return 'lvl-excellent'
+  if (confidence >= 0.7) return 'lvl-high'
+  if (confidence >= 0.4) return 'lvl-medium'
+  return 'lvl-low'
 };
 
 const startCamera = async () => {
@@ -251,9 +264,12 @@ const detectFrame = async () => {
     const file = new File([blob], "capture.jpg", { type: "image/jpeg" });
     try {
       const result = await detect(file);
+      console.log('DEBUG: Camera detection result:', result);
       lastResult.value = result;
       if (result.results && result.results.length > 0) {
+        console.log('DEBUG: Objects detected count:', result.results.length);
         result.results.forEach(item => {
+          console.log(`DEBUG: Detected [${item.class_name}] with confidence ${item.confidence}`);
           detectionHistory.value.unshift({ ...item, id: Date.now() + Math.random() });
           if (detectionHistory.value.length > 10) detectionHistory.value.pop();
         });
@@ -281,9 +297,9 @@ const drawResults = (data) => {
     const width = x2 - x1;
     const height = y2 - y1;
     let color = '#6c757d';
-    if (item.class_name.includes('可回收')) color = '#3576ca';
-    if (item.class_name.includes('有害')) color = '#dc3545';
-    if (item.class_name.includes('厨余')) color = '#28a745';
+    if (item.class_name.includes('可回收垃圾')) color = '#3576ca';
+    if (item.class_name.includes('有害垃圾')) color = '#dc3545';
+    if (item.class_name.includes('厨余垃圾')) color = '#28a745';
     
     ctx.strokeStyle = color;
     ctx.lineWidth = 4;
@@ -387,22 +403,7 @@ onUnmounted(() => {
   border-bottom: 1px solid #f1f1f1;
 }
 
-/* Category Labels (replicated from detect.css to ensure consistency) */
-.category-label {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: 15px;
-  color: #fff;
-  font-weight: 600;
-  font-size: 0.75rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  white-space: nowrap;
-}
-
-.category-label.recyclable { background-color: var(--color-recyclable); }
-.category-label.harmful { background-color: var(--color-harmful); }
-.category-label.kitchen { background-color: var(--color-kitchen); }
-.category-label.other { background-color: var(--color-other); }
+/* Category labels moved to shared labels.css component */
 
 /* Custom Scrollbar for the results list */
 .results-list-wrapper::-webkit-scrollbar {

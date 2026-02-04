@@ -27,7 +27,7 @@ class YoloService:
         self.non_max_suppression = non_max_suppression
 
         self.model, self.device, self.imgsz, self.stride = self._load_model()
-        self.class_names = ['可回收', '有害', '厨余', '其他']
+        self.class_names = ['可回收垃圾', '有害垃圾', '厨余垃圾', '其他垃圾']
 
     def _find_weights(self):
         search_paths = [

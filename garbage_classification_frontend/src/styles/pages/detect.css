@@ -7,6 +7,7 @@
 .detect-content {
   margin-left: var(--page-margin);
   margin-right: var(--page-margin);
+  padding-top: 0 !important;
   padding-bottom: 5rem;
 }
 
@@ -98,33 +99,7 @@
   /* 悬停时稍微放大，交互感更强 */
 }
 
-/* 分类标签样式 */
-.detect-page-wrapper .category-label {
-  display: inline-block;
-  padding: 6px 14px;
-  border-radius: 20px;
-  color: var(--white);
-  font-weight: 600;
-  margin-right: 8px;
-  font-size: 0.875rem;
-  box-shadow: var(--box-shadow-sm);
-}
-
-.detect-page-wrapper .category-label.recyclable {
-  background-color: var(--color-recyclable);
-}
-
-.detect-page-wrapper .category-label.harmful {
-  background-color: var(--color-harmful);
-}
-
-.detect-page-wrapper .category-label.kitchen {
-  background-color: var(--color-kitchen);
-}
-
-.detect-page-wrapper .category-label.other {
-  background-color: var(--color-other);
-}
+/* Category labels moved to shared labels.css component */
 
 /* 加载器 */
 .detect-page-wrapper .loader {

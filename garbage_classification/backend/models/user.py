@@ -31,7 +31,7 @@ class User(db.Model):
             'username': self.username,
             'email': self.email,
             'is_admin': bool(self.is_admin),  # 显式转换为 bool，确保管理员标志正确
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'created_at': (self.created_at.isoformat() + 'Z') if self.created_at else None
         }
     
     def is_valid_for_session(self):

@@ -193,7 +193,10 @@ const noticeType = ref('')
 
 const formattedDate = computed(() => {
   if (user.value && user.value.created_at) {
-    const date = new Date(user.value.created_at)
+    const dateString = user.value.created_at
+    // Robust UTC handling: append 'Z' if missing
+    const utcString = dateString.endsWith('Z') ? dateString : dateString + 'Z'
+    const date = new Date(utcString)
     return date.toLocaleDateString('zh-CN', {
       year: 'numeric',
       month: '2-digit',
