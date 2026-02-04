@@ -9,27 +9,23 @@
   --primary-color: #28a745;
   --primary-rgb: 40, 167, 69;
   --secondary-color: #6c757d;
-  --success-color: #198754;
   --third-color: #dee2e6;
   --fourth-color: #e9ecef;
   --formcontrol-color: #ced4da;
 
-  /* 通知色 */
+  /* 通知与状态色 */
   --info-color: #0dcaf0;
   --info-bg-color: #cfe2ff;
   --info-color-text: #084298;
 
-  /* 提示色 */
   --warning-color: #fd7e14;
   --warning-bg-color: #fff3cd;
   --warning-color-text: #664d03;
 
-  /* 警告色 */
   --danger-color: #dc3545;
   --danger-bg-color: #f8d7da;
   --danger-color-text: #842029;
 
-  /* 成功色 */
   --success-color: #28a745;
   --success-bg-color: #d1e7dd;
   --success-color-text: #0f5132;

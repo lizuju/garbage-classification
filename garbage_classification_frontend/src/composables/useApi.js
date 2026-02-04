@@ -18,24 +18,21 @@ export function useApi() {
   // 将图片 URL 转换为 base64 数据 URL（支持带认证的图片加载）
   const convertImageToBase64 = async (imageUrl) => {
     try {
-      const token = localStorage.getItem('auth_token')
-      const headers = {}
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`
-      }
-
-      const response = await fetch(imageUrl, { headers })
+      const response = await fetch(imageUrl, { headers: getHeaders() })
       if (!response.ok) throw new Error(`HTTP ${response.status}`)
-      
+
       const blob = await response.blob()
       return new Promise((resolve, reject) => {
         const reader = new FileReader()
         reader.onload = () => resolve(reader.result)
-        reader.onerror = reject
+        reader.onerror = () => {
+          console.error('FileReader error')
+          resolve(null)
+        }
         reader.readAsDataURL(blob)
       })
     } catch (error) {
-      console.error('转换图片失败:', error)
+      console.error('转换图片失败:', imageUrl, error)
       return null
     }
   }
@@ -44,19 +41,19 @@ export function useApi() {
     try {
       const formData = new FormData()
       formData.append('file', file)
-      
+
       const headers = getHeaders()
       // FormData 会自动设置 Content-Type，删除手动设置
       delete headers['Content-Type']
-      
+
       const response = await fetch(`${API_BASE}/api/detect`, {
         method: 'POST',
         headers,
         body: formData,
       })
-      
+
       await handleResponse(response)
-      
+
       const data = await response.json()
       if (data.status === 'success') {
         // 将结果图片 URL 转换为 base64（支持认证）
@@ -79,9 +76,9 @@ export function useApi() {
         `${API_BASE}/api/user/history?page=${page}&page_size=${pageSize}`,
         { headers: getHeaders() }
       )
-      
+
       await handleResponse(response)
-      
+
       const data = await response.json()
       if (data.status === 'success') {
         return data
@@ -99,9 +96,9 @@ export function useApi() {
         method: 'DELETE',
         headers: getHeaders(),
       })
-      
+
       await handleResponse(response)
-      
+
       const data = await response.json()
       if (data.status === 'success') {
         return data
@@ -118,9 +115,9 @@ export function useApi() {
       const response = await fetch(`${API_BASE}/api/admin/stats`, {
         headers: getHeaders(),
       })
-      
+
       await handleResponse(response)
-      
+
       const data = await response.json()
       if (data.status === 'success') {
         return data

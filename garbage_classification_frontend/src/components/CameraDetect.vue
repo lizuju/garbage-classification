@@ -59,19 +59,56 @@
     </div>
 
     <!-- Results Summary -->
-    <div v-if="lastResult && isDetecting" class="camera-result-summary mt-3">
-      <div v-if="formattedResults.length > 0" class="d-flex flex-wrap justify-content-center gap-2">
-        <span 
-          v-for="(item, idx) in formattedResults" 
-          :key="idx" 
-          :class="`badge rounded-pill bg-${getCategoryColor(item.class_name)}`"
-          style="font-size: 0.9rem; padding: 0.5em 1em;"
-        >
-          {{ item.class_name }} {{ (item.confidence * 100).toFixed(0) }}%
-        </span>
-      </div>
-      <div v-else class="text-muted small">
-        暂未检测到目标
+    <div v-if="isStreaming" class="camera-results-container mt-4">
+      <h6 class="mb-3 d-flex align-items-center">
+        <i class="bi bi-list-columns-reverse me-2 text-primary"></i>
+        检测历史
+      </h6>
+      
+      <div class="results-list-wrapper">
+        <div v-if="detectionHistory.length > 0" class="table-responsive">
+          <table class="table table-sm align-middle result-table">
+            <thead>
+              <tr>
+                <th style="width: 30%">物品名称</th>
+                <th style="width: 45%">信心度</th>
+                <th style="width: 25%">位置</th>
+              </tr>
+            </thead>
+            <tbody>
+              <transition-group name="list">
+                <tr v-for="item in detectionHistory" :key="item.id">
+                  <td>
+                    <span :class="`category-label ${getCategoryClass(item.class_name)}`">
+                      {{ item.class_name }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="progress" style="height: 18px">
+                      <div
+                        :class="['progress-bar', getProgressBarColor(item.confidence)]"
+                        :style="{ width: `${(item.confidence * 100).toFixed(1)}%` }"
+                      >
+                        {{ (item.confidence * 100).toFixed(1) }}%
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-muted font-monospace small">
+                    {{
+                      item.bbox
+                        ? `[${Math.round(item.bbox[0])}, ${Math.round(item.bbox[1])}]`
+                        : 'N/A'
+                    }}
+                  </td>
+                </tr>
+              </transition-group>
+            </tbody>
+          </table>
+        </div>
+        <div v-else class="text-center py-4 text-muted">
+          <i class="bi bi-search mb-2 d-block" style="font-size: 1.5rem; opacity: 0.5;"></i>
+          等待检测结果...
+        </div>
       </div>
     </div>
   </div>
@@ -99,42 +136,39 @@ const stream = ref(null);
 const isStreaming = ref(false);
 const isInitializing = ref(false);
 const isDetecting = ref(false);
+const isProcessing = ref(false); // Throttle flag
 const error = ref('');
 const lastResult = ref(null);
+const detectionHistory = ref([]); // Store last 10 detections
 
 let detectionTimer = null;
+let offscreenCanvas = null;
 
-// Categories for badge colors
-const getCategoryColor = (name) => {
-  if (name.includes('可回收')) return 'primary';
-  if (name.includes('有害')) return 'danger';
-  if (name.includes('厨余')) return 'success';
-  return 'secondary'; // 其他
+// Categories for classification labels
+const getCategoryClass = (className) => {
+  if (className.includes('可回收')) return 'recyclable';
+  if (className.includes('有害')) return 'harmful';
+  if (className.includes('厨余')) return 'kitchen';
+  return 'other';
 };
 
-const formattedResults = computed(() => {
-  if (!lastResult.value?.results) return [];
-  return lastResult.value.results;
-});
+// Progress bar color based on confidence
+const getProgressBarColor = (confidence) => {
+  if (confidence > 0.8) return 'bg-success';
+  if (confidence > 0.5) return 'bg-info';
+  return 'bg-warning';
+};
 
 const startCamera = async () => {
   error.value = '';
   isInitializing.value = true;
-  
   try {
     const constraints = {
-      video: {
-        width: { ideal: 640 },
-        height: { ideal: 480 },
-        facingMode: 'environment' // Prefer back camera on mobile
-      }
+      video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'environment' }
     };
-    
     stream.value = await navigator.mediaDevices.getUserMedia(constraints);
-    
     if (videoRef.value) {
       videoRef.value.srcObject = stream.value;
-      // Wait for metadata to load to set canvas dimensions match video
       videoRef.value.onloadedmetadata = () => {
         isInitializing.value = false;
         isStreaming.value = true;
@@ -155,12 +189,8 @@ const stopCamera = () => {
     stream.value.getTracks().forEach(track => track.stop());
     stream.value = null;
   }
-  if (videoRef.value) {
-    videoRef.value.srcObject = null;
-  }
+  if (videoRef.value) videoRef.value.srcObject = null;
   isStreaming.value = false;
-  
-  // Clear canvas
   const ctx = canvasRef.value?.getContext('2d');
   if (ctx && canvasRef.value) {
     ctx.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height);
@@ -175,17 +205,14 @@ const resizeCanvas = () => {
 };
 
 const toggleDetection = () => {
-  if (isDetecting.value) {
-    stopDetection();
-  } else {
-    startDetection();
-  }
+  if (isDetecting.value) stopDetection();
+  else startDetection();
 };
 
 const startDetection = () => {
   if (!isStreaming.value) return;
   isDetecting.value = true;
-  detectFrame(); // Immediate first frame
+  detectFrame();
   detectionTimer = setInterval(detectFrame, props.detectionInterval);
 };
 
@@ -195,7 +222,6 @@ const stopDetection = () => {
     clearInterval(detectionTimer);
     detectionTimer = null;
   }
-  // Clear bounding boxes
   const ctx = canvasRef.value?.getContext('2d');
   if (ctx && canvasRef.value) {
     ctx.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height);
@@ -203,81 +229,86 @@ const stopDetection = () => {
 };
 
 const detectFrame = async () => {
-  if (!videoRef.value || !canvasRef.value || !isDetecting.value) return;
+  if (!videoRef.value || !canvasRef.value || !isDetecting.value || isProcessing.value) return;
 
-  // 1. Capture frame to a temporary canvas (or use the existing one but be careful not to send drawn boxes)
-  // Actually, we can just draw the video frame to an offscreen canvas or the current canvas (clearing it first)
+  isProcessing.value = true;
   const video = videoRef.value;
-  const canvas = document.createElement('canvas'); // Offscreen canvas for capture
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
   
-  // 2. Convert to blob/file
-  canvas.toBlob(async (blob) => {
-    if (!blob) return;
-    
-    // Create File object to match useApi expectations
+  if (!offscreenCanvas) offscreenCanvas = document.createElement('canvas');
+  if (offscreenCanvas.width !== video.videoWidth || offscreenCanvas.height !== video.videoHeight) {
+    offscreenCanvas.width = video.videoWidth;
+    offscreenCanvas.height = video.videoHeight;
+  }
+  
+  const ctx = offscreenCanvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
+  
+  offscreenCanvas.toBlob(async (blob) => {
+    if (!blob) {
+      isProcessing.value = false;
+      return;
+    }
     const file = new File([blob], "capture.jpg", { type: "image/jpeg" });
-    
     try {
       const result = await detect(file);
       lastResult.value = result;
+      if (result.results && result.results.length > 0) {
+        result.results.forEach(item => {
+          detectionHistory.value.unshift({ ...item, id: Date.now() + Math.random() });
+          if (detectionHistory.value.length > 10) detectionHistory.value.pop();
+        });
+      }
       drawResults(result);
     } catch (err) {
       console.error('Detection error:', err);
-      // Don't stop detection on single frame error, but maybe log it
+    } finally {
+      isProcessing.value = false;
     }
   }, 'image/jpeg', 0.8);
 };
 
 const drawResults = (data) => {
   if (!canvasRef.value || !videoRef.value) return;
-  
   const ctx = canvasRef.value.getContext('2d');
   const canvasWidth = canvasRef.value.width;
   const canvasHeight = canvasRef.value.height;
-  
-  // Clear previous drawings
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-  
   if (!data.results || data.results.length === 0) return;
 
-  // The backend likely returns bboxes normalized or relative to the original image size sent.
-  // Since we sent the full video frame, the bbox coordinates should map directly 1:1.
-  
   data.results.forEach(item => {
     if (!item.bbox) return;
     const [x1, y1, x2, y2] = item.bbox;
     const width = x2 - x1;
     const height = y2 - y1;
+    let color = '#6c757d';
+    if (item.class_name.includes('可回收')) color = '#3576ca';
+    if (item.class_name.includes('有害')) color = '#dc3545';
+    if (item.class_name.includes('厨余')) color = '#28a745';
     
-    // Style based on category
-    let color = '#6c757d'; // Default grey
-    if (item.class_name.includes('可回收')) color = '#007bff'; // Blue
-    if (item.class_name.includes('有害')) color = '#dc3545'; // Red
-    if (item.class_name.includes('厨余')) color = '#28a745'; // Green
-    
-    // Draw Box
     ctx.strokeStyle = color;
     ctx.lineWidth = 4;
     ctx.strokeRect(x1, y1, width, height);
-    
-    // Draw Label Background
     ctx.fillStyle = color;
     const text = `${item.class_name} ${(item.confidence * 100).toFixed(0)}%`;
     const textWidth = ctx.measureText(text).width;
     ctx.fillRect(x1, y1 - 25, textWidth + 10, 25);
-    
-    // Draw Label Text
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 16px Arial';
     ctx.fillText(text, x1 + 5, y1 - 7);
   });
 };
 
+const handleResize = () => {
+  if (isStreaming.value) resizeCanvas();
+};
+
+import { onMounted } from 'vue';
+onMounted(() => {
+  window.addEventListener('resize', handleResize);
+});
+
 onUnmounted(() => {
+  window.removeEventListener('resize', handleResize);
   stopCamera();
 });
 </script>
@@ -326,5 +357,80 @@ onUnmounted(() => {
   justify-content: center;
   align-items: center;
   z-index: 10;
+}
+
+/* Results List Styles */
+.results-list-wrapper {
+  max-height: 400px;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.result-table {
+  margin-bottom: 0;
+}
+
+.result-table th {
+  background: #f8f9fa;
+  padding: 12px 15px;
+  font-size: 0.85rem;
+  color: #6c757d;
+  font-weight: 600;
+  border-top: none;
+}
+
+.result-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+/* Category Labels (replicated from detect.css to ensure consistency) */
+.category-label {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 15px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.75rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  white-space: nowrap;
+}
+
+.category-label.recyclable { background-color: var(--color-recyclable); }
+.category-label.harmful { background-color: var(--color-harmful); }
+.category-label.kitchen { background-color: var(--color-kitchen); }
+.category-label.other { background-color: var(--color-other); }
+
+/* Custom Scrollbar for the results list */
+.results-list-wrapper::-webkit-scrollbar {
+  width: 6px;
+}
+.results-list-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+.results-list-wrapper::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+.results-list-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* List Transitions */
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.4s ease;
+}
+.list-enter-from {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
 }
 </style>

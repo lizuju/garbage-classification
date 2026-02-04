@@ -6,6 +6,9 @@
       compact
     />
     <div class="admin-content">
+    <div v-if="message" :class="`alert alert-${messageType} mb-4`" role="alert">
+      {{ message }}
+    </div>
     <div class="row">
       <div class="col-md-3">
         <div class="card text-center">
@@ -75,6 +78,8 @@ import '../styles/pages/admin.css'
 const { getAdminStats } = useApi()
 
 const stats = ref({})
+const message = ref('')
+const messageType = ref('danger')
 
 const getTotalCount = () => {
   if (!stats.value.class_distribution) return 1
@@ -99,6 +104,8 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error('获取统计失败:', error)
+    message.value = '无法加载统计数据，请检查服务状态。'
+    messageType.value = 'danger'
   }
 })
 </script>
