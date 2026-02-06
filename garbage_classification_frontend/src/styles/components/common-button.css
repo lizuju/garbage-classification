@@ -16,14 +16,32 @@
   z-index: 1;
   background-size: 200% auto;
   transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
   letter-spacing: 0.2px;
 }
 
 /* 2. 尺寸定义 */
-.btn-lg { padding: 18px 50px; font-size: 1.25rem; }
-.btn-md { padding: 12px 35px; font-size: 1.05rem; }
-.btn-sm { padding: 8px 20px; font-size: 0.9rem; }
+.btn-square {
+  padding: 12px 35px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  border-radius: 12px;
+}
+
+.btn-lg {
+  padding: 18px 50px;
+  font-size: 1.25rem;
+}
+
+.btn-md {
+  padding: 12px 35px;
+  font-size: 1.05rem;
+}
+
+.btn-sm {
+  padding: 8px 20px;
+  font-size: 0.85rem;
+}
 
 /* 3. 扫光特效 */
 .base-custom-btn::after {
@@ -33,12 +51,10 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.4) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.4) 50%,
+      rgba(255, 255, 255, 0) 100%);
   transition: none;
   z-index: -1;
 }
@@ -75,35 +91,56 @@
   display: inline-block;
   transform: translateX(4px);
 }
-i, span, .bi { transition: var(--transition-standard); }
+
+.base-custom-btn.btn-sm:hover:not(:disabled) i,
+.base-custom-btn.btn-sm:hover:not(:disabled) span,
+.base-custom-btn.btn-sm:hover:not(:disabled) .bi {
+  transform: translateX(1px);
+}
+
+/* 圆形按钮(如关闭按钮)不需要内部图标位移，保持居中 */
+.base-custom-btn.btn-circle:hover:not(:disabled) i,
+.base-custom-btn.btn-circle:hover:not(:disabled) span,
+.base-custom-btn.btn-circle:hover:not(:disabled) .bi {
+  transform: none;
+}
+
+i,
+span,
+.bi {
+  transition: var(--transition-standard);
+}
 
 /* 颜色主题配置 */
-/* 1. 成功绿 (森林翠绿：更深邃，带微妙明暗差) */
+/* 1. 成功绿 */
 .btn-success {
   background: linear-gradient(180deg, #16a34a 0%, #15803d 100%);
   box-shadow: 0 4px 14px 0 rgba(22, 163, 74, 0.3);
 }
+
 .btn-success:hover {
   background: linear-gradient(180deg, #15803d 0%, #166534 100%);
   box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4);
 }
 
-/* 2. 信息蓝 (调淡版：通透的湖蓝色渐变) */
+/* 2. 信息蓝 */
 .btn-info {
   /* 调淡了起始色，增加了呼吸感 */
-  background: linear-gradient(180deg, #38bdf8 0%, #0ea5e9 100%); 
+  background: linear-gradient(180deg, #38bdf8 0%, #0ea5e9 100%);
   box-shadow: 0 4px 14px rgba(56, 189, 248, 0.3);
 }
+
 .btn-info:hover {
   background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%);
   box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
 }
 
-/* 3. 主题蓝 (深邃交互蓝：比之前的黑色更有科技感) */
+/* 3. 主题蓝 */
 .btn-primary {
   background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
   box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
 }
+
 .btn-primary:hover {
   background: linear-gradient(180deg, #2563eb 0%, #1e40af 100%);
   box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
@@ -120,11 +157,12 @@ i, span, .bi { transition: var(--transition-standard); }
   box-shadow: 0 6px 20px rgba(62, 109, 156, 0.4);
 }
 
-/* 4. 金色主题 (流动金属质感) */
+/* 4. 金色主题 */
 .btn-gold {
   background: linear-gradient(180deg, #fff4d6 0%, #d4c391 100%);
   box-shadow: 0 4px 14px rgba(183, 140, 31, 0.3);
 }
+
 .btn-gold:hover {
   background: linear-gradient(180deg, #fff8e6 0%, #dbc88f 100%);
   box-shadow: 0 6px 20px rgba(184, 134, 11, 0.4);
@@ -141,7 +179,18 @@ i, span, .bi { transition: var(--transition-standard); }
   box-shadow: 0 6px 20px rgba(123, 95, 163, 0.4);
 }
 
-/* 取消按钮（暖米杏色） */
+/* 删除红 */
+.btn-danger {
+  background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:hover {
+  background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%);
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+}
+
+/* 取消按钮 */
 .btn-cancel {
   background: linear-gradient(180deg, #e8a96a 0%, #e29a4e 100%);
   box-shadow: 0 4px 14px rgba(120, 90, 60, 0.3);
@@ -161,6 +210,58 @@ i, span, .bi { transition: var(--transition-standard); }
   color: var(--white) !important;
   box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.1);
 }
+
 .btn-glass:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+
+/* 7. 圆形按钮变体 (Close Button / Icon Button) */
+.base-custom-btn.btn-circle {
+  border-radius: 50%;
+  padding: 0;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 圆形按钮尺寸 */
+.base-custom-btn.btn-circle.btn-sm {
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+}
+
+.base-custom-btn.btn-circle.btn-md {
+  width: 36px;
+  height: 36px;
+  font-size: 1.2rem;
+}
+
+.base-custom-btn.btn-circle.btn-lg {
+  width: 48px;
+  height: 48px;
+  font-size: 1.5rem;
+}
+
+/* 8. 新增主题：深色毛玻璃 (用于模态框关闭) */
+.btn-glass-dark {
+  background: rgba(0, 0, 0, 0.06);
+  color: #666 !important;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: none;
+}
+
+.btn-glass-dark:hover {
+  background: rgba(0, 0, 0, 0.15);
+  color: #333 !important;
+  transform: rotate(90deg) scale(1.1);
+  /* 添加旋转效果增强交互 */
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* 覆盖 .detect-page-wrapper .remove-btn 的特定样式如果使用 danger 主题 */
+/* 保持 danger 主题的一致性，但适配圆形 */
+.btn-circle.btn-danger {
+  border: 1px solid var(--white);
 }

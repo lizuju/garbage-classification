@@ -1,14 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
+import { useAuthModal } from '../composables/useAuthModal'
 
 // 页面组件
 import HomePage from '../pages/HomePage.vue'
-import LoginPage from '../pages/LoginPage.vue'
-import RegisterPage from '../pages/RegisterPage.vue'
 import AboutPage from '../pages/AboutPage.vue'
 import DetectPage from '../pages/DetectPage.vue'
 import HistoryPage from '../pages/HistoryPage.vue'
-import ProfilePage from '../pages/ProfilePage.vue'
 import AdminPage from '../pages/AdminPage.vue'
 
 const routes = [
@@ -20,12 +18,16 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: LoginPage,
+    // Redirect to home and open login modal
+    redirect: '/',
+    meta: { openModal: 'login' }
   },
   {
     path: '/register',
     name: 'Register',
-    component: RegisterPage,
+    // Redirect to home and open register modal
+    redirect: '/',
+    meta: { openModal: 'register' }
   },
   {
     path: '/about',
@@ -47,8 +49,11 @@ const routes = [
   {
     path: '/user/profile',
     name: 'Profile',
-    component: ProfilePage,
-    meta: { requiresAuth: true },
+    // Redirect to previous route and open profile modal
+    redirect: (to) => {
+      return { path: '/' }
+    },
+    meta: { requiresAuth: true, openModal: 'profile' }
   },
   {
     path: '/admin',
@@ -120,7 +125,10 @@ router.beforeEach(async (to, from, next) => {
 
   // 检查是否需要认证
   if (to.meta.requiresAuth && !isLoggedIn.value) {
-    next('/login')
+    // Open login modal instead of redirecting to login page
+    const { openLogin } = useAuthModal()
+    openLogin()
+    next('/')
     return
   }
 
@@ -131,6 +139,24 @@ router.beforeEach(async (to, from, next) => {
   }
 
   next()
+})
+
+// Handle modal opening after navigation
+router.afterEach((to, from) => {
+  if (to.meta.openModal) {
+    const { openLogin, openRegister, openProfile } = useAuthModal()
+
+    // Delay modal opening slightly to ensure DOM is ready
+    setTimeout(() => {
+      if (to.meta.openModal === 'login') {
+        openLogin()
+      } else if (to.meta.openModal === 'register') {
+        openRegister()
+      } else if (to.meta.openModal === 'profile') {
+        openProfile()
+      }
+    }, 100)
+  }
 })
 
 export default router

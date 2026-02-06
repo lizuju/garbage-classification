@@ -129,10 +129,70 @@ export function useApi() {
     }
   }
 
+  const getAdminUsers = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/api/admin/users`, {
+        headers: getHeaders(),
+      })
+
+      await handleResponse(response)
+
+      const data = await response.json()
+      if (data.status === 'success') {
+        return data
+      }
+      throw new Error(data.message || '获取用户列表失败')
+    } catch (error) {
+      console.error('获取管理员用户列表失败:', error)
+      throw error
+    }
+  }
+
+  const getAdminLogs = async (page = 1, perPage = 20) => {
+    try {
+      const response = await fetch(`${API_BASE}/api/admin/logs?page=${page}&per_page=${perPage}`, {
+        headers: getHeaders(),
+      })
+
+      await handleResponse(response)
+
+      const data = await response.json()
+      if (data.status === 'success') {
+        return data
+      }
+      throw new Error(data.message || '获取系统日志失败')
+    } catch (error) {
+      console.error('获取系统日志失败:', error)
+      throw error
+    }
+  }
+
+  const exportAdminData = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/api/admin/export`, {
+        headers: getHeaders(),
+      })
+
+      await handleResponse(response)
+
+      const data = await response.json()
+      if (data.status === 'success') {
+        return data.export_data
+      }
+      throw new Error(data.message || '导出数据失败')
+    } catch (error) {
+      console.error('导出管理员数据失败:', error)
+      throw error
+    }
+  }
+
   return {
     detect,
     getHistory,
     deleteHistory,
     getAdminStats,
+    getAdminUsers,
+    getAdminLogs,
+    exportAdminData,
   }
 }

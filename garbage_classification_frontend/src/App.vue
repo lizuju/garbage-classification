@@ -5,6 +5,7 @@
       <router-view />
     </main>
     <Footer />
+    <AuthModal />
   </div>
 </template>
 
@@ -13,6 +14,7 @@ import { onMounted } from 'vue'
 import { useAuth } from './composables/useAuth'
 import Navbar from './components/Navbar.vue'
 import Footer from './components/Footer.vue'
+import AuthModal from './components/AuthModal.vue'
 
 // 导入图标文件，让 Vite 处理它们的路径（包含哈希）
 import favicon from './assets/icons/favicon.ico'

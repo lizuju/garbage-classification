@@ -90,19 +90,22 @@
                   <!-- 预览图 -->
                   <div v-if="preview" class="preview-container">
                     <div class="image-wrapper"> <img :src="preview" alt="preview" class="preview-image" />
-                      <button
-                        type="button"
-                        class="btn-danger remove-btn"
+                      <CommonButton
+                        theme="danger"
+                        circle
+                        size="sm"
+                        class="remove-btn"
                         @click="resetUpload"
+                        type="button"
                       >
                         <i class="bi bi-x-lg"></i>
-                      </button>
+                      </CommonButton>
                     </div>
                   </div>
 
                   <div class="d-grid gap-2 mt-3">
                     <common-button
-                      theme="primary"
+                      theme="success"
                       size="md"
                       :disabled="!selectedFile || isLoading"
                       @click="handleDetect"

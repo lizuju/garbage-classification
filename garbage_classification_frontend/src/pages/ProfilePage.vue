@@ -8,7 +8,7 @@
   <div v-else class="container py-5">
     <div class="row justify-content-center">
       <div class="col-md-8 col-lg-7">
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="card card-glass overflow-hidden">
           <div class="bg-success" style="height: 6px;"></div>
           
           <div class="card-body p-4 p-md-5">
@@ -46,7 +46,7 @@
                   <div class="d-flex flex-column">
                     <span class="form-label fw-bold text-secondary small">账户类型</span>
                     <div>
-                      <span :class="userTypeBadgeClass + ' px-3 py-1 rounded-pill'" style="font-size: 0.85rem;">
+                      <span :class="['role-label', user.is_admin ? 'admin' : 'user']">
                         {{ userTypeLabel }}
                       </span>
                     </div>
@@ -170,6 +170,7 @@
 <script setup>
 import { ref, onMounted, computed, nextTick, onUnmounted } from 'vue'
 import { useAuth } from '../composables/useAuth'
+import '../styles/components/card.css'
 
 let errorTimer = null;
 let noticeTimer = null;
@@ -217,11 +218,8 @@ const userTypeLabel = computed(() => {
 
 // 2. 计算 Badge 的颜色类名
 const userTypeBadgeClass = computed(() => {
-  const baseClass = 'badge '
-  if (!user.value) return baseClass + 'bg-secondary'
-  
-  // 管理员显示红色 (bg-danger)，普通用户显示灰色 (bg-secondary)
-  return user.value.is_admin ? baseClass + 'bg-danger' : baseClass + 'bg-secondary'
+  if (!user.value) return 'user'
+  return user.value.is_admin ? 'admin' : 'user'
 })
 
 const showNotice = (text, type = 'info') => {

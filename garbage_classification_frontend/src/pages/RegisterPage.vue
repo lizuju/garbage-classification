@@ -3,7 +3,7 @@
     <div class="container mt-5 mb-5">
       <div class="row justify-content-center">
         <div class="col-md-7">
-          <div class="card shadow">
+          <div class="card card-glass">
             <div class="card-body p-5">
               <h3 class="card-title mb-2 text-center">注册</h3>
               <p class="text-center text-muted mb-4">创建账户以使用垃圾分类识别系统</p>
@@ -184,6 +184,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
 import '../styles/pages/register.css'
+import '../styles/components/card.css'
 
 const router = useRouter()
 const { register } = useAuth()

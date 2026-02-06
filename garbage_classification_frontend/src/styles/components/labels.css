@@ -27,3 +27,53 @@
 .category-label.other {
     background-color: var(--color-other);
 }
+
+/* User Role Labels (Sync with category-label size) */
+.role-label {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    color: var(--white);
+    font-weight: 600;
+    margin-right: 8px;
+    font-size: 0.875rem;
+    transition: var(--transition-standard);
+    text-align: center;
+}
+
+.role-label.admin {
+    background-color: rgba(var(--danger-rgb), 0.1);
+    color: var(--danger-color);
+    border: 1px solid rgba(var(--danger-rgb), 0.2);
+}
+
+.role-label.user {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--text-muted);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Status Badges (Unified with category-label size) */
+.status-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    color: var(--white);
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-align: center;
+    transition: var(--transition-standard);
+    box-shadow: var(--box-shadow-sm);
+}
+
+.status-badge.success {
+    background-color: var(--success-color);
+}
+
+.status-badge.warning {
+    background-color: var(--warning-color);
+}
+
+.status-badge.danger {
+    background-color: var(--danger-color);
+}

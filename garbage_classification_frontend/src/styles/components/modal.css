@@ -1,0 +1,158 @@
+/* modal.css - Global Modal Styles (OOP Design) */
+
+/* ============================================
+   1. BODY STATE - Scroll Lock
+   ============================================ */
+body.modal-open {
+    overflow: hidden !important;
+}
+
+/* ============================================
+   2. MODAL BACKDROP - Blur Background
+   ============================================ */
+.modal-backdrop-blur {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+/* ============================================
+   3. MODAL CONTAINER - Card Wrapper
+   ============================================ */
+.modal-container {
+    width: 67vw;
+    height: auto;
+    max-height: 95vh;
+    max-width: none;
+    position: relative;
+    border-radius: 24px !important;
+    overflow-y: auto;
+    /* Base shadow for modal cards */
+    box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        box-shadow 0.4s ease;
+}
+
+/* Profile/Audit specific overrides removed to enforce unified dimensions */
+
+/* ============================================
+   4. MODAL CARD HOVER EFFECT
+   Override .card:hover with higher specificity
+   ============================================ */
+.modal-container:hover,
+.modal-container.card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow:
+        0 30px 60px -12px rgba(0, 0, 0, 0.3),
+        0 18px 36px -18px rgba(0, 0, 0, 0.2),
+        0 0 0 1px rgba(255, 255, 255, 0.15) !important;
+}
+
+
+/* ============================================
+   5. MODAL CLOSE BUTTON
+   ============================================ */
+.modal-close-btn {
+    position: absolute !important;
+    top: 1rem !important;
+    right: 1rem !important;
+    z-index: 10;
+}
+
+/* ============================================
+   6. MODAL HEADER VARIANTS
+   ============================================ */
+.modal-header-gradient {
+    padding: 2rem;
+    background: linear-gradient(135deg, #20957d 0%, #58a85b 100%);
+    color: white;
+    text-align: center;
+    border-radius: 24px 24px 0 0;
+}
+
+/* ============================================
+   7. MODAL BODY
+   ============================================ */
+.modal-body-content {
+    padding: 2rem;
+}
+
+/* ============================================
+   8. TRANSITIONS & ANIMATIONS
+   ============================================ */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.zoom-fade-enter-active {
+    animation: zoomFadeIn 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.zoom-fade-leave-active {
+    animation: zoomFadeOut 0.3s ease forwards;
+}
+
+@keyframes zoomFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes zoomFadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(0.9) translateY(20px);
+    }
+}
+
+/* ============================================
+   9. RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    .modal-backdrop-blur {
+        padding: 1rem;
+    }
+
+    .modal-container {
+        width: 95%;
+        /* Override 2/3 rule for mobile */
+        height: auto;
+        /* Allow auto height on mobile */
+        max-height: 85vh;
+        /* Limit height */
+    }
+
+    /* Disable hover effects on mobile */
+    .modal-container:hover {
+        transform: none;
+    }
+}

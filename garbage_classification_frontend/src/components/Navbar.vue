@@ -28,14 +28,14 @@
           <!-- 未登录菜单 -->
           <template v-if="!isLoggedIn">
             <li class="nav-item">
-              <router-link to="/login" class="nav-link" :class="{ active: $route.path === '/login' }">
+              <a href="#" class="nav-link" @click.prevent="openLogin">
                 登录
-              </router-link>
+              </a>
             </li>
             <li class="nav-item">
-              <router-link to="/register" class="nav-link" :class="{ active: $route.path === '/register' }">
+              <a href="#" class="nav-link" @click.prevent="openRegister">
                 注册
-              </router-link>
+              </a>
             </li>
           </template>
 
@@ -72,9 +72,9 @@
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li>
-                  <router-link to="/user/profile" class="dropdown-item">
+                  <a href="#" class="dropdown-item" @click.prevent="openProfile">
                     个人资料
-                  </router-link>
+                  </a>
                 </li>
                 <li>
                   <hr class="dropdown-divider" />
@@ -96,8 +96,10 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
+import { useAuthModal } from '../composables/useAuthModal'
 
 const { user, isLoggedIn, logout } = useAuth()
+const { openLogin, openRegister, openProfile } = useAuthModal()
 const router = useRouter()
 
 const handleLogout = async () => {
@@ -121,6 +123,7 @@ const handleLogout = async () => {
   position: relative;
   margin-left: 0.5rem;
   margin-right: 0.5rem;
+  cursor: pointer;
 }
 
 .nav-link:hover {

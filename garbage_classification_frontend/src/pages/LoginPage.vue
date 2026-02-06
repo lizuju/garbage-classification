@@ -3,7 +3,7 @@
     <div class="container mt-5 mb-5">
       <div class="row justify-content-center">
         <div class="col-md-7">
-          <div class="card shadow">
+          <div class="card card-glass">
             <div class="card-body p-5">
               <h3 class="card-title mb-2 text-center">登录</h3>
               <p class="text-center text-muted mb-4">登录您的账户以使用所有功能</p>
@@ -80,6 +80,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
 import '../styles/pages/login.css'
+import '../styles/components/card.css'
 
 const router = useRouter()
 const { login } = useAuth()

@@ -1,24 +1,60 @@
-/* card.css */
+/* card.css - Premium Modern Design */
 
 .card {
-  border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  border-radius: var(--border-radius-md);
-  transition: var(--transition-standard);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.03),
+    0 10px 15px -3px rgba(0, 0, 0, 0.01);
+  border-radius: var(--border-radius);
+  background-color: var(--white);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    box-shadow 0.4s ease,
+    border-color 0.3s ease,
+    background-color 0.3s ease;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 
-.card:hover {
-  box-shadow: var(--shadow-hover);
+/* Glassmorphism Effect */
+.card-glass {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+}
+
+/* OOP Pattern: Card hover effect - exclude modal containers
+   Modal containers get their hover behavior from modal.css */
+.card:not(.modal-container):hover {
+  transform: translateY(-8px);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: rgba(var(--primary-rgb), 0.3);
+  z-index: 10;
 }
 
 .card-title {
   color: var(--text-dark);
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 1.1rem;
   margin-bottom: var(--spacing-md);
+  letter-spacing: -0.01em;
 }
 
 .card-body h3 {
   color: var(--primary-color);
-  font-weight: bold;
-  margin: 10px 0;
+  font-weight: 800;
+  font-size: 2rem;
+  margin: 12px 0;
+  letter-spacing: -0.02em;
+}
+
+/* Specific adjustment for cards inside columns to ensure smooth layout */
+.col-md-3 .card,
+.col-md-4 .card,
+.col-md-6 .card {
+  height: 100%;
 }

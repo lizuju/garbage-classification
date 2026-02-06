@@ -67,9 +67,9 @@
                          <span v-else class="text-muted small">无识别数据</span>
                        </td>
                       <td>
-                        <button class="btn btn-sm btn-danger" @click="deleteItem(item.id)">
+                        <CommonButton theme="danger" size="sm" @click="deleteItem(item.id)">
                           <i class="bi bi-trash"></i> 删除
-                        </button>
+                        </CommonButton>
                       </td>
                     </tr>
                   </tbody>
@@ -93,6 +93,7 @@ import { ref, onMounted } from 'vue'
 import { useAuth } from '../composables/useAuth'
 import { useApi } from '../composables/useApi'
 import PageHero from '@/components/PageHero.vue'
+import CommonButton from '@/components/CommonButton.vue'
 import '../styles/pages/history.css'
 import '../styles/components/progress.css'
 import '../styles/components/labels.css'

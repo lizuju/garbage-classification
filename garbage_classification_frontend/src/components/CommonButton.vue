@@ -3,7 +3,7 @@
   <a
     v-if="href"
     :href="href"
-    :class="['base-custom-btn', `btn-${theme}`, `btn-${size}`]"
+    :class="['base-custom-btn', `btn-${theme}`, `btn-${size}`, { 'btn-circle': circle }]"
     @click.prevent="handleClick"
   >
     <slot></slot>
@@ -13,7 +13,7 @@
   <router-link
     v-else-if="to"
     :to="to"
-    :class="['base-custom-btn', `btn-${theme}`, `btn-${size}`]"
+    :class="['base-custom-btn', `btn-${theme}`, `btn-${size}`, { 'btn-circle': circle }]"
     @click.native="handleRouterClick"
   >
     <slot></slot>
@@ -23,7 +23,7 @@
   <button
     v-else
     :type="nativeType"
-    :class="['base-custom-btn', `btn-${theme}`, `btn-${size}`]"
+    :class="['base-custom-btn', `btn-${theme}`, `btn-${size}`, { 'btn-circle': circle }]"
     @click="emitClick"
   >
     <slot></slot>
@@ -39,7 +39,8 @@ const props = defineProps({
   to: { type: [String, Object], default: null }, // 跨页面跳转
   theme: { type: String, default: 'success' },
   size: { type: String, default: 'lg' },
-  nativeType: { type: String, default: 'button' }
+  nativeType: { type: String, default: 'button' },
+  circle: { type: Boolean, default: false }
 })
 
 const emit = defineEmits(['click'])
