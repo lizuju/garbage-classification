@@ -8,7 +8,7 @@
         <p v-reveal class="hero-description text-center hero-fade-in anim-delay-4">使用深度学习和计算机视觉技术，让垃圾分类变得简单高效</p>
         <div v-reveal class="hero-fade-in">
           <CommonButton
-            :to="isLoggedIn ? '/user/detect' : '/login'"
+            @click="handleStart"
             theme="success"
             size="lg"
           >
@@ -39,7 +39,7 @@
                   让改变看得见。
                 </h3>
                 <common-button
-                  :to="isLoggedIn ? '/user/history' : '/login'"
+                  @click="handleHistory"
                   theme="info"
                   size="md"
                 >
@@ -84,7 +84,7 @@
                   一切井然有序。
                 </h3>
                 <common-button 
-                  :to="isLoggedIn ? '/user/profile' : '/login'" 
+                  @click="handleProfile"
                   theme="primary"
                   size="md"
                 >
@@ -324,9 +324,46 @@
 
 <script setup>
 import { onMounted } from 'vue';
+import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
+import { useAuthModal } from '@/composables/useAuthModal' // Import useAuthModal
 import CommonButton from '@/components/CommonButton.vue';
 import '../styles/pages/home.css';
 
+const router = useRouter()
 const { isLoggedIn } = useAuth()
+// Destructure openLogin and openProfile from useAuthModal
+const { openLogin, openProfile } = useAuthModal() 
+
+const handleStart = () => {
+  if (isLoggedIn.value) {
+    router.push('/user/detect')
+  } else {
+    // Open login modal instead of redirecting
+    openLogin() 
+  }
+}
+
+const handleHistory = () => {
+  if (isLoggedIn.value) {
+    router.push('/user/history')
+  } else {
+    // Open login modal instead of redirecting
+    openLogin()
+  }
+}
+
+const handleProfile = () => {
+  if (isLoggedIn.value) {
+    // Open profile modal instead of redirecting
+    openProfile()
+  } else {
+    // Open login modal instead of redirecting
+    openLogin()
+  }
+}
+
+const handleHashClick = () => {
+  // Logic for hash link if needed, or keep as is in template
+}
 </script>

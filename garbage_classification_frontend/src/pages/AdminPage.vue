@@ -318,7 +318,6 @@
         <transition name="zoom-fade">
           <div v-reveal class="modal-container modal-profile card card-glass hero-fade-in">
             <!-- Close Button -->
-            <!-- Close Button -->
             <CommonButton 
               theme="glass-dark" 
               circle 

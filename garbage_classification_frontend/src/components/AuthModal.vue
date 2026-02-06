@@ -7,7 +7,6 @@
           :class="['modal-container', 'card', 'card-glass', modalType === 'profile' ? 'modal-profile' : '']"
         >
           <!-- Close Button -->
-          <!-- Close Button -->
           <CommonButton 
             theme="glass-dark" 
             circle 
