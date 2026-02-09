@@ -10,6 +10,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(128))
     is_admin = db.Column(db.Boolean, default=False)
+    is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __init__(self, username, email, **kwargs):
@@ -31,6 +32,7 @@ class User(db.Model):
             'username': self.username,
             'email': self.email,
             'is_admin': bool(self.is_admin),  # 显式转换为 bool，确保管理员标志正确
+            'is_active': True if self.is_active is None else bool(self.is_active),
             'created_at': (self.created_at.isoformat() + 'Z') if self.created_at else None
         }
     
@@ -41,5 +43,5 @@ class User(db.Model):
         """
         return (self.id is not None and 
                 self.username is not None and 
-                self.email is not None)
-
+                self.email is not None and
+                (self.is_active is None or bool(self.is_active)))

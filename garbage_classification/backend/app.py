@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 from flask import Flask, send_from_directory, session
+from sqlalchemy import text
 
 from .config import Config
 from .extensions import db, cors
@@ -22,8 +23,18 @@ def create_app():
     db.init_app(app)
     cors.init_app(app, supports_credentials=True, resources={
         r"/api/*": {
-            "origins": ["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:5001", "http://127.0.0.1:5001", "http://192.168.31.190:5001"],
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "origins": [
+                "http://localhost:3000",
+                "http://127.0.0.1:3000",
+                "http://localhost:5173",
+                "http://127.0.0.1:5173",
+                "http://localhost:5174",
+                "http://127.0.0.1:5174",
+                "http://localhost:5001",
+                "http://127.0.0.1:5001",
+                "http://192.168.31.190:5001"
+            ],
+            "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"],
             "supports_credentials": True,
             "max_age": 3600
@@ -57,6 +68,20 @@ def create_app():
     # init db & default admin
     with app.app_context():
         db.create_all()
+
+        # SQLite 轻量迁移：补充 users 表的 is_active 字段
+        try:
+            if str(app.config['SQLALCHEMY_DATABASE_URI']).startswith('sqlite:///'):
+                columns = db.session.execute(text("PRAGMA table_info(user)")).fetchall()
+                column_names = {col[1] for col in columns}
+                if 'is_active' not in column_names:
+                    db.session.execute(text("ALTER TABLE user ADD COLUMN is_active BOOLEAN DEFAULT 1"))
+                    db.session.execute(text("UPDATE user SET is_active = 1 WHERE is_active IS NULL"))
+                    db.session.commit()
+                    print("✓ 已为 user 表补充 is_active 字段")
+        except Exception as e:
+            db.session.rollback()
+            print(f"✗ 初始化 is_active 字段失败: {str(e)}")
         
         # 检查管理员用户是否存在
         admin = User.query.filter_by(username='admin').first()

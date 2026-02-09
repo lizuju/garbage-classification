@@ -139,6 +139,35 @@
 
 /* Role Labels transitioned to labels.css */
 
+.stats-label {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+    display: block;
+    min-height: 28px;
+    line-height: 28px;
+}
+
+.stats-value {
+    font-size: 2.1rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    color: var(--text-dark);
+}
+
+.stats-value-slot {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stats-label-shift {
+    position: relative;
+    top: -8px;
+}
+
 .log-type {
     font-family: var(--font-mono);
     font-size: 0.75rem;

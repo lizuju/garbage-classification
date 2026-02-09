@@ -12,6 +12,27 @@ export const MODAL_TYPES = {
 const isOpen = ref(false)
 const modalType = ref(null)
 const previousRoute = ref(null)
+let savedScrollY = 0
+let lastKnownScrollY = 0
+
+const getScrollY = () => window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0
+
+if (typeof window !== 'undefined') {
+    window.addEventListener('scroll', () => {
+        if (!isOpen.value) {
+            lastKnownScrollY = getScrollY()
+        }
+    }, { passive: true })
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            const targetY = isOpen.value ? savedScrollY : lastKnownScrollY
+            requestAnimationFrame(() => {
+                window.scrollTo(0, targetY)
+            })
+        }
+    })
+}
 
 export function useAuthModal() {
     const openModal = (type, fromRoute = null) => {
@@ -19,7 +40,11 @@ export function useAuthModal() {
         previousRoute.value = fromRoute
         isOpen.value = true
         // Lock body scroll using CSS class
+        savedScrollY = getScrollY()
         document.body.classList.add('modal-open')
+        document.body.style.top = `-${savedScrollY}px`
+        document.body.style.position = 'fixed'
+        document.body.style.width = '100%'
     }
 
     const closeModal = () => {
@@ -27,6 +52,17 @@ export function useAuthModal() {
         modalType.value = null
         // Unlock body scroll
         document.body.classList.remove('modal-open')
+        const offsetY = savedScrollY
+        document.body.style.top = ''
+        document.body.style.position = ''
+        document.body.style.width = ''
+        // Restore scroll after layout settles (avoid jump to bottom)
+        requestAnimationFrame(() => {
+            window.scrollTo(0, offsetY)
+            requestAnimationFrame(() => {
+                window.scrollTo(0, offsetY)
+            })
+        })
     }
 
     const openLogin = (fromRoute = null) => openModal(MODAL_TYPES.LOGIN, fromRoute)

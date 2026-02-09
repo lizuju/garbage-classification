@@ -169,6 +169,8 @@ def login():
         
         # 验证密码
         if user and user.check_password(password):
+            if user.is_active is False:
+                return jsonify({'status': 'error', 'message': '账号已被禁用'}), 403
             print(f"✓ 用户验证成功: {user.username} (is_admin={user.is_admin})")
             
             # 生成 JWT token
@@ -228,4 +230,3 @@ def get_user():
     except Exception as e:
         print(f"✗ 获取用户信息失败: {str(e)}")
         return jsonify({'status': 'error', 'message': '获取用户信息失败'}), 500
-

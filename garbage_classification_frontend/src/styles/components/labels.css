@@ -77,3 +77,27 @@
 .status-badge.danger {
     background-color: var(--danger-color);
 }
+
+.badge-red-rect {
+/* 使用 flex 布局实现精准居中 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* 长度缩短：左右 padding 从 16px 降至 10px */
+  padding: 2px 26px; 
+  
+  /* 颜色与字体 */
+  background-color: #e11d48;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  
+  /* 圆角矩形：4px-6px 是标准矩形圆角 */
+  border-radius: 4px; 
+  
+  /* 细节微调 */
+  line-height: 1; /* 取消行高干扰，由 flex 控制居中 */
+  letter-spacing: 0.5px;
+  white-space: nowrap; /* 确保文字不换行 */
+}

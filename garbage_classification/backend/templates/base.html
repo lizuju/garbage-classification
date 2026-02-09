@@ -94,6 +94,71 @@
     <script>
         // 设置当前年份
         document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        // ==================== Token 管理与 API 请求封装 ====================
+        // 统一保存/读取 token，并为 /api/* 请求自动加上 Authorization 头
+        window.AuthToken = {
+            get: function() {
+                return localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+            },
+            set: function(token, remember) {
+                if (!token) return;
+                if (remember) {
+                    localStorage.setItem('auth_token', token);
+                    sessionStorage.removeItem('auth_token');
+                } else {
+                    sessionStorage.setItem('auth_token', token);
+                    localStorage.removeItem('auth_token');
+                }
+            },
+            clear: function() {
+                localStorage.removeItem('auth_token');
+                sessionStorage.removeItem('auth_token');
+            }
+        };
+
+        (function wrapFetchWithAuth() {
+            const originalFetch = window.fetch.bind(window);
+
+            function isApiRequest(input) {
+                try {
+                    const url = input instanceof Request ? input.url : input;
+                    const parsed = new URL(url, window.location.origin);
+                    return parsed.origin === window.location.origin && parsed.pathname.startsWith('/api/');
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            function buildHeaders(initHeaders, reqHeaders) {
+                const headers = new Headers(reqHeaders || {});
+                if (initHeaders) {
+                    new Headers(initHeaders).forEach((value, key) => {
+                        headers.set(key, value);
+                    });
+                }
+                const token = window.AuthToken.get();
+                if (token && !headers.has('Authorization')) {
+                    headers.set('Authorization', 'Bearer ' + token);
+                }
+                return headers;
+            }
+
+            window.fetch = function(input, init = {}) {
+                if (!isApiRequest(input)) {
+                    return originalFetch(input, init);
+                }
+
+                if (input instanceof Request) {
+                    const headers = buildHeaders(init.headers, input.headers);
+                    const newRequest = new Request(input, { ...init, headers });
+                    return originalFetch(newRequest);
+                }
+
+                const headers = buildHeaders(init.headers);
+                return originalFetch(input, { ...init, headers });
+            };
+        })();
         
         // ==================== 用户管理模块 ====================
         // 面向对象设计：统一处理所有用户相关操作
@@ -231,6 +296,7 @@
                         console.log('← 退出登录响应:', data);
                         if (data.status === 'success') {
                             console.log('✓ 退出登录成功');
+                            window.AuthToken.clear();
                             // 延迟 200ms 后跳转到首页，确保 cookie 清除
                             setTimeout(() => {
                                 window.location.href = '/';

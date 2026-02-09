@@ -99,6 +99,7 @@
             
             const username = document.getElementById('login-username').value.trim();
             const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('remember-me').checked;
             
             // 前端验证
             if (!username || !password) {
@@ -137,6 +138,11 @@
                 
                 if (data.status === 'success') {
                     console.log('✓ 登录成功，跳转中...');
+                    if (data.token) {
+                        window.AuthToken.set(data.token, rememberMe);
+                    } else {
+                        console.warn('⚠ 未返回 token，无法保存登录状态');
+                    }
                     // 登录成功，跳转到首页
                     window.location.href = '/';
                 } else {

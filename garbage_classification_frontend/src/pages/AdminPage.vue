@@ -55,40 +55,48 @@
           <div class="col-md-3">
             <div class="card text-center h-100">
               <div class="card-body d-flex flex-column justify-content-center">
-                <h6 class="mb-2">总检测数</h6>
-                <h2 class="fw-bold mb-0">{{ stats.total_detections || 0 }}</h2>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="card text-center h-100">
-              <div class="card-body d-flex flex-column justify-content-center">
-                <h6 class="mb-2">总注册用户</h6>
-                <h2 class="fw-bold mb-0">{{ stats.total_users || 0 }}</h2>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="card text-center h-100">
-              <div class="card-body d-flex flex-column justify-content-center">
-                <h6 class="mb-2">平均信心度</h6>
-                <div v-if="stats.avg_confidence && stats.avg_confidence > 0" class="gc-progress-container mt-2" style="max-width: 140px; margin: 0 auto;">
-                  <div
-                    class="gc-progress-bar"
-                    :class="getProgressLevelClass(stats.avg_confidence)"
-                    :style="{ width: `${(stats.avg_confidence * 100).toFixed(1)}%` }"
-                  ></div>
-                  <span class="gc-progress-label">{{ (stats.avg_confidence * 100).toFixed(1) }}%</span>
+                <h6 class="mb-2 stats-label">总检测数</h6>
+                <div class="stats-value-slot">
+                  <h2 class="fw-bold mb-0 stats-value">{{ stats.total_detections || 0 }}</h2>
                 </div>
-                <div v-else class="small">暂无数据</div>
               </div>
             </div>
           </div>
           <div class="col-md-3">
             <div class="card text-center h-100">
               <div class="card-body d-flex flex-column justify-content-center">
-                <h6 class="mb-2">今日活跃</h6>
-                <h2 class="fw-bold mb-0">{{ stats.daily_active || 0 }}</h2>
+                <h6 class="mb-2 stats-label">总注册用户</h6>
+                <div class="stats-value-slot">
+                  <h2 class="fw-bold mb-0 stats-value">{{ stats.total_users || 0 }}</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card text-center h-100">
+              <div class="card-body d-flex flex-column justify-content-center">
+                <h6 class="mb-2 stats-label stats-label-shift">平均信心度</h6>
+                <div class="stats-value-slot">
+                  <div v-if="stats.avg_confidence && stats.avg_confidence > 0" class="gc-progress-container" style="max-width: 140px; margin: 0 auto;">
+                    <div
+                      class="gc-progress-bar"
+                      :class="getProgressLevelClass(stats.avg_confidence)"
+                      :style="{ width: `${(stats.avg_confidence * 100).toFixed(1)}%` }"
+                    ></div>
+                    <span class="gc-progress-label">{{ (stats.avg_confidence * 100).toFixed(1) }}%</span>
+                  </div>
+                  <div v-else class="small">暂无数据</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card text-center h-100">
+              <div class="card-body d-flex flex-column justify-content-center">
+                <h6 class="mb-2 stats-label">今日活跃</h6>
+                <div class="stats-value-slot">
+                  <h2 class="fw-bold mb-0 stats-value">{{ stats.daily_active || 0 }}</h2>
+                </div>
               </div>
             </div>
           </div>
@@ -229,21 +237,24 @@
                     <td class="fw-bold">{{ user.username }}</td>
                     <td>{{ user.email }}</td>
                     <td>
-                      <span class="role-label" :class="user.is_admin ? 'admin' : 'user'">
-                        {{ user.is_admin ? '管理员' : '普通用户' }}
-                      </span>
+                      <div class="d-flex flex-column gap-1 align-items-start">
+                        <span class="role-label" :class="user.is_admin ? 'admin' : 'user'">
+                          {{ user.is_admin ? '管理员' : '普通用户' }}
+                        </span>
+                        <span v-if="user.is_active === false" class="badge-red-rect">已禁用</span>
+                      </div>
                     </td>
                     <td>{{ formatDate(user.created_at) }}</td>
                     <td>
                       <div class="d-flex gap-2">
-                        <CommonButton theme="primary" size="sm" @click="() => {}">编辑</CommonButton>
+                        <CommonButton theme="primary" size="sm" @click="openUserEditor(user)">编辑</CommonButton>
                         <CommonButton 
-                          theme="danger" 
+                          :theme="user.is_active === false ? 'success' : 'danger'" 
                           size="sm" 
-                          :disabled="user.username === 'admin'"
-                          @click="() => {}"
+                          :disabled="isSelfUser(user) || user.is_admin"
+                          @click="toggleUserStatus(user)"
                         >
-                          禁用
+                          {{ user.is_active === false ? '恢复' : '禁用' }}
                         </CommonButton>
                       </div>
                     </td>
@@ -311,6 +322,35 @@
       </div>
 
     </div>
+
+    <!-- User Edit Modal -->
+    <transition name="fade">
+      <div v-if="showUserModal" class="modal-backdrop-blur" @click.self="closeUserModal">
+        <transition name="zoom-fade">
+          <div v-reveal class="modal-container modal-profile card card-glass hero-fade-in">
+            <CommonButton 
+              theme="glass-dark" 
+              circle 
+              size="md" 
+              class="modal-close-btn" 
+              @click="closeUserModal" 
+              aria-label="关闭"
+            >
+              <i class="bi bi-x-lg"></i>
+            </CommonButton>
+            <div class="modal-content-inner">
+              <div class="bg-success" style="height: 6px; border-radius: 24px 24px 0 0;"></div>
+              <AdminUserProfileModal
+                v-if="selectedUser"
+                :user="selectedUser"
+                @close="closeUserModal"
+                @updated="handleUserUpdated"
+              />
+            </div>
+          </div>
+        </transition>
+      </div>
+    </transition>
 
     <!-- Security Audit Modal -->
     <transition name="fade">
@@ -382,8 +422,10 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useApi } from '../composables/useApi'
+import { useAuth } from '../composables/useAuth'
 import PageHero from '@/components/PageHero.vue'
 import CommonButton from '@/components/CommonButton.vue'
+import AdminUserProfileModal from '@/components/AdminUserProfileModal.vue'
 import '../styles/pages/admin.css'
 import '../styles/components/progress.css'
 import '../styles/components/table.css'
@@ -391,7 +433,8 @@ import '../styles/components/card.css'
 import '../styles/components/modal.css'
 import '../styles/components/common-button.css'
 
-const { getAdminStats, getAdminUsers, getAdminLogs, exportAdminData } = useApi()
+const { getAdminStats, getAdminUsers, getAdminUserDetail, updateAdminUserStatus, getAdminLogs, exportAdminData } = useApi()
+const { user: currentUser } = useAuth()
 
 const activeTab = ref('overview')
 const stats = ref({})
@@ -405,6 +448,10 @@ const isExporting = ref(false)
 const actionNotice = ref('')
 const noticeType = ref('')
 let noticeTimer = null
+
+// User Edit Modal State
+const showUserModal = ref(false)
+const selectedUser = ref(null)
 
 // Audit Modal State
 const showAuditModal = ref(false)
@@ -470,6 +517,54 @@ const handleAudit = () => {
 const closeAuditModal = () => {
   showAuditModal.value = false
   document.body.classList.remove('modal-open')
+}
+
+const isSelfUser = (targetUser) => {
+  return currentUser.value && targetUser && targetUser.id === currentUser.value.id
+}
+
+const openUserEditor = async (targetUser) => {
+  if (!targetUser) return
+  try {
+    const result = await getAdminUserDetail(targetUser.id)
+    const detail = result.user || targetUser
+    selectedUser.value = detail
+    showUserModal.value = true
+    document.body.classList.add('modal-open')
+  } catch (err) {
+    showNotice('获取用户详情失败', 'danger')
+  }
+}
+
+const closeUserModal = () => {
+  showUserModal.value = false
+  selectedUser.value = null
+  document.body.classList.remove('modal-open')
+}
+
+const handleUserUpdated = (updatedUser) => {
+  if (!updatedUser) return
+  const idx = users.value.findIndex(u => u.id === updatedUser.id)
+  if (idx !== -1) users.value[idx] = updatedUser
+  showNotice('用户资料已更新', 'success')
+}
+
+const toggleUserStatus = async (targetUser) => {
+  if (!targetUser) return
+  const nextStatus = targetUser.is_active === false
+  try {
+    const result = await updateAdminUserStatus(targetUser.id, nextStatus)
+    const updated = result.user
+    if (updated) {
+      const idx = users.value.findIndex(u => u.id === updated.id)
+      if (idx !== -1) users.value[idx] = updated
+    } else {
+      targetUser.is_active = nextStatus
+    }
+    showNotice(nextStatus ? '用户已恢复' : '用户已禁用', 'success')
+  } catch (err) {
+    showNotice(err.message || '操作失败', 'danger')
+  }
 }
 
 const startScan = async () => {

@@ -3,6 +3,7 @@ import time
 from functools import wraps
 from flask import request, jsonify
 from ..config import Config
+from ..models import User
 
 
 class JWTManager:
@@ -99,6 +100,13 @@ def jwt_required(f):
         if not payload:
             return jsonify({'status': 'error', 'message': '认证令牌无效或已过期'}), 401
         
+        # 校验用户状态（是否存在/是否被禁用）
+        user = User.query.get(payload.get('user_id'))
+        if not user:
+            return jsonify({'status': 'error', 'message': '用户不存在'}), 404
+        if user.is_active is False:
+            return jsonify({'status': 'error', 'message': '账号已被禁用'}), 403
+
         # 将 payload 附加到请求对象上，供路由函数使用
         request.jwt_payload = payload
         
@@ -123,6 +131,13 @@ def admin_required(f):
         if not payload:
             return jsonify({'status': 'error', 'message': '认证令牌无效或已过期'}), 401
         
+        # 校验用户状态（是否存在/是否被禁用）
+        user = User.query.get(payload.get('user_id'))
+        if not user:
+            return jsonify({'status': 'error', 'message': '用户不存在'}), 404
+        if user.is_active is False:
+            return jsonify({'status': 'error', 'message': '账号已被禁用'}), 403
+
         if not payload.get('is_admin'):
             return jsonify({'status': 'error', 'message': '需要管理员权限'}), 403
         

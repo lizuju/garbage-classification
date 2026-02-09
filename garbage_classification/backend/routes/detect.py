@@ -84,7 +84,7 @@ def detect():
                 db.session.commit()
                 print(f"DEBUG: Successfully committed history ID: {history.id}")
                 print(f"DEBUG: Saved result_json content: {result_json[:100]}...")
-                log_action('user_action', f'Detection finished: {len(results)} objects', user.id)
+                log_action('user_action', f'检测完成：共 {len(results)} 个目标', user.id)
             except Exception as commit_err:
                 print(f"DEBUG: FAILED to commit history: {str(commit_err)}")
                 db.session.rollback()

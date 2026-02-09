@@ -148,6 +148,67 @@ export function useApi() {
     }
   }
 
+  const getAdminUserDetail = async (userId) => {
+    try {
+      const response = await fetch(`${API_BASE}/api/admin/users/${userId}`, {
+        headers: getHeaders(),
+      })
+
+      await handleResponse(response)
+
+      const data = await response.json()
+      if (data.status === 'success') {
+        return data
+      }
+      throw new Error(data.message || '获取用户详情失败')
+    } catch (error) {
+      console.error('获取管理员用户详情失败:', error)
+      throw error
+    }
+  }
+
+  const updateAdminUser = async (userId, payload) => {
+    try {
+      const response = await fetch(`${API_BASE}/api/admin/users/${userId}`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify(payload),
+      })
+
+      await handleResponse(response)
+
+      const data = await response.json()
+      if (data.status === 'success') {
+        return data
+      }
+      throw new Error(data.message || '更新用户失败')
+    } catch (error) {
+      console.error('更新管理员用户失败:', error)
+      throw error
+    }
+  }
+
+  const updateAdminUserStatus = async (userId, isActive) => {
+    try {
+      const response = await fetch(`${API_BASE}/api/admin/users/${userId}/status`, {
+        method: 'PATCH',
+        headers: getHeaders(),
+        body: JSON.stringify({ is_active: isActive }),
+      })
+
+      await handleResponse(response)
+
+      const data = await response.json()
+      if (data.status === 'success') {
+        return data
+      }
+      throw new Error(data.message || '更新用户状态失败')
+    } catch (error) {
+      console.error('更新管理员用户状态失败:', error)
+      throw error
+    }
+  }
+
   const getAdminLogs = async (page = 1, perPage = 20) => {
     try {
       const response = await fetch(`${API_BASE}/api/admin/logs?page=${page}&per_page=${perPage}`, {
@@ -192,6 +253,9 @@ export function useApi() {
     deleteHistory,
     getAdminStats,
     getAdminUsers,
+    getAdminUserDetail,
+    updateAdminUser,
+    updateAdminUserStatus,
     getAdminLogs,
     exportAdminData,
   }

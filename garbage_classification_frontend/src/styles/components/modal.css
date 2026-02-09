@@ -5,6 +5,9 @@
    ============================================ */
 body.modal-open {
     overflow: hidden !important;
+    position: fixed;
+    left: 0;
+    right: 0;
 }
 
 /* ============================================
@@ -87,6 +90,12 @@ body.modal-open {
    ============================================ */
 .modal-body-content {
     padding: 2rem;
+}
+
+/* Shared inner scroll region (matches Profile modal style) */
+.modal-content-inner {
+    max-height: 95vh;
+    overflow-y: auto;
 }
 
 /* ============================================
