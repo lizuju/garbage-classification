@@ -1,6 +1,59 @@
 # 🗑️ YOLOv5 垃圾分类识别系统
 
-基于 YOLOv5 的垃圾分类识别系统，支持四类垃圾（**可回收物**、**有害垃圾**、**厨余垃圾**、**其他垃圾**）的自动识别与分类。本系统包含 Flask 后端、Vue 3 前端和 YOLO 目标检测模型，支持用户多角色登录与 JWT 认证，能够实现垃圾图像上传、自动分类、历史记录管理等功能。
+本项目是一个**前后端分离的垃圾分类识别平台**，基于 YOLOv5 目标检测模型，提供完整的用户体系、管理员后台、日志与统计、历史记录管理以及模型训练与迭代流程。适用于毕业设计、科研验证与工程化落地。
+
+---
+
+## 🧭 系统介绍
+
+该系统围绕“**垃圾图像上传 → YOLOv5 识别 → 分类结果展示 → 记录与管理**”的完整链路构建，覆盖了从模型训练到业务落地的主要环节：
+
+- **模型层**：YOLOv5 目标检测负责识别四类垃圾（可回收、有害、厨余、其他），具备快速推理与较高准确率。
+- **服务层**：Flask 后端提供 REST API，承担身份认证、检测调用、记录管理、日志审计等核心逻辑。
+- **交互层**：Vue 3 前端提供用户端与管理员端界面，包含识别、历史、资料修改、管理后台等功能。
+
+系统既适合作为“AI+业务”的工程实践，也可作为课程设计/毕业设计的完整方案。
+
+---
+
+## ✨ 项目亮点
+
+- **YOLOv5 高性能检测**：端到端检测流程，支持多类垃圾识别与高效推理。
+- **前后端分离架构**：前端 Vue 3 + Vite，后端 Flask，部署与扩展更灵活。
+- **前端 UI 设计突出**：界面风格统一、玻璃拟态卡片、动效与过渡自然，整体体验更接近工业级产品。
+- **多角色权限体系**：管理员/普通用户分级管理，权限边界清晰。
+- **完整后台管理闭环**：用户管理、操作日志、统计面板、数据导出齐全。
+- **可迭代训练体系**：支持自定义数据集训练与权重更新，便于模型持续优化。
+- **工程化可维护**：结构清晰，模块划分明确，适合二次开发与功能扩展。
+
+---
+
+## 🎨 前端 UI 风格与交互设计
+
+- **整体视觉统一**：组件风格一致，配色克制且清晰，信息层级明确  
+- **卡片玻璃拟态**：重点内容采用玻璃拟态卡片，提升质感  
+- **动效过渡自然**：页面切换、弹窗进入、列表交互具有柔和过渡  
+- **可读性优先**：字体与间距经过统一设计，减少视觉噪声  
+- **移动端适配**：关键模块支持响应式布局，保证移动端体验  
+
+---
+
+## ✅ 环境要求
+
+**后端（Flask）**
+- Python 3.8+
+- pip / virtualenv
+- 常用依赖：Flask、SQLAlchemy、PyJWT 等
+
+**前端（Vue 3）**
+- Node.js 16+（建议 18+）
+- npm 8+
+- Vite 构建工具
+
+**模型训练（YOLOv5-6.2）**
+- PyTorch
+- CUDA（可选，GPU 加速）
+- 训练数据需满足 YOLO 数据集格式
 
 ---
 
@@ -9,669 +62,146 @@
 ```
 Garbage_classification_Yolov5/
 │
-├── 📄 README.md                              # 项目文档（此文件）
-├── 📄 garbage.yaml                           # YOLOv5 数据集配置文件
-├── 📄 cookies.txt                            # Cookie 存储文件
-├── 📄 LICENSE                                # 许可证
+├── README.md
+├── garbage.yaml
+├── LICENSE
+├── run_detect.sh
+├── uploads/
+│   └── results/
 │
-├── 📂 datasets/                              # 训练和测试数据集
-│   ├── best.pt                               # 预训练模型权重文件
-│   ├── 📂 coco128/                           # COCO 示例数据集
-│   │   ├── LICENSE
-│   │   ├── README.txt
-│   │   └── 📂 images/
-│   │       └── 📂 train2017/
-│   └── 📂 wangy/                             # 自定义垃圾数据集
-│       ├── 📂 images/
-│       │   ├── 📂 train/                     # 训练集图片
-│       │   └── 📂 val/                       # 验证集图片
-│       └── 📂 labels/
-│           ├── 📂 train/                     # 训练集标签（YOLO 格式）
-│           └── 📂 val/                       # 验证集标签
+├── datasets/
+│   ├── coco128/
+│   ├── wangy/
+│   └── best.pt
 │
-├── 📂 garbage_classification/                # 后端 Flask 应用
-│   ├── 📄 __init__.py
-│   └── 📂 backend/
-│       ├── 📄 app.py                         # Flask 应用入口
-│       ├── 📄 config.py                      # 配置管理（JWT、数据库等）
-│       ├── 📄 extensions.py                  # Flask 扩展（db 等）
-│       │
-│       ├── 📂 models/                        # 数据库模型
-│       │   ├── 📄 __init__.py
-│       │   ├── 📄 user.py                    # 用户模型（支持 is_admin 字段）
-│       │   ├── 📄 image.py                   # 图像模型
-│       │   ├── 📄 log.py                     # 系统日志模型
-│       │   └── 📄 __pycache__/
-│       │
-│       ├── 📂 routes/                        # API 路由
-│       │   ├── 📄 __init__.py
-│       │   ├── 📄 auth.py                    # 认证路由（登录/注册/注销，JWT 生成）
-│       │   ├── 📄 pages.py                   # HTML 页面路由
-│       │   ├── 📄 detect.py                  # 目标检测路由（@jwt_required 保护）
-│       │   ├── 📄 user.py                    # 用户管理路由（@jwt_required 保护）
-│       │   ├── 📄 admin.py                   # 管理员路由（@admin_required 保护）
-│       │   └── 📄 __pycache__/
-│       │
-│       ├── 📂 services/                      # 业务逻辑服务层
-│       │   ├── 📄 __init__.py
-│       │   ├── 📄 yolo_service.py            # YOLOv5 模型管理
-│       │   ├── 📄 auth_service.py            # 旧认证（已弃用）
-│       │   ├── 📄 jwt_service.py             # ✨ JWT 令牌管理（新）
-│       │   ├── 📄 log_service.py             # 日志记录服务
-│       │   └── 📄 __pycache__/
-│       │
-│       ├── 📂 utils/                         # 工具函数
-│       │   ├── 📄 file.py                    # 文件处理
-│       │   └── 📄 ...                        # 其他工具
-│       │
-│       ├── 📂 static/                        # 静态资源（旧 HTML UI）
-│       │   └── 📂 images/
-│       │
-│       ├── 📂 templates/                     # HTML 模板（旧）
-│       │   ├── 📄 base.html
-│       │   ├── 📄 index.html
-│       │   ├── 📄 login.html
-│       │   ├── 📄 register.html
-│       │   ├── 📄 detect.html
-│       │   ├── 📄 history.html
-│       │   ├── 📄 profile.html
-│       │   ├── 📄 about.html
-│       │   └── 📄 admin.html
-│       │
-│       ├── 📂 uploads/                       # 上传文件存储
-│       │   └── 📂 results/                   # 检测结果存储
-│       │
-│       ├── 📂 instance/                      # Flask 实例目录
-│       │   └── app.db                        # SQLite 数据库
-│       │
-│       └── 📄 __pycache__/
+├── garbage_classification/
+│   ├── __init__.py
+│   └── backend/
+│       ├── app.py
+│       ├── config.py
+│       ├── extensions.py
+│       ├── models/
+│       ├── routes/
+│       ├── services/
+│       ├── utils/
+│       ├── templates/
+│       ├── static/
+│       ├── uploads/
+│       └── instance/
 │
-├── 📂 garbage_classification_frontend/       # ✨ 前端 Vue 3 应用（新）
-│   ├── 📄 index.html                         # 应用入口 HTML
-│   ├── 📄 package.json                       # 前端依赖配置
-│   ├── 📄 vite.config.js                     # Vite 构建配置
-│   ├── 📄 README.md                          # 前端项目文档
-│   │
-│   ├── 📂 public/                            # 静态公共资源
-│   │
-│   ├── 📂 src/                               # 前端源代码
-│   │   ├── 📄 App.vue                        # 主应用组件（路由入口）
-│   │   ├── 📄 main.js                        # 应用启动文件
-│   │   ├── 📄 style.css                      # 全局样式
-│   │   │
-│   │   ├── 📂 assets/                        # 资源文件
-│   │   │
-│   │   ├── 📂 components/                    # Vue 可复用组件
-│   │   │   ├── 📄 Navbar.vue                 # 导航栏（支持角色显示）
-│   │   │   ├── 📄 Footer.vue                 # 页脚
-│   │   │   └── ...                           # 其他组件
-│   │   │
-│   │   ├── 📂 composables/                   # Vue 3 Composition API 组合式函数
-│   │   │   ├── 📄 useAuth.js                 # 认证组合（登录/注册/logout/JWT localStorage 存储）
-│   │   │   └── 📄 useApi.js                  # API 调用组合（自动添加 Authorization 头）
-│   │   │
-│   │   ├── 📂 pages/                         # 页面组件（对应路由）
-│   │   │   ├── 📄 HomePage.vue               # 首页
-│   │   │   ├── 📄 LoginPage.vue              # 登录页
-│   │   │   ├── 📄 RegisterPage.vue           # 注册页
-│   │   │   ├── 📄 DetectPage.vue             # 垃圾检测页（用户）
-│   │   │   ├── 📄 HistoryPage.vue            # 识别历史页（用户）
-│   │   │   ├── 📄 ProfilePage.vue            # 个人资料页（用户）
-│   │   │   ├── 📄 AboutPage.vue              # 关于页面
-│   │   │   └── 📄 AdminPage.vue              # 管理后台（管理员）
-│   │   │
-│   │   ├── 📂 router/                        # Vue Router 配置
-│   │   │   └── 📄 index.js                   # 路由定义及权限守护
-│   │   │
-│   │   └── 📂 styles/                        # 样式文件
+├── garbage_classification_frontend/
+│   ├── README.md
+│   ├── index.html
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── vite.config.js
+│   ├── public/
+│   └── src/
+│       ├── App.vue
+│       ├── main.js
+│       ├── assets/
+│       ├── components/
+│       ├── composables/
+│       ├── pages/
+│       ├── router/
+│       ├── styles/
+│       └── directives/
 │
-├── 📂 yolov5-6.2/                            # YOLOv5 目标检测框架
-│   ├── 📄 detect.py                          # 检测脚本
-│   ├── 📄 train.py                           # 训练脚本
-│   ├── 📄 val.py                             # 验证脚本
-│   ├── 📄 export.py                          # 模型导出
-│   ├── 📄 hubconf.py                         # Hub 配置
-│   ├── 📄 requirements.txt                   # YOLOv5 依赖
-│   ├── 📄 setup.cfg                          # 设置配置
-│   ├── 📄 LICENSE                            # 许可证
-│   ├── 📄 README.md                          # YOLOv5 说明
-│   ├── 📄 tutorial.ipynb                     # 教程 Jupyter Notebook
-│   ├── 📄 best.pt                            # 预训练权重（副本）
-│   ├── 📄 yolov5m.pt                         # YOLOv5 Medium 权重
-│   │
-│   ├── 📂 models/                            # 模型架构定义
-│   │   ├── 📄 __init__.py
-│   │   ├── 📄 common.py                      # 通用模块
-│   │   ├── 📄 experimental.py                # 实验性模块
-│   │   ├── 📄 yolo.py                        # YOLO 模型主类
-│   │   ├── 📄 tf.py                          # TensorFlow 模型
-│   │   ├── 📄 yolov5*.yaml                   # 模型配置文件
-│   │   └── 📂 hub/
-│   │
-│   ├── 📂 utils/                             # 工具函数
-│   │   ├── 📄 __init__.py
-│   │   ├── 📄 dataloaders.py                 # 数据加载
-│   │   ├── 📄 augmentations.py               # 数据增强
-│   │   ├── 📄 loss.py                        # 损失函数
-│   │   ├── 📄 metrics.py                     # 指标计算
-│   │   ├── 📄 plots.py                       # 绘图工具
-│   │   ├── 📄 general.py                     # 通用工具
-│   │   ├── 📄 callbacks.py                   # 回调函数
-│   │   ├── 📄 torch_utils.py                 # PyTorch 工具
-│   │   ├── 📄 downloads.py                   # 文件下载
-│   │   ├── 📄 activations.py                 # 激活函数
-│   │   ├── 📄 autoanchor.py                  # 自动锚框
-│   │   ├── 📄 autobatch.py                   # 自动批大小
-│   │   ├── 📄 benchmarks.py                  # 性能基准
-│   │   ├── 📂 loggers/                       # 日志记录
-│   │   ├── 📂 docker/                        # Docker 配置
-│   │   ├── 📂 aws/                           # AWS 工具
-│   │   ├── 📂 google_app_engine/             # GCP 部署
-│   │   ├── 📂 flask_rest_api/                # Flask REST API 示例
-│   │   └── 📄 __pycache__/
-│   │
-│   ├── 📂 data/                              # 数据集配置
-│   │   ├── 📄 *.yaml                         # 数据集配置文件
-│   │   ├── 📂 images/                        # 示例图片
-│   │   ├── 📂 scripts/                       # 数据处理脚本
-│   │   └── 📂 hyps/                          # 超参数配置
-│   │
-│   ├── 📂 classify/                          # 分类模型（扩展）
-│   │   ├── 📄 predict.py
-│   │   ├── 📄 train.py
-│   │   └── 📄 val.py
-│   │
-│   ├── 📂 runs/                              # 训练结果输出
-│   │   └── 📂 train/                         # 训练日志和权重
-│   │
-│   └── 📄 __pycache__/
-│
-├── 📂 uploads/                               # 全局上传文件存储
-│   └── 📂 results/                           # 检测结果存储
-│
-└── 📄 run_detect.sh                          # Linux/Mac 运行检测脚本
+└── yolov5-6.2/
+    ├── detect.py
+    ├── train.py
+    ├── val.py
+    ├── export.py
+    ├── requirements.txt
+    ├── models/
+    ├── utils/
+    ├── data/
+    ├── runs/
+    └── weights/
 ```
 
 ---
 
-## ✨ 核心功能
+## 🚀 部署流程
 
-### 1. 垃圾分类检测
-- 上传图片自动识别垃圾类别（可回收物、有害垃圾、厨余垃圾、其他垃圾）
-- 基于 YOLOv5 模型，支持多物体检测
-- 返回物体类别、置信度等信息
-
-### 2. 用户管理系统
-- 用户注册、登录、个人资料管理
-- **JWT 令牌认证**（支持同一浏览器同时登录多个账户）
-- 密码加密存储、邮箱唯一性检查
-- 用户角色区分（普通用户 / 管理员）
-
-### 3. 历史记录管理
-- 保存用户的检测历史记录
-- 支持查看、删除历史记录
-- 分页显示，支持大数据集
-
-### 4. 管理后台
-- 管理员可查看系统统计数据
-- 用户列表管理（开发中）
-- 系统日志查看
-- 权限控制（@admin_required 装饰器）
-
-### 5. 响应式界面
-- Vue 3 + Bootstrap 5 前端
-- 适配桌面、平板、手机设备
-- 现代化 UI 设计
-
----
-
-## 🔐 JWT 认证系统
-
-### 登录流程
-1. **前端**：提交 `login_id` 和 `password` 到 `/api/login`
-2. **后端**：验证凭证后生成 JWT Token
-3. **前端**：保存 Token 到 `localStorage` 作为 `auth_token`
-4. **后端**：后续请求通过 Authorization 头验证 Token
-
-### Token 结构
-```json
-{
-  "user_id": 1,
-  "username": "admin",
-  "is_admin": true,
-  "iat": 1768581213.86,
-  "exp": 1768667613.86
-}
-```
-
-### 保护装饰器
-```python
-@app.route('/api/detect', methods=['POST'])
-@jwt_required  # 需要有效的 JWT Token
-def detect():
-    payload = request.jwt_payload  # 获取 Token 中的数据
-    user_id = payload['user_id']
-    ...
-
-@app.route('/api/admin/stats')
-@admin_required  # 需要有效的 JWT Token 且 is_admin=true
-def get_admin_stats():
-    ...
-```
-
-### 前端使用
-```javascript
-// useAuth.js - 登录时保存 Token
-const login = async (login_id, password) => {
-  const response = await fetch(`${API_BASE}/api/login`, {...})
-  const data = await response.json()
-  if (data.token) {
-    token.value = data.token
-    localStorage.setItem('auth_token', data.token)  // 保存到 localStorage
-  }
-}
-
-// useApi.js - 所有请求自动添加 Authorization 头
-const getHeaders = () => {
-  const headers = { 'Content-Type': 'application/json' }
-  const token = localStorage.getItem('auth_token')
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`  // "Bearer <token>"
-  }
-  return headers
-}
-```
-
----
-
-## 🚀 快速开始
-
-### 前置要求
-- **Python 3.8+**（后端）
-- **Node.js 14+**（前端）
-- **Conda 环境**：`yolov5_env`
-
-### 后端启动
-
+### 1) 启动后端
 ```bash
-# 进入项目根目录
-cd /Users/giovanni/UniversityDocuments/Senior/毕业设计/代码/Garbage_classification_Yolov5
-
-# 激活 conda 环境
-conda activate yolov5_env
-
-# 启动 Flask 后端服务（默认运行在 http://127.0.0.1:5001）
 python -m garbage_classification.backend.app
 ```
 
-**预期输出**：
-```
-✓ 管理员用户已存在
-✓ YOLOv5 路径已验证
-* Running on http://127.0.0.1:5001
-```
-
-### 前端启动
-
-在新终端中：
-
+### 2) 启动前端
 ```bash
-# 进入前端项目目录
 cd garbage_classification_frontend
-
-# 安装依赖（首次运行）
-npm install
-
-# 启动开发服务器（运行在 http://localhost:3000）
 npm run dev
 ```
 
-**预期输出**：
-```
-VITE v4.x.x  ready in xxx ms
+---
 
-➜  Local:   http://localhost:3000/
-➜  press h to show help
-```
+## 🧠 训练模型流程
 
-### 在浏览器中访问
-- 打开 http://localhost:3000
-- 使用默认管理员账户登录或注册新账户
+1. **准备数据集**
+   - 按 YOLO 数据格式准备 `images/` 与 `labels/`
+   - `labels` 为 YOLO 标准格式（类别 + 归一化坐标）
+
+2. **配置数据集文件**
+   - 修改 `garbage.yaml`（训练/验证路径与类别）
+
+3. **启动训练**
+   - 进入 `yolov5-6.2/` 目录执行训练脚本
+
+4. **产出权重与替换**
+   - 训练完成后，将权重文件替换到后端模型加载路径
+   - 即可更新线上识别效果
+
+> 该流程支持多次迭代训练，适合模型持续优化。
 
 ---
 
-## 🔑 默认凭据
+## 🔐 权限与安全策略
 
-**管理员账号**：
-- 用户名：`admin`
-- 邮箱：`admin@example.com`
-- 密码：`admin123`
-
-**新用户**：
-- 可通过 `/register` 页面自行注册
-
----
-
-## 📊 API 接口汇总
-
-### 认证接口
-| 方法 | 路由 | 说明 | 认证 |
-|------|------|------|------|
-| POST | `/api/login` | 用户登录，返回 Token | ❌ |
-| POST | `/api/register` | 用户注册 | ❌ |
-| POST | `/api/logout` | 用户登出 | ✅ |
-| GET | `/api/user` | 获取当前用户信息 | ✅ |
-
-### 用户接口
-| 方法 | 路由 | 说明 | 认证 |
-|------|------|------|------|
-| GET | `/api/user/profile` | 获取用户资料 | ✅ |
-| PUT | `/api/user/profile` | 更新用户资料（需验证密码） | ✅ |
-| GET | `/api/user/history` | 获取检测历史（分页） | ✅ |
-| DELETE | `/api/user/history/<id>` | 删除历史记录 | ✅ |
-
-### 检测接口
-| 方法 | 路由 | 说明 | 认证 |
-|------|------|------|------|
-| POST | `/api/detect` | 上传图片进行检测 | ✅ |
-| GET | `/api/images/<id>/original` | 获取原始图片 | ✅ |
-| GET | `/api/images/<id>/result` | 获取检测结果图片 | ✅ |
-
-### 管理接口
-| 方法 | 路由 | 说明 | 认证 |
-|------|------|------|------|
-| GET | `/api/admin/stats` | 获取系统统计数据 | ✅ 管理员 |
-| GET | `/api/admin/users` | 获取用户列表 | ✅ 管理员 |
-| GET | `/api/admin/logs` | 获取系统日志 | ✅ 管理员 |
+- JWT 认证保护关键接口
+- 管理员与用户权限隔离
+- 管理员不可禁用（后端校验）
+- 最后一个管理员不可降级
+- 登录状态与接口权限严格区分，避免越权访问
+- 关键行为写入日志，便于审计与追踪
 
 ---
 
-## 🌐 路由映射
+## 📊 统计与监控
 
-### 公开路由
-| 路由 | 页面 | 说明 |
-|------|------|------|
-| `/` | 首页 | 项目介绍 |
-| `/login` | 登录 | 用户登录 |
-| `/register` | 注册 | 用户注册 |
-| `/about` | 关于 | 项目信息 |
-
-### 用户路由（需登录）
-| 路由 | 页面 | 说明 |
-|------|------|------|
-| `/user/detect` | 检测页面 | 上传图片进行垃圾分类 |
-| `/user/history` | 历史记录 | 查看过去的检测记录 |
-| `/user/profile` | 个人资料 | 修改邮箱和密码 |
-
-### 管理员路由（需登录且 `is_admin=true`）
-| 路由 | 页面 | 说明 |
-|------|------|------|
-| `/admin` | 仪表板 | 统计数据展示 |
-| `/admin/users` | 用户管理 | 用户列表（开发中）|
-| `/admin/analytics` | 数据分析 | 分析数据（开发中）|
-| `/admin/settings` | 系统设置 | 系统配置（开发中）|
+- 统计面板包含检测量、用户数、活跃度、平均置信度
+- 支持操作日志审计，管理员可追踪关键行为
+- 数据导出支持运营与模型分析
+- 管理后台支持多维度系统状态查看
 
 ---
 
-## 🧪 使用场景
+## 🧪 测试建议
 
-### 场景 1：用户注册和登录
-1. 访问 http://localhost:3000/register
-2. 填写用户名、邮箱、密码（≥8字符）
-3. 点击注册，自动跳转到登录页
-4. 输入用户名和密码登录
-5. 自动重定向到 `/user/detect`
+**核心流程测试**
+- 注册 / 登录 / 记住我 / 注销
+- 图片上传与识别
+- 历史记录生成与查询
+- 个人资料修改与密码变更
 
-### 场景 2：上传图片检测
-1. 登录普通用户账户
-2. 进入 `/user/detect`
-3. 上传垃圾图片
-4. 系统返回检测结果（物品名称、信心度）
-5. 结果自动保存到历史记录
-
-### 场景 3：查看识别历史
-1. 登录用户账户
-2. 点击导航栏 "识别历史"
-3. 显示所有过去的检测记录（分页）
-4. 每条记录显示检测物品数、平均信心度
-
-### 场景 4：管理员仪表板
-1. 以管理员账号登录（admin/admin123）
-2. 导航栏显示 "📊 管理后台"
-3. 进入 `/admin`，显示仪表板
-4. 展示统计数据：总用户数、总识别数、平均信心度
-
-### 场景 5：同时登录多个账户
-1. **标签页 1**：登录用户 A（Token A 保存在 localStorage）
-2. **标签页 2**：清空 localStorage，登录用户 B（Token B 保存）
-3. 两个标签页可独立使用，互不影响
+**管理后台测试**
+- 用户编辑 / 禁用 / 恢复
+- 权限限制（普通用户访问后台）
+- 数据统计与导出
+- 日志列表分页
 
 ---
 
-## 📝 技术栈
+## ⭐ YOLOv5 模型识别优势
 
-### 后端
-- **Flask**：Web 框架
-- **SQLAlchemy**：ORM 数据库
-- **PyJWT**：JWT 令牌生成与验证
-- **Flask-CORS**：跨域资源共享
-- **Pillow**：图像处理
-
-### 模型
-- **YOLOv5**：目标检测框架（支持多物体检测）
-- **PyTorch**：深度学习框架
-- **OpenCV**：计算机视觉库
-- **NumPy**：数值计算库
-
-### 前端
-- **Vue 3**：前端框架
-- **Vite**：构建工具
-- **Vue Router**：路由管理
-- **Bootstrap 5**：UI 框架
-- **Axios**：HTTP 客户端（通过 Fetch API）
-
-### 数据库
-- **SQLite**：轻量级数据库（开发环境）
-- 可升级到 PostgreSQL（生产环境）
-
----
-
-## 🔧 配置文件
-
-### 后端配置 (`garbage_classification/backend/config.py`)
-```python
-class Config:
-    # 数据库
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///instance/app.db'
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    
-    # JWT 配置
-    JWT_SECRET = 'your-secret-key-here'
-    JWT_EXPIRATION = 86400  # 24 小时
-    
-    # 文件上传
-    UPLOAD_FOLDER = './uploads'
-    ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif'}
-    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB
-    
-    # YOLOv5 模型
-    YOLO_WEIGHTS = './datasets/best.pt'
-    YOLO_CONF_THRESHOLD = 0.25
-```
-
----
-
-## 🎯 使用预训练模型检测
-
-### 通过 Web 界面（推荐）
-1. 启动后端和前端（见快速开始部分）
-2. 在浏览器中访问 http://localhost:3000/user/detect
-3. 上传垃圾图片，系统自动返回检测结果
-
-### 通过命令行脚本
-
-#### 快速检测（Linux/Mac）
-```bash
-# 使用 run_detect.sh 脚本（一键检测）
-./run_detect.sh
-```
-
-#### 直接使用 YOLOv5 检测脚本
-```bash
-# 进入 YOLOv5 目录
-cd yolov5-6.2
-
-# 检测单张图片
-python detect.py --weights ../datasets/best.pt --source <图片路径> --img 640 --conf 0.25
-
-# 检测图片文件夹
-python detect.py --weights ../datasets/best.pt --source /path/to/images --img 640 --conf 0.25
-
-# 检测摄像头实时流
-python detect.py --weights ../datasets/best.pt --source 0 --img 640 --conf 0.25
-
-# 结果保存到 runs/detect/exp/ 目录
-```
-
-### 检测参数说明
-| 参数 | 说明 | 默认值 |
-|------|------|--------|
-| `--weights` | 模型权重文件路径 | `yolov5s.pt` |
-| `--source` | 输入源（图片路径、文件夹、摄像头编号 0） | `data/images` |
-| `--img` | 推理图片大小 | `640` |
-| `--conf` | 置信度阈值（0-1，低于此值的检测结果将被过滤） | `0.25` |
-| `--iou` | NMS IoU 阈值 | `0.45` |
-| `--device` | CUDA 设备（`0` 表示 GPU:0，`cpu` 表示 CPU） | `0` |
-| `--augment` | 是否使用测试时数据增强 | `False` |
-| `--visualize` | 是否可视化特征映射 | `False` |
-| `--save-txt` | 是否保存标签文本文件 | `False` |
-| `--save-conf` | 是否在保存的标签中包含置信度 | `False` |
-
-### 检测结果
-检测完成后，结果存储在 `runs/detect/exp/` 目录中：
-- **图片**：带有检测框和标签的结果图片
-- **标签**：YOLO 格式的检测结果文本文件（可选）
-- **日志**：检测统计信息
-
----
-
-## 🔧 模型训练
-
-### 准备数据集
-
-#### 1. 数据集格式要求（YOLO 格式）
-```
-data/
-├── images/
-│   ├── train/
-│   │   ├── img1.jpg
-│   │   ├── img2.jpg
-│   │   └── ...
-│   ├── val/
-│   │   ├── img3.jpg
-│   │   └── ...
-│   └── test/
-│       ├── img4.jpg
-│       └── ...
-└── labels/
-    ├── train/
-    │   ├── img1.txt      # 格式: <class_id> <x_center> <y_center> <width> <height> (0-1 归一化)
-    │   ├── img2.txt
-    │   └── ...
-    ├── val/
-    │   └── ...
-    └── test/
-        └── ...
-```
-
-#### 2. 创建数据集配置文件（`garbage.yaml`）
-```yaml
-path: /path/to/dataset  # 数据集根目录
-train: images/train     # 训练集相对路径
-val: images/val         # 验证集相对路径
-test: images/test       # 测试集相对路径（可选）
-
-nc: 4  # 类别数量
-names: ['可回收物', '有害垃圾', '厨余垃圾', '其他垃圾']  # 类别名称
-```
-
-### 执行训练
-
-#### 基础训练
-```bash
-# 进入 YOLOv5 目录
-cd yolov5-6.2
-
-# 基础训练
-python train.py --img 640 --batch 16 --epochs 100 --data ../garbage.yaml --weights yolov5s.pt
-```
-
-#### 高级训练（带更多参数）
-```bash
-python train.py \
-  --img 640                    # 输入图片大小
-  --batch 16                   # 批大小
-  --epochs 100                 # 训练轮数
-  --data ../garbage.yaml       # 数据集配置文件
-  --weights yolov5s.pt         # 预训练权重（yolov5s/m/l/x）
-  --device 0                   # GPU 设备编号
-  --patience 20                # EarlyStopping 耐心值
-  --save-period 10             # 每 10 个 epoch 保存一次
-  --nosave                     # 不保存中间权重（仅保存最终）
-  --cache                      # 缓存图片到内存（加快训练）
-  --augment                    # 使用数据增强
-  --rect                       # 矩形训练（加速）
-```
-
-### 训练参数说明
-| 参数 | 说明 | 默认值 | 建议值 |
-|------|------|--------|--------|
-| `--img` | 输入图片大小 | `640` | `416/512/640/1024` |
-| `--batch` | 批大小 | `16` | `32/64`（根据 GPU 显存调整） |
-| `--epochs` | 训练轮数 | `100` | `100-300` |
-| `--weights` | 预训练权重 | `yolov5s.pt` | `yolov5s/m/l/x`（精度递增） |
-| `--device` | 使用设备 | `0` | `0,1,2,3`（多 GPU）或 `cpu` |
-| `--patience` | 早停耐心值 | `20` | `10-30` |
-| `--save-period` | 保存周期 | `0`（关闭） | `5-10` |
-| `--cache` | 缓存到内存 | `False` | `True`（内存充足时） |
-| `--augment` | 数据增强 | `True` | `True` |
-| `--rect` | 矩形训练 | `False` | `True`（加速） |
-
-### 训练输出
-训练完成后，结果存储在 `runs/train/exp/` 目录中：
-- **weights/best.pt**：最佳模型权重（验证精度最高）
-- **weights/last.pt**：最后一个 epoch 的权重
-- **results.csv**：训练日志（损失、精度等）
-- **results.png**：训练曲线图
-- **confusion_matrix.png**：混淆矩阵
-
-### 模型评估
-```bash
-# 在验证集上评估模型
-python val.py --weights runs/train/exp/weights/best.pt --data ../garbage.yaml --img 640
-
-# 获取模型统计信息
-python -m torch.utils.bottleneck runs/train/exp/weights/best.pt
-```
-
-### 模型导出
-```bash
-# 导出为 ONNX 格式（跨平台）
-python export.py --weights runs/train/exp/weights/best.pt --include onnx
-
-# 导出为 TorchScript 格式
-python export.py --weights runs/train/exp/weights/best.pt --include torchscript
-
-# 导出为 CoreML 格式（iOS）
-python export.py --weights runs/train/exp/weights/best.pt --include coreml
-```
+- **高精度识别**：支持多类别垃圾分类检测
+- **实时推理**：适合实际场景快速响应
+- **可扩展性强**：支持替换权重文件进行升级
+- **工程化成熟**：生态完善，适合稳定部署
 
 ---
 
 ## 📄 许可证
 
-本项目使用 YOLOv5 的许可证。详见 [LICENSE](./LICENSE) 文件。
-
----
-
-**最后更新**：2026-01-17 | **前端框架**：Vue 3 + Vite | **认证方式**：JWT | **检测模型**：YOLOv5
+本项目遵循仓库内 `LICENSE` 约束。
