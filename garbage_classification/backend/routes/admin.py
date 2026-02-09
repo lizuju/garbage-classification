@@ -14,6 +14,9 @@ def list_users():
     user_list = admin_service.get_users_list()
     return jsonify({'status': 'success', 'users': user_list}), 200
 
+def _admin_count():
+    return User.query.filter_by(is_admin=True).count()
+
 
 @admin_bp.route('/admin/users/<int:user_id>', methods=['GET'])
 @admin_required
@@ -59,14 +62,22 @@ def update_user_detail(user_id):
         if new_pwd != confirm_pwd:
             return jsonify({'status': 'error', 'message': '两次输入的密码不一致'}), 400
         user.set_password(new_pwd)
-
+    
     # 管理员标识更新（可选）
     if 'is_admin' in data:
-        user.is_admin = bool(data['is_admin'])
+        new_is_admin = bool(data['is_admin'])
+        # 防止降级最后一个管理员
+        if user.is_admin and not new_is_admin and _admin_count() <= 1:
+            return jsonify({'status': 'error', 'message': '至少需要保留一个管理员账户'}), 400
+        user.is_admin = new_is_admin
 
     # 用户状态更新（可选）
     if 'is_active' in data:
         user.is_active = bool(data['is_active'])
+
+    # 统一规则：管理员账号不可禁用
+    if user.is_admin and user.is_active is False:
+        return jsonify({'status': 'error', 'message': '管理员账户不能禁用'}), 400
 
     try:
         db.session.commit()

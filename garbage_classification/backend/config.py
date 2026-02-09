@@ -32,6 +32,7 @@ class Config:
     # JWT 配置
     JWT_SECRET = os.environ.get('JWT_SECRET', 'jwt-dev-key-should-be-changed')
     JWT_EXPIRATION = 24 * 60 * 60  # 24小时
+    JWT_EXPIRATION_REMEMBER = 7 * 24 * 60 * 60  # 7天（记住我）
 
     # 上传目录：统一走项目根 uploads
     UPLOAD_FOLDER = str(ROOT / 'uploads')
@@ -47,4 +48,3 @@ class Config:
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'  # 防止CSRF，允许same-site请求
     SESSION_COOKIE_NAME = 'gc_session'
-

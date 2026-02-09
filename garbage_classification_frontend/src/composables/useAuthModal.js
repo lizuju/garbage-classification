@@ -51,17 +51,17 @@ export function useAuthModal() {
         isOpen.value = false
         modalType.value = null
         // Unlock body scroll
+        const html = document.documentElement
+        const prevScrollBehavior = html.style.scrollBehavior
+        html.style.scrollBehavior = 'auto'
         document.body.classList.remove('modal-open')
         const offsetY = savedScrollY
         document.body.style.top = ''
         document.body.style.position = ''
         document.body.style.width = ''
-        // Restore scroll after layout settles (avoid jump to bottom)
+        window.scrollTo(0, offsetY)
         requestAnimationFrame(() => {
-            window.scrollTo(0, offsetY)
-            requestAnimationFrame(() => {
-                window.scrollTo(0, offsetY)
-            })
+            html.style.scrollBehavior = prevScrollBehavior
         })
     }
 

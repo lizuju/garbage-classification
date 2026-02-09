@@ -4,15 +4,15 @@ from ..extensions import db
 from ..models import User
 from ..services.log_service import log_action
 from ..services.jwt_service import JWTManager, jwt_required
+from ..config import Config
 
 auth_bp = Blueprint('auth', __name__)
 
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
-    # 调试：打印请求信息
+    # 调试：打印请求信息（避免输出敏感数据）
     print(f"Register - Content-Type: {request.content_type}")
-    print(f"Register - Request data: {request.data}")
     
     # 尝试多种方式获取数据
     data = None
@@ -20,7 +20,6 @@ def register():
     # 方法1: 尝试解析JSON
     try:
         data = request.get_json(force=True, silent=True)
-        print(f"Register - JSON data: {data}")
     except Exception as e:
         print(f"Register - JSON parse error: {e}")
     
@@ -32,7 +31,6 @@ def register():
                 'email': request.form.get('email'),
                 'password': request.form.get('password')
             }
-            print(f"Register - Form data: {data}")
         except Exception as e:
             print(f"Register - Form parse error: {e}")
     
@@ -41,7 +39,6 @@ def register():
         try:
             import json
             data = json.loads(request.data.decode('utf-8'))
-            print(f"Register - Raw data parsed: {data}")
         except Exception as e:
             print(f"Register - Raw data parse error: {e}")
     
@@ -108,9 +105,8 @@ def register():
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
-    # 调试：打印请求信息
+    # 调试：打印请求信息（避免输出敏感数据）
     print(f"Content-Type: {request.content_type}")
-    print(f"Request data: {request.data}")
     print(f"Is JSON: {request.is_json}")
     
     # 尝试多种方式获取数据
@@ -119,7 +115,6 @@ def login():
     # 方法1: 尝试解析JSON
     try:
         data = request.get_json(force=True, silent=True)
-        print(f"JSON data: {data}")
     except Exception as e:
         print(f"JSON parse error: {e}")
     
@@ -131,7 +126,6 @@ def login():
                 'email': request.form.get('email'),
                 'password': request.form.get('password')
             }
-            print(f"Form data: {data}")
         except Exception as e:
             print(f"Form parse error: {e}")
     
@@ -140,7 +134,6 @@ def login():
         try:
             import json
             data = json.loads(request.data.decode('utf-8'))
-            print(f"Raw data parsed: {data}")
         except Exception as e:
             print(f"Raw data parse error: {e}")
     
@@ -150,6 +143,7 @@ def login():
     # 获取登陆凭证（可能是login_id、username或email）
     login_id = data.get('login_id') or data.get('username') or data.get('email')
     password = data.get('password', '')
+    remember_me = data.get('remember_me', False)
     
     if not login_id or not password:
         return jsonify({
@@ -174,7 +168,9 @@ def login():
             print(f"✓ 用户验证成功: {user.username} (is_admin={user.is_admin})")
             
             # 生成 JWT token
-            token = JWTManager.encode_token(user.id, user.username, user.is_admin)
+            # 记住我：延长 token 过期时间
+            expires_in = Config.JWT_EXPIRATION_REMEMBER if remember_me else Config.JWT_EXPIRATION
+            token = JWTManager.encode_token(user.id, user.username, user.is_admin, expires_in=expires_in)
             
             if not token:
                 return jsonify({'status': 'error', 'message': 'Token 生成失败'}), 500
@@ -206,6 +202,22 @@ def login():
 def logout():
     # JWT 方式无需做任何事，客户端删除 token 即可
     return jsonify({'status': 'success', 'message': '注销成功'}), 200
+
+
+@auth_bp.route('/refresh', methods=['POST'])
+@jwt_required
+def refresh_token():
+    """刷新 JWT token（仅在 token 仍有效时允许刷新）"""
+    payload = request.jwt_payload
+    user_id = payload.get('user_id')
+    username = payload.get('username')
+    is_admin = payload.get('is_admin', False)
+
+    token = JWTManager.encode_token(user_id, username, is_admin)
+    if not token:
+        return jsonify({'status': 'error', 'message': 'Token 刷新失败'}), 500
+
+    return jsonify({'status': 'success', 'token': token}), 200
 
 
 @auth_bp.route('/user', methods=['GET'])

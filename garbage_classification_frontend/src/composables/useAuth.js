@@ -4,9 +4,54 @@ const user = ref(null)
 const isLoading = ref(false)
 const isLoggedIn = computed(() => !!user.value)
 const token = ref(localStorage.getItem('auth_token') || null)
+let refreshTimer = null
+
+const decodeJwt = (jwtToken) => {
+  try {
+    const payload = jwtToken.split('.')[1]
+    const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')))
+    return decoded
+  } catch (e) {
+    return null
+  }
+}
 
 export function useAuth() {
   const API_BASE = 'http://localhost:5001'
+
+  const scheduleRefresh = () => {
+    if (refreshTimer) {
+      clearTimeout(refreshTimer)
+      refreshTimer = null
+    }
+    if (!token.value) return
+
+    const payload = decodeJwt(token.value)
+    if (!payload || !payload.exp) return
+
+    const now = Math.floor(Date.now() / 1000)
+    const refreshAt = payload.exp - 120
+    const delayMs = Math.max((refreshAt - now) * 1000, 5000)
+
+    refreshTimer = setTimeout(async () => {
+      try {
+        const response = await fetch(`${API_BASE}/api/refresh`, {
+          method: 'POST',
+          headers: getHeaders(),
+        })
+        if (response.status === 200) {
+          const data = await response.json()
+          if (data.status === 'success' && data.token) {
+            token.value = data.token
+            localStorage.setItem('auth_token', data.token)
+            scheduleRefresh()
+          }
+        }
+      } catch (error) {
+        console.warn('刷新 token 失败:', error)
+      }
+    }, delayMs)
+  }
 
   // 获取请求头，自动添加 JWT token
   const getHeaders = () => {
@@ -21,6 +66,7 @@ export function useAuth() {
   const initAuth = async () => {
     if (token.value) {
       await getCurrentUser()
+      scheduleRefresh()
     }
   }
 
@@ -39,6 +85,10 @@ export function useAuth() {
       if (response.status === 401) {
         // Token 过期或无效
         token.value = null
+        if (refreshTimer) {
+          clearTimeout(refreshTimer)
+          refreshTimer = null
+        }
         localStorage.removeItem('auth_token')
         user.value = null
         return null
@@ -48,6 +98,7 @@ export function useAuth() {
       
       if (data && data.status === 'success' && data.user) {
         user.value = data.user
+        scheduleRefresh()
         return data.user
       }
       user.value = null
@@ -61,12 +112,12 @@ export function useAuth() {
     }
   }
 
-  const login = async (login_id, password) => {
+  const login = async (login_id, password, rememberMe = false) => {
     try {
       const response = await fetch(`${API_BASE}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ login_id, password }),
+        body: JSON.stringify({ login_id, password, remember_me: rememberMe }),
       })
       
       const data = await response.json()
@@ -75,6 +126,7 @@ export function useAuth() {
         token.value = data.token
         localStorage.setItem('auth_token', data.token)
         user.value = data.user
+        scheduleRefresh()
         return data
       }
       throw new Error(data.message || '登录失败')
@@ -117,6 +169,10 @@ export function useAuth() {
       // 无论后端请求是否成功，都清除本地数据
       user.value = null
       token.value = null
+      if (refreshTimer) {
+        clearTimeout(refreshTimer)
+        refreshTimer = null
+      }
       localStorage.removeItem('auth_token')
     }
   }

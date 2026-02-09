@@ -31,6 +31,11 @@
         padding: 20px 0;
         margin-top: 100px;
     }
+    .terms-links a {
+        text-decoration: underline;
+        color: inherit;
+        cursor: pointer;
+    }
 </style>
 {% endblock %}
 
@@ -85,7 +90,7 @@
 
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input" id="terms" required>
-                    <label class="form-check-label" for="terms">我已阅读并同意<a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">服务条款</a>和<a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">隐私政策</a></label>
+                    <label class="form-check-label terms-links" for="terms">我已阅读并同意<a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">服务条款</a>和<a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">隐私政策</a></label>
                 </div>
 
                 <div class="d-grid">

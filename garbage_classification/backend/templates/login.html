@@ -100,6 +100,7 @@
             const username = document.getElementById('login-username').value.trim();
             const password = document.getElementById('password').value;
             const rememberMe = document.getElementById('remember-me').checked;
+            const rememberMe = document.getElementById('remember-me').checked;
             
             // 前端验证
             if (!username || !password) {
@@ -115,7 +116,8 @@
             // 准备请求数据
             const requestData = {
                 username: username,
-                password: password
+                password: password,
+                remember_me: rememberMe
             };
             
             console.log('→ 发送登录请求:', requestData);

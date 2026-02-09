@@ -67,7 +67,7 @@
                 </div>
 
                 <div class="mb-3 form-check">
-                  <input type="checkbox" class="form-check-input" id="modal-remember-me">
+                  <input type="checkbox" class="form-check-input" id="modal-remember-me" v-model="loginForm.rememberMe">
                   <label class="form-check-label" for="modal-remember-me">记住我</label>
                 </div>
 
@@ -181,7 +181,12 @@
 
                 <div class="mb-3 form-check">
                   <input type="checkbox" class="form-check-input" id="modal-terms" v-model="registerForm.acceptTerms" required>
-                  <label class="form-check-label" for="modal-terms">我已阅读并同意服务条款和隐私政策</label>
+                  <label class="form-check-label terms-links" for="modal-terms">
+                    我已阅读并同意
+                    <a href="#" class="terms-link-blue" @click.prevent="openTerms">服务条款</a>
+                    和
+                    <a href="#" class="terms-link-blue" @click.prevent="openPrivacy">隐私政策</a>
+                  </label>
                 </div>
 
                 <CommonButton 
@@ -214,6 +219,9 @@
       </transition>
     </div>
   </transition>
+
+  <TermsPrivacyModal :isOpen="showTerms" type="terms" @close="closeTerms" />
+  <TermsPrivacyModal :isOpen="showPrivacy" type="privacy" @close="closePrivacy" />
 </template>
 
 <script setup>
@@ -223,6 +231,7 @@ import { useAuth } from '../composables/useAuth'
 import { useAuthModal } from '../composables/useAuthModal'
 import ProfileContent from './ProfileContent.vue'
 import CommonButton from './CommonButton.vue'
+import TermsPrivacyModal from './TermsPrivacyModal.vue'
 import '../styles/components/modal.css'
 import '../styles/components/card.css'
 import '../styles/components/common-button.css'
@@ -232,7 +241,7 @@ const { login, register } = useAuth()
 const { isOpen, modalType, closeModal, switchToLogin, switchToRegister } = useAuthModal()
 
 // Login form state
-const loginForm = ref({ login_id: '', password: '' })
+const loginForm = ref({ login_id: '', password: '', rememberMe: false })
 const loginMessage = ref('')
 const loginMessageType = ref('')
 const loginLoading = ref(false)
@@ -248,11 +257,13 @@ const registerForm = ref({
 const registerMessage = ref('')
 const registerMessageType = ref('')
 const registerLoading = ref(false)
+const showTerms = ref(false)
+const showPrivacy = ref(false)
 
 // Reset forms when modal closes
 watch(isOpen, (newVal) => {
   if (!newVal) {
-    loginForm.value = { login_id: '', password: '' }
+    loginForm.value = { login_id: '', password: '', rememberMe: false }
     loginMessage.value = ''
     registerForm.value = { username: '', email: '', password: '', confirmPassword: '', acceptTerms: false }
     registerMessage.value = ''
@@ -272,7 +283,7 @@ const handleLogin = async () => {
 
   loginLoading.value = true
   try {
-    await login(loginForm.value.login_id, loginForm.value.password)
+    await login(loginForm.value.login_id, loginForm.value.password, loginForm.value.rememberMe)
     loginMessage.value = '登录成功！'
     loginMessageType.value = 'success'
     setTimeout(() => {
@@ -323,9 +334,36 @@ const handleRegister = async () => {
     registerLoading.value = false
   }
 }
+
+const openTerms = () => {
+  showTerms.value = true
+}
+
+const closeTerms = () => {
+  showTerms.value = false
+}
+
+const openPrivacy = () => {
+  showPrivacy.value = true
+}
+
+const closePrivacy = () => {
+  showPrivacy.value = false
+}
 </script>
 
 <style scoped>
+.terms-links a {
+  text-decoration: underline;
+  color: inherit;
+}
+
+.terms-link-blue {
+  color: #0d6efd !important;
+  text-decoration: underline;
+  text-decoration-color: #0d6efd;
+}
+
 .modal-content-inner {
   max-height: 95vh;
   overflow-y: auto;

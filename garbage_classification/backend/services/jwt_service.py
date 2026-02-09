@@ -10,7 +10,7 @@ class JWTManager:
     """JWT token 管理器"""
 
     @staticmethod
-    def encode_token(user_id, username, is_admin=False):
+    def encode_token(user_id, username, is_admin=False, expires_in=None):
         """
         编码 JWT token
         
@@ -22,12 +22,13 @@ class JWTManager:
         Returns:
             str: JWT token
         """
+        expiration = expires_in if expires_in is not None else Config.JWT_EXPIRATION
         payload = {
             'user_id': user_id,
             'username': username,
             'is_admin': is_admin,
             'iat': time.time(),
-            'exp': time.time() + Config.JWT_EXPIRATION,
+            'exp': time.time() + expiration,
         }
         
         try:

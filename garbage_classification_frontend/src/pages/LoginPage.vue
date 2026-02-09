@@ -51,7 +51,7 @@
                 </div>
 
                 <div class="mb-3 form-check">
-                    <input type="checkbox" class="form-check-input" id="remember-me">
+                    <input type="checkbox" class="form-check-input" id="remember-me" v-model="formData.rememberMe">
                     <label class="form-check-label" for="remember-me">记住我</label>
                 </div>
 
@@ -88,6 +88,7 @@ const { login } = useAuth()
 const formData = ref({
   login_id: '',
   password: '',
+  rememberMe: false,
 })
 
 const message = ref('')
@@ -103,7 +104,7 @@ const handleSubmit = async () => {
 
   isLoading.value = true
   try {
-    const result = await login(formData.value.login_id, formData.value.password)
+    const result = await login(formData.value.login_id, formData.value.password, formData.value.rememberMe)
     message.value = '登录成功！'
     messageType.value = 'success'
     setTimeout(() => {

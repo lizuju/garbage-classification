@@ -115,10 +115,16 @@
       <div class="row g-3 mb-4">
         <div class="col-md-6">
           <label class="form-label fw-bold text-secondary small">用户角色</label>
-          <select v-model="formData.is_admin" class="form-select">
+          <select v-model="formData.is_admin" class="form-select" :disabled="isSelfUser">
             <option :value="true">管理员</option>
             <option :value="false">普通用户</option>
           </select>
+          <div v-if="!isSelfUser && profileUser?.is_admin && formData.is_admin === false" class="form-text mt-1 small text-muted">
+            若该用户是最后一个管理员，将无法降级
+          </div>
+          <div v-if="isSelfUser" class="form-text mt-1 small text-muted">
+            不能降级当前登录管理员
+          </div>
         </div>
         <div class="col-md-6">
           <label class="form-label fw-bold text-secondary small">账号状态</label>
@@ -154,6 +160,7 @@
 <script setup>
 import { ref, computed, nextTick, onUnmounted, watch } from 'vue'
 import { useApi } from '../composables/useApi'
+import { useAuth } from '../composables/useAuth'
 import CommonButton from './CommonButton.vue'
 import '../styles/components/labels.css'
 
@@ -167,6 +174,7 @@ let errorTimer = null
 let noticeTimer = null
 
 const { updateAdminUser } = useApi()
+const { user: currentUser } = useAuth()
 
 const formData = ref({
   username: '',
@@ -184,7 +192,8 @@ const actionNotice = ref('')
 const noticeType = ref('')
 
 const profileUser = computed(() => props.user)
-const isAdminUser = computed(() => !!profileUser.value?.is_admin)
+const isSelfUser = computed(() => !!currentUser.value && !!profileUser.value && currentUser.value.id === profileUser.value.id)
+const isAdminUser = computed(() => !!formData.value.is_admin)
 
 const formattedDate = computed(() => {
   if (profileUser.value && profileUser.value.created_at) {
@@ -264,6 +273,11 @@ const handleUpdate = async () => {
     return
   }
 
+  if (isSelfUser.value && formData.value.is_admin === false) {
+    showError('不能降级当前登录管理员', 'danger')
+    return
+  }
+
   if (!username || username.length < 3 || username.length > 20) {
     showError('用户名长度需为 3-20 个字符', 'danger')
     return
@@ -328,6 +342,15 @@ watch(
     }
   },
   { immediate: true }
+)
+
+watch(
+  () => formData.value.is_admin,
+  (isAdmin) => {
+    if (isAdmin) {
+      formData.value.is_active = true
+    }
+  }
 )
 
 onUnmounted(() => {

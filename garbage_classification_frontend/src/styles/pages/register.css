@@ -8,3 +8,8 @@
 .register-page-wrapper a:hover {
   text-decoration: underline;
 }
+
+.terms-links a {
+  text-decoration: underline;
+  color: inherit;
+}

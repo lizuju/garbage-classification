@@ -252,6 +252,7 @@
                           :theme="user.is_active === false ? 'success' : 'danger'" 
                           size="sm" 
                           :disabled="isSelfUser(user) || user.is_admin"
+                          :title="user.is_admin ? '管理员不可禁用' : (isSelfUser(user) ? '不能禁用当前登录管理员' : '')"
                           @click="toggleUserStatus(user)"
                         >
                           {{ user.is_active === false ? '恢复' : '禁用' }}
@@ -459,6 +460,7 @@ const auditState = ref('scanning') // 'scanning' | 'report'
 const currentScanTarget = ref('')
 const scanProgress = ref(0)
 const auditReport = ref({ score: 0, items: [] })
+const bodyScrollY = ref(0)
 
 const fetchStats = async () => {
   isLoadingStats.value = true
@@ -510,13 +512,36 @@ const handleExport = async () => {
 
 const handleAudit = () => {
   showAuditModal.value = true
-  document.body.classList.add('modal-open')
+  lockBodyScroll()
   startScan()
 }
 
 const closeAuditModal = () => {
   showAuditModal.value = false
+  unlockBodyScroll()
+}
+
+const lockBodyScroll = () => {
+  bodyScrollY.value = window.pageYOffset || document.documentElement.scrollTop || 0
+  document.body.classList.add('modal-open')
+  document.body.style.top = `-${bodyScrollY.value}px`
+  document.body.style.position = 'fixed'
+  document.body.style.width = '100%'
+}
+
+const unlockBodyScroll = () => {
+  const offsetY = bodyScrollY.value || 0
+  const html = document.documentElement
+  const prevScrollBehavior = html.style.scrollBehavior
+  html.style.scrollBehavior = 'auto'
   document.body.classList.remove('modal-open')
+  document.body.style.top = ''
+  document.body.style.position = ''
+  document.body.style.width = ''
+  window.scrollTo(0, offsetY)
+  requestAnimationFrame(() => {
+    html.style.scrollBehavior = prevScrollBehavior
+  })
 }
 
 const isSelfUser = (targetUser) => {
@@ -530,7 +555,7 @@ const openUserEditor = async (targetUser) => {
     const detail = result.user || targetUser
     selectedUser.value = detail
     showUserModal.value = true
-    document.body.classList.add('modal-open')
+    lockBodyScroll()
   } catch (err) {
     showNotice('获取用户详情失败', 'danger')
   }
@@ -539,7 +564,7 @@ const openUserEditor = async (targetUser) => {
 const closeUserModal = () => {
   showUserModal.value = false
   selectedUser.value = null
-  document.body.classList.remove('modal-open')
+  unlockBodyScroll()
 }
 
 const handleUserUpdated = (updatedUser) => {
