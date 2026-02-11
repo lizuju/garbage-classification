@@ -20,7 +20,7 @@
           <!-- Content remains the same -->
           <div class="alert alert-info">
             <i class="bi bi-info-circle-fill me-2"></i>
-            支持 JPG、JPEG、PNG 格式的图片，最大 5MB。图片质量越清晰，识别效果越好。<strong>系统使用低置信度阈值(0.1)，可更好地识别垃圾物品。</strong>
+            支持 JPG、JPEG、PNG 格式的图片，可单张或批量上传（最多 20 张，单张不超过 5MB，总大小不超过 30MB）。图片质量越清晰，识别效果越好。<strong>系统使用低置信度阈值(0.1)，可更好地识别垃圾物品。</strong>
           </div>
 
           <div v-if="message" :class="`alert alert-${messageType}`" role="alert">
@@ -75,8 +75,8 @@
                     @drop.prevent="handleDrop"
                   >
                     <i class="bi bi-cloud-arrow-up upload-icon"></i>
-                    <h5>点击或拖拽图片到此处</h5>
-                    <p class="text-muted">支持 JPG、JPEG、PNG 格式</p>
+                    <h5>点击或拖拽图片到此处（支持批量）</h5>
+                    <p class="text-muted">支持 JPG、JPEG、PNG 格式，最多 20 张</p>
                   </div>
 
                   <input
@@ -84,34 +84,54 @@
                     type="file"
                     class="d-none"
                     accept="image/*"
+                    multiple
                     @change="handleFileSelect"
                   />
 
                   <!-- 预览图 -->
-                  <div v-if="preview" class="preview-container">
-                    <div class="image-wrapper"> <img :src="preview" alt="preview" class="preview-image" />
-                      <CommonButton
-                        theme="danger"
-                        circle
-                        size="sm"
-                        class="remove-btn"
-                        @click="resetUpload"
-                        type="button"
-                      >
-                        <i class="bi bi-x-lg"></i>
-                      </CommonButton>
+                  <div v-if="previews.length > 0" class="preview-container">
+                    <div class="preview-grid">
+                      <div v-for="(item, index) in previews" :key="`${item.name}-${index}`" class="image-wrapper">
+                        <div class="image-frame">
+                          <img :src="item.url" alt="preview" class="preview-image" />
+                          <CommonButton
+                            theme="danger"
+                            circle
+                            size="xs"
+                            class="remove-btn"
+                            @click.stop="removeSelectedFile(index)"
+                            type="button"
+                          >
+                            <i class="bi bi-x-lg"></i>
+                          </CommonButton>
+                        </div>
+                        <div class="preview-name text-truncate">{{ item.name }}</div>
+                      </div>
                     </div>
+                  </div>
+                  <div v-if="selectedFiles.length > 0" class="selected-count">
+                    已选择 {{ selectedFiles.length }} 张图片
+                  </div>
+                  <div v-if="selectedFiles.length > 0" class="d-grid gap-2 mt-2">
+                    <CommonButton
+                      theme="danger"
+                      size="sm"
+                      @click="resetUpload"
+                      type="button"
+                    >
+                      <i class="bi bi-x-lg me-1"></i>清空已选图片
+                    </CommonButton>
                   </div>
 
                   <div class="d-grid gap-2 mt-3">
                     <common-button
                       theme="success"
                       size="md"
-                      :disabled="!selectedFile || isLoading"
+                      :disabled="selectedFiles.length === 0 || isLoading"
                       @click="handleDetect"
                     >
                       <i class="bi bi-search me-1"></i>
-                      {{ isLoading ? '识别中...' : '开始识别' }}
+                      {{ isLoading ? '识别中...' : selectedFiles.length > 1 ? `开始批量识别（${selectedFiles.length} 张）` : '开始识别' }}
                     </common-button>
                   </div>
                 </div>
@@ -129,20 +149,27 @@
               </div>
 
               <!-- 结果展示 -->
-              <div v-if="results" class="result-container">
-                <div class="card">
+              <div v-if="detectionResults.length > 0" class="result-container">
+                <div class="card mb-3" v-for="(result, resIndex) in detectionResults" :key="`${result.image_id || 'err'}-${resIndex}`">
                   <div class="card-body">
-                    <h5 class="card-title">识别结果</h5>
+                    <h5 class="card-title">
+                      识别结果 {{ detectionResults.length > 1 ? `#${resIndex + 1}` : '' }}
+                    </h5>
+                    <p class="small text-muted mb-2">{{ result.filename || '未命名文件' }}</p>
+
+                    <div v-if="result.status !== 'success'" class="alert alert-danger mb-3">
+                      <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ result.message || '识别失败' }}
+                    </div>
 
                     <!-- 结果图 -->
-                    <div v-if="results.result_url_base64" class="mb-3">
-                      <img :src="results.result_url_base64" alt="detection result" class="img-fluid rounded" />
+                    <div v-if="result.status === 'success' && result.result_url_base64" class="mb-3">
+                      <img :src="result.result_url_base64" alt="detection result" class="img-fluid rounded" />
                     </div>
 
                     <!-- 检测到的物品 -->
-                    <div v-if="results.results && results.results.length > 0">
+                    <div v-if="result.status === 'success' && result.results && result.results.length > 0">
                       <div class="alert alert-success">
-                        <h6><i class="bi bi-check-circle-fill me-2"></i> 检测到 {{ results.results.length }} 个物体</h6>
+                        <h6><i class="bi bi-check-circle-fill me-2"></i> 检测到 {{ result.results.length }} 个物体</h6>
                       </div>
 
                       <div class="table-responsive">
@@ -155,7 +182,7 @@
                             </tr>
                           </thead>
                           <tbody>
-                            <tr v-for="(item, idx) in results.results" :key="idx">
+                            <tr v-for="(item, idx) in result.results" :key="idx">
                               <td>
                                 <span :class="`category-label ${getCategoryClass(item.class_name)}`">
                                   {{ item.class_name }}
@@ -184,7 +211,7 @@
                         </table>
                       </div>
                     </div>
-                    <div v-else class="alert alert-info">
+                    <div v-else-if="result.status === 'success'" class="alert alert-info">
                       <i class="bi bi-info-circle me-2"></i>未检测到垃圾物品
                     </div>
                   </div>
@@ -198,7 +225,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { useAuth } from '../composables/useAuth'
 import { useApi } from '../composables/useApi'
 import CommonButton from '@/components/CommonButton.vue'
@@ -209,14 +236,14 @@ import '../styles/components/progress.css'
 import '../styles/components/labels.css'
 
 const { isLoggedIn } = useAuth()
-const { detect } = useApi()
+const { detect, detectBatch } = useApi()
 
 const detectMode = ref('upload') // 'upload' or 'camera'
 
 const fileInput = ref(null)
-const selectedFile = ref(null)
-const preview = ref(null)
-const results = ref(null)
+const selectedFiles = ref([])
+const previews = ref([])
+const detectionResults = ref([])
 const isLoading = ref(false)
 const isDragOver = ref(false)
 const message = ref('')
@@ -236,15 +263,49 @@ const triggerFileInput = () => {
   fileInput.value?.click()
 }
 
+const MAX_BATCH_FILES = 20
+const MAX_SINGLE_FILE_SIZE = 5 * 1024 * 1024
+const MAX_TOTAL_UPLOAD_SIZE = 30 * 1024 * 1024
+
+const revokePreviewUrls = () => {
+  previews.value.forEach((item) => {
+    if (item?.url) URL.revokeObjectURL(item.url)
+  })
+}
+
+const setSelectedFiles = (files) => {
+  revokePreviewUrls()
+  const imageFiles = files.filter((file) => file && file.type.startsWith('image/')).slice(0, MAX_BATCH_FILES)
+  const oversized = imageFiles.find((file) => file.size > MAX_SINGLE_FILE_SIZE)
+  if (oversized) {
+    selectedFiles.value = []
+    previews.value = []
+    message.value = `文件 ${oversized.name} 超过 5MB，请压缩后再上传`
+    messageType.value = 'warning'
+    return
+  }
+  const totalSize = imageFiles.reduce((sum, file) => sum + (file.size || 0), 0)
+  if (totalSize > MAX_TOTAL_UPLOAD_SIZE) {
+    selectedFiles.value = []
+    previews.value = []
+    message.value = '批量上传总大小不能超过 30MB，请减少文件数量或压缩图片'
+    messageType.value = 'warning'
+    return
+  }
+
+  const validImages = imageFiles
+  selectedFiles.value = validImages
+  previews.value = validImages.map((file) => ({
+    name: file.name,
+    url: URL.createObjectURL(file),
+  }))
+}
+
 const handleFileSelect = (e) => {
-  const file = e.target.files?.[0]
-  if (file && file.type.startsWith('image/')) {
-    selectedFile.value = file
-    const reader = new FileReader()
-    reader.onload = (evt) => {
-      preview.value = evt.target?.result
-    }
-    reader.readAsDataURL(file)
+  const files = Array.from(e.target.files || [])
+  if (files.length > 0 && files.some((file) => file.type.startsWith('image/'))) {
+    setSelectedFiles(files)
+    detectionResults.value = []
     message.value = ''
   } else {
     message.value = '请选择有效的图片文件'
@@ -254,20 +315,19 @@ const handleFileSelect = (e) => {
 
 const handleDrop = (e) => {
   isDragOver.value = false
-  const file = e.dataTransfer?.files?.[0]
-  if (file && file.type.startsWith('image/')) {
-    selectedFile.value = file
-    const reader = new FileReader()
-    reader.onload = (evt) => {
-      preview.value = evt.target?.result
-    }
-    reader.readAsDataURL(file)
+  const files = Array.from(e.dataTransfer?.files || [])
+  if (files.length > 0 && files.some((file) => file.type.startsWith('image/'))) {
+    setSelectedFiles(files)
+    detectionResults.value = []
     message.value = ''
+  } else {
+    message.value = '请选择有效的图片文件'
+    messageType.value = 'warning'
   }
 }
 
 const handleDetect = async () => {
-  if (!selectedFile.value) {
+  if (selectedFiles.value.length === 0) {
     message.value = '请先选择图片'
     messageType.value = 'warning'
     return
@@ -275,9 +335,15 @@ const handleDetect = async () => {
 
   isLoading.value = true
   try {
-    const result = await detect(selectedFile.value)
-    results.value = result
-    message.value = '识别完成！'
+    if (selectedFiles.value.length === 1) {
+      const result = await detect(selectedFiles.value[0])
+      detectionResults.value = [result]
+      message.value = '识别完成！'
+    } else {
+      const batchResult = await detectBatch(selectedFiles.value)
+      detectionResults.value = batchResult.items || []
+      message.value = batchResult.message || '批量识别完成！'
+    }
     messageType.value = 'success'
   } catch (error) {
     message.value = error.message || '识别失败，请重试'
@@ -288,11 +354,26 @@ const handleDetect = async () => {
 }
 
 const resetUpload = () => {
-  selectedFile.value = null
-  preview.value = null
-  results.value = null
+  revokePreviewUrls()
+  selectedFiles.value = []
+  previews.value = []
+  detectionResults.value = []
   message.value = ''
   if (fileInput.value) {
+    fileInput.value.value = ''
+  }
+}
+
+const removeSelectedFile = (index) => {
+  const target = previews.value[index]
+  if (target?.url) {
+    URL.revokeObjectURL(target.url)
+  }
+  selectedFiles.value.splice(index, 1)
+  previews.value.splice(index, 1)
+  detectionResults.value = []
+
+  if (selectedFiles.value.length === 0 && fileInput.value) {
     fileInput.value.value = ''
   }
 }
@@ -313,4 +394,8 @@ const getCategoryClass = (className) => {
   }
   return classMap[className] || 'other'
 }
+
+onUnmounted(() => {
+  revokePreviewUrls()
+})
 </script>

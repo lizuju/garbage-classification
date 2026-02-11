@@ -26,7 +26,8 @@ class Config:
 
     # Flask
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-key-should-be-changed')
-    MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5MB
+    # 请求体总大小限制（用于批量上传）；单张大小由业务逻辑单独限制
+    MAX_CONTENT_LENGTH = 30 * 1024 * 1024  # 30MB
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
     # JWT 配置

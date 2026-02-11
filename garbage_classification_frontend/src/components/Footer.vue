@@ -10,8 +10,10 @@
           <h5>链接</h5>
           <ul class="list-unstyled">
             <li><router-link to="/">首页</router-link></li>
-            <li><router-link to="/user/detect">开始识别</router-link></li>
             <li><router-link to="/about">关于项目</router-link></li>
+            <li><a href="#" @click.prevent="goProtected('/user/detect')">识别检测</a></li>
+            <li><a href="#" @click.prevent="goProtected('/recycle-map')">回收地图</a></li>
+            <li><a href="#" @click.prevent="goProtected('/user/history')">识别历史</a></li>
           </ul>
         </div>
         <div class="col-md-3 mb-4">
@@ -32,8 +34,22 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuth } from '../composables/useAuth'
+import { useAuthModal } from '../composables/useAuthModal'
 
 const currentYear = ref(new Date().getFullYear())
+const router = useRouter()
+const { isLoggedIn } = useAuth()
+const { openLogin } = useAuthModal()
+
+const goProtected = (path) => {
+  if (!isLoggedIn.value) {
+    openLogin()
+    return
+  }
+  router.push(path)
+}
 </script>
 
 <style scoped>

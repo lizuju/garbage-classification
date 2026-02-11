@@ -56,29 +56,53 @@
 .detect-page-wrapper .preview-container {
   position: relative;
   margin-top: var(--spacing-md);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+}
+
+.detect-page-wrapper .preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
 }
 
 .detect-page-wrapper .image-wrapper {
-  position: relative;
-  display: inline-block;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: #fff;
+  padding: 6px;
 }
 
-.detect-page-wrapper .preview-image {
-  max-width: 100%;
-  max-height: 300px;
-  border-radius: var(--border-radius-md);
-  box-shadow: var(--shadow-standard);
-  object-fit: cover;
+.detect-page-wrapper .image-frame {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .detect-page-wrapper .remove-btn {
   position: absolute !important;
-  top: -10px !important;
-  right: -10px !important;
-  z-index: 10;
+  top: 6px !important;
+  right: 6px !important;
+  z-index: 5;
+}
+
+.detect-page-wrapper .preview-image {
+  width: 100%;
+  height: 96px;
+  display: block;
+  box-shadow: var(--shadow-standard);
+  object-fit: cover;
+}
+
+.detect-page-wrapper .preview-name {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.detect-page-wrapper .selected-count {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--primary-color);
+  font-weight: 600;
 }
 
 /* Category labels moved to shared labels.css component */

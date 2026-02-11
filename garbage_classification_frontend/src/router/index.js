@@ -5,6 +5,7 @@ import { useAuthModal } from '../composables/useAuthModal'
 // 页面组件
 import HomePage from '../pages/HomePage.vue'
 import AboutPage from '../pages/AboutPage.vue'
+import RecycleMapPage from '../pages/RecycleMapPage.vue'
 import DetectPage from '../pages/DetectPage.vue'
 import HistoryPage from '../pages/HistoryPage.vue'
 import AdminPage from '../pages/AdminPage.vue'
@@ -33,6 +34,12 @@ const routes = [
     path: '/about',
     name: 'About',
     component: AboutPage,
+  },
+  {
+    path: '/recycle-map',
+    name: 'RecycleMap',
+    component: RecycleMapPage,
+    meta: { requiresAuth: true },
   },
   {
     path: '/user/detect',

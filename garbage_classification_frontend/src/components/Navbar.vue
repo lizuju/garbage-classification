@@ -24,7 +24,6 @@
               关于项目
             </router-link>
           </li>
-
           <!-- 未登录菜单 -->
           <template v-if="!isLoggedIn">
             <li class="nav-item">
@@ -45,6 +44,11 @@
             <li class="nav-item">
               <router-link to="/user/detect" class="nav-link" :class="{ active: $route.path.includes('/user/detect') }">
                 识别检测
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <router-link to="/recycle-map" class="nav-link" :class="{ active: $route.path === '/recycle-map' }">
+                回收地图
               </router-link>
             </li>
             <li class="nav-item">

@@ -70,6 +70,99 @@ export function useApi() {
     }
   }
 
+  const detectBatch = async (files) => {
+    const runFallbackBySingleDetect = async () => {
+      const items = []
+      let successCount = 0
+      for (const file of files) {
+        try {
+          const result = await detect(file)
+          items.push({
+            ...result,
+            filename: file.name,
+            status: 'success',
+          })
+          successCount += 1
+        } catch (error) {
+          items.push({
+            status: 'error',
+            filename: file.name,
+            message: error.message || '识别失败',
+          })
+        }
+      }
+
+      const failedCount = files.length - successCount
+      if (successCount === 0) {
+        throw new Error('批量识别失败')
+      }
+
+      return {
+        status: 'success',
+        message: `批量识别完成：成功 ${successCount} 张，失败 ${failedCount} 张`,
+        total: files.length,
+        success_count: successCount,
+        failed_count: failedCount,
+        items,
+      }
+    }
+
+    try {
+      if (!Array.isArray(files) || files.length === 0) {
+        throw new Error('请至少选择一张图片')
+      }
+
+      const formData = new FormData()
+      files.forEach((file) => {
+        formData.append('files', file)
+      })
+
+      const headers = getHeaders()
+      delete headers['Content-Type']
+
+      const response = await fetch(`${API_BASE}/api/detect/batch`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      })
+
+      await handleResponse(response)
+
+      let data = null
+      try {
+        data = await response.json()
+      } catch (error) {
+        throw new Error('批量接口返回格式异常')
+      }
+
+      if (!response.ok) {
+        throw new Error(data?.message || `批量检测失败 (HTTP ${response.status})`)
+      }
+
+      if (data.status !== 'success') {
+        throw new Error(data.message || '批量检测失败')
+      }
+
+      const items = Array.isArray(data.items) ? data.items : []
+      for (const item of items) {
+        if (item.status === 'success' && item.result_url) {
+          const fullUrl = `${API_BASE}${item.result_url}`
+          item.result_url_base64 = await convertImageToBase64(fullUrl)
+        }
+      }
+
+      return data
+    } catch (error) {
+      const isNetworkError = error instanceof TypeError || /Failed to fetch/i.test(String(error?.message || ''))
+      if (isNetworkError) {
+        console.warn('批量接口不可用，已自动降级为逐张识别:', error)
+        return runFallbackBySingleDetect()
+      }
+      console.error('批量检测失败:', error)
+      throw error
+    }
+  }
+
   const getHistory = async (page = 1, pageSize = 10) => {
     try {
       const response = await fetch(
@@ -249,6 +342,7 @@ export function useApi() {
 
   return {
     detect,
+    detectBatch,
     getHistory,
     deleteHistory,
     getAdminStats,

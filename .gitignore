@@ -26,6 +26,7 @@ build/
 .installed.cfg
 *.egg
 MANIFEST
+node_modules/
 
 # --- 单元测试与覆盖率 ---
 htmlcov/
@@ -43,9 +44,13 @@ coverage.xml
 .env
 .venv
 .secret
+*.local
+.env.local
+config.local.py
 
 # --- 日志文件 ---
-node_modules/
+*.log
+server.log
 
 # --- 数据文件与模型权重 ---
 datasets/
@@ -53,19 +58,14 @@ data/images/
 data/labels/
 *.zip
 *.tar
+*.pt
 
-# --- 图片与模型权重 ---
+# --- 媒体文件 ---
 *.jpg
 *.png
 *.jpeg
 *.gif
-*.pt
 
 # 忽略所有 txt 格式的 cookie 文件
 cookies.txt
-# 如果你在不同文件夹下都有，可以写成 **/cookies.txt
 **/cookies.txt
-
-# 忽略日志文件
-*.log
-server.log
