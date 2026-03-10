@@ -70,9 +70,9 @@
           <table class="table table-sm align-middle result-table">
             <thead>
               <tr>
-                <th style="width: 30%">物品名称</th>
-                <th style="width: 45%">信心度</th>
-                <th style="width: 25%">位置</th>
+                <th style="width: 35%">物品类别</th>
+                <th style="width: 35%">物品名称</th>
+                <th style="width: 30%">信心度</th>
               </tr>
             </thead>
             <tbody>
@@ -80,8 +80,11 @@
                 <tr v-for="item in detectionHistory" :key="item.id">
                   <td>
                     <span :class="`category-label ${getCategoryClass(item.class_name)}`">
-                      {{ item.class_name }}
+                      {{ getMajorCategory(item.class_name) }}
                     </span>
+                  </td>
+                  <td>
+                    {{ getItemName(item.class_name) }}
                   </td>
                   <td>
                     <div v-if="item.confidence && item.confidence > 0" class="gc-progress-container">
@@ -93,13 +96,6 @@
                       <span class="gc-progress-label">{{ (item.confidence * 100).toFixed(1) }}%</span>
                     </div>
                     <span v-else class="text-muted small">极低信心度</span>
-                  </td>
-                  <td class="text-muted font-monospace small">
-                    {{
-                      item.bbox
-                        ? `[${Math.round(item.bbox[0])}, ${Math.round(item.bbox[1])}]`
-                        : 'N/A'
-                    }}
                   </td>
                 </tr>
               </transition-group>
@@ -131,7 +127,7 @@ const props = defineProps({
 
 const emit = defineEmits(['error']);
 
-const { detect } = useApi();
+const { detectRealtime } = useApi();
 
 const videoRef = ref(null);
 const canvasRef = ref(null);
@@ -149,19 +145,29 @@ let offscreenCanvas = null;
 
 // Categories for classification labels
 const getCategoryClass = (className) => {
+  const major = getMajorCategory(className)
   const classMap = {
-    '可回收垃圾': 'recyclable',
+    '可回收物': 'recyclable',
     '有害垃圾': 'harmful',
     '厨余垃圾': 'kitchen',
     '其他垃圾': 'other',
   }
-  // Backward compatibility
-  if (className === '可回收') return 'recyclable'
-  if (className === '有害') return 'harmful'
-  if (className === '厨余') return 'kitchen'
-  if (className === '其他') return 'other'
+  return classMap[major] || 'other'
+}
 
-  return classMap[className] || 'other'
+const getMajorCategory = (className) => {
+  const name = className || ''
+  if (name.includes('可回收')) return '可回收物'
+  if (name.includes('有害')) return '有害垃圾'
+  if (name.includes('厨余')) return '厨余垃圾'
+  return '其他垃圾'
+}
+
+const getItemName = (className) => {
+  const name = className || ''
+  return name
+    .replace(/^(可回收物|有害垃圾|厨余垃圾|其他垃圾)[-_：: ]*/g, '')
+    .trim() || name
 }
 
 // Progress bar color based on confidence
@@ -248,11 +254,13 @@ const detectFrame = async () => {
   const video = videoRef.value;
   
   if (!offscreenCanvas) offscreenCanvas = document.createElement('canvas');
-  if (offscreenCanvas.width !== video.videoWidth || offscreenCanvas.height !== video.videoHeight) {
-    offscreenCanvas.width = video.videoWidth;
-    offscreenCanvas.height = video.videoHeight;
+  const targetW = video.videoWidth || 640;
+  const targetH = video.videoHeight || 480;
+  if (offscreenCanvas.width !== targetW || offscreenCanvas.height !== targetH) {
+    offscreenCanvas.width = targetW;
+    offscreenCanvas.height = targetH;
   }
-  
+
   const ctx = offscreenCanvas.getContext('2d');
   ctx.drawImage(video, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
   
@@ -261,18 +269,17 @@ const detectFrame = async () => {
       isProcessing.value = false;
       return;
     }
-    const file = new File([blob], "capture.jpg", { type: "image/jpeg" });
+    const file = new File([blob], "capture.png", { type: "image/png" });
     try {
-      const result = await detect(file);
+      const result = await detectRealtime(file);
       console.log('DEBUG: Camera detection result:', result);
       lastResult.value = result;
       if (result.results && result.results.length > 0) {
         console.log('DEBUG: Objects detected count:', result.results.length);
-        result.results.forEach(item => {
-          console.log(`DEBUG: Detected [${item.class_name}] with confidence ${item.confidence}`);
-          detectionHistory.value.unshift({ ...item, id: Date.now() + Math.random() });
-          if (detectionHistory.value.length > 10) detectionHistory.value.pop();
-        });
+
+        const topItem = result.results[0];
+        detectionHistory.value.unshift({ ...topItem, id: Date.now() + Math.random() });
+        if (detectionHistory.value.length > 10) detectionHistory.value.pop();
       }
       drawResults(result);
     } catch (err) {
@@ -280,7 +287,7 @@ const detectFrame = async () => {
     } finally {
       isProcessing.value = false;
     }
-  }, 'image/jpeg', 0.8);
+  }, 'image/png');
 };
 
 const drawResults = (data) => {
@@ -297,9 +304,9 @@ const drawResults = (data) => {
     const width = x2 - x1;
     const height = y2 - y1;
     let color = '#6c757d';
-    if (item.class_name.includes('可回收垃圾')) color = '#3576ca';
-    if (item.class_name.includes('有害垃圾')) color = '#dc3545';
-    if (item.class_name.includes('厨余垃圾')) color = '#28a745';
+    if (item.class_name.includes('可回收')) color = '#3576ca';
+    if (item.class_name.includes('有害')) color = '#dc3545';
+    if (item.class_name.includes('厨余')) color = '#28a745';
     
     ctx.strokeStyle = color;
     ctx.lineWidth = 4;

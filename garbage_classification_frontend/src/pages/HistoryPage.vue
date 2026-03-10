@@ -35,8 +35,9 @@
                      <tr>
                        <th>时间</th>
                        <th>检测记录</th>
-                       <th>识别物品</th>
-                       <th>平均信心度</th>
+                       <th>物品类别</th>
+                       <th>物品名称</th>
+                       <th>信心度</th>
                        <th>操作</th>
                      </tr>
                   </thead>
@@ -45,24 +46,23 @@
                       <td>{{ formatDate(item.created_at) }}</td>
                        <td>{{ item.detection_count || 0 }} 个</td>
                        <td>
-                         <div class="d-flex flex-wrap gap-1">
-                           <span 
-                             v-for="(res, ridx) in getUniqueCategories(item.results)" 
-                             :key="ridx"
-                             :class="`category-label ${getCategoryClass(res)}`"
-                           >
-                             {{ res }}
-                           </span>
-                         </div>
+                         <span v-if="getTopItem(item.results)" :class="`category-label ${getCategoryClass(getTopItem(item.results).class_name)}`">
+                           {{ getMajorCategory(getTopItem(item.results).class_name) }}
+                         </span>
+                         <span v-else class="text-muted small">无识别数据</span>
                        </td>
                        <td>
-                         <div v-if="item.confidence && item.confidence > 0" class="gc-progress-container">
+                         <span v-if="getTopItem(item.results)">{{ getItemName(getTopItem(item.results).class_name) }}</span>
+                         <span v-else class="text-muted small">无识别数据</span>
+                       </td>
+                       <td>
+                         <div v-if="getTopConfidence(item.results) > 0" class="gc-progress-container">
                            <div
                              class="gc-progress-bar"
-                             :class="getProgressLevelClass(item.confidence)"
-                             :style="{ width: `${(item.confidence * 100).toFixed(1)}%` }"
+                             :class="getProgressLevelClass(getTopConfidence(item.results))"
+                             :style="{ width: `${(getTopConfidence(item.results) * 100).toFixed(1)}%` }"
                            ></div>
-                           <span class="gc-progress-label">{{ (item.confidence * 100).toFixed(1) }}%</span>
+                           <span class="gc-progress-label">{{ (getTopConfidence(item.results) * 100).toFixed(1) }}%</span>
                          </div>
                          <span v-else class="text-muted small">无识别数据</span>
                        </td>
@@ -139,24 +139,39 @@ const deleteItem = async (id) => {
 }
 
 const getCategoryClass = (className) => {
+  const major = getMajorCategory(className)
   const classMap = {
-    '可回收垃圾': 'recyclable',
+    '可回收物': 'recyclable',
     '有害垃圾': 'harmful',
     '厨余垃圾': 'kitchen',
     '其他垃圾': 'other',
   }
-  // Backward compatibility also needed here
-  if (className === '可回收') return 'recyclable'
-  if (className === '有害') return 'harmful'
-  if (className === '厨余') return 'kitchen'
-  if (className === '其他') return 'other'
-  
-  return classMap[className] || 'other'
+  return classMap[major] || 'other'
 }
 
-const getUniqueCategories = (results) => {
-  if (!results || !Array.isArray(results)) return []
-  return [...new Set(results.map(r => r.class_name))]
+const getMajorCategory = (className) => {
+  const name = className || ''
+  if (name.includes('可回收')) return '可回收物'
+  if (name.includes('有害')) return '有害垃圾'
+  if (name.includes('厨余')) return '厨余垃圾'
+  return '其他垃圾'
+}
+
+const getItemName = (className) => {
+  const name = className || ''
+  return name
+    .replace(/^(可回收物|有害垃圾|厨余垃圾|其他垃圾)[-_：: ]*/g, '')
+    .trim() || name
+}
+
+const getTopItem = (results) => {
+  if (!results || !Array.isArray(results) || results.length === 0) return null
+  return [...results].sort((a, b) => (b.confidence || 0) - (a.confidence || 0))[0]
+}
+
+const getTopConfidence = (results) => {
+  const top = getTopItem(results)
+  return top && top.confidence ? top.confidence : 0
 }
 
 const getProgressLevelClass = (confidence) => {

@@ -2,11 +2,14 @@ import io
 import os
 from pathlib import Path
 import json
+from collections import deque
 
 import numpy as np
 import torch
 from PIL import Image as PILImage
+from PIL import ImageEnhance, ImageFilter
 from PIL import ImageDraw, ImageFont
+from torchvision import transforms
 
 
 class YoloService:
@@ -27,15 +30,75 @@ class YoloService:
         self.non_max_suppression = non_max_suppression
 
         self.model, self.device, self.imgsz, self.stride = self._load_model()
-        self.class_names = ['可回收垃圾', '有害垃圾', '厨余垃圾', '其他垃圾']
+        self.cls_imgsz = 448
+        self.cls_mean = [0.485, 0.456, 0.406]
+        self.cls_std = [0.229, 0.224, 0.225]
+        self.class_names = self._load_class_names()
+        self.model_names = self._normalize_model_names(getattr(self.model, 'names', None))
+        self.dict_order = self._build_imagenet_dict_order(len(self.class_names))
+        self.realtime_history = {}
+        self.realtime_window = 3
+        self.realtime_conf_threshold = 0.2
+        self.realtime_crop_ratio = 0.7
+
+    def _load_class_names(self):
+        candidates = [
+            self.project_root / 'classname.txt',
+            self.project_root / 'garbage265_hierarchical' / 'classname.txt',
+        ]
+        for p in candidates:
+            if p.exists():
+                with open(p, 'r', encoding='utf-8') as f:
+                    names = [line.strip() for line in f.readlines()]
+                names = [n for n in names if n]
+                if names:
+                    return names
+        return ['可回收垃圾', '有害垃圾', '厨余垃圾', '其他垃圾']
+
+    def _normalize_model_names(self, names):
+        if names is None:
+            return []
+        if isinstance(names, dict):
+            return [v for _, v in sorted(names.items(), key=lambda kv: kv[0])]
+        if isinstance(names, (list, tuple)):
+            return list(names)
+        return []
+
+    def _build_imagenet_dict_order(self, n):
+        # ImageFolder dictionary order (lexicographic) for folder names: 0,1,10,100...
+        return sorted([str(i) for i in range(n)])
+
+    def _map_index_to_chinese(self, idx):
+        name = self.model_names[idx] if idx < len(self.model_names) else str(idx)
+        name_str = str(name)
+
+        if name_str.startswith('class') and name_str[5:].isdigit():
+            out_idx = int(name_str[5:])
+            if 0 <= out_idx < len(self.dict_order):
+                dir_name = self.dict_order[out_idx]
+                if dir_name.isdigit():
+                    class_id = int(dir_name)
+                    if 0 <= class_id < len(self.class_names):
+                        return self.class_names[class_id]
+
+        if name_str.isdigit():
+            class_id = int(name_str)
+            if 0 <= class_id < len(self.class_names):
+                return self.class_names[class_id]
+
+        if 0 <= idx < len(self.class_names):
+            return self.class_names[idx]
+
+        return name_str
 
     def _find_weights(self):
         search_paths = [
-            self.project_root / 'best.pt',
-            self.yolov5_path / 'runs/train/garbage_model/weights/best.pt',
-            self.yolov5_path / 'best.pt',
-            self.yolov5_path / 'yolov5m.pt',
-            self.yolov5_path / 'yolov5s.pt',
+            self.project_root / 'garbage265_hierarchical' / 'weights' / 'best.pt',
+            # self.project_root / 'best.pt',
+            # self.yolov5_path / 'runs/train/garbage_model/weights/best.pt',
+            # self.yolov5_path / 'best.pt',
+            # self.yolov5_path / 'yolov5m.pt',
+            # self.yolov5_path / 'yolov5s.pt',
         ]
         for p in search_paths:
             if p.exists():
@@ -57,6 +120,7 @@ class YoloService:
 
         device = self._select_device()
         model = self.attempt_load(weights, device=device)
+        model.eval()
         stride = int(model.stride.max())
         imgsz = self.check_img_size(640, s=stride)
 
@@ -94,24 +158,152 @@ class YoloService:
                     pass
         return ImageFont.load_default()
 
+    def _select_output(self, outputs):
+        # Compatible with DetectMultiBackend outputs (tuple/dict/tensor)
+        if isinstance(outputs, (tuple, list)):
+            if not outputs:
+                return None
+            return outputs[0]
+        if isinstance(outputs, dict):
+            if 'sub_class' in outputs:
+                return outputs['sub_class']
+            return next(iter(outputs.values()))
+        return outputs
+
+    def _preprocess_realtime_image(self, img: PILImage.Image):
+        w, h = img.size
+        ratio = max(0.5, min(1.0, float(self.realtime_crop_ratio)))
+        crop_w = int(w * ratio)
+        crop_h = int(h * ratio)
+        left = int((w - crop_w) / 2)
+        top = int((h - crop_h) / 2)
+        img = img.crop((left, top, left + crop_w, top + crop_h))
+
+        # Light denoise + mild tone adjustments
+        img = img.filter(ImageFilter.GaussianBlur(radius=0.6))
+        img = ImageEnhance.Contrast(img).enhance(1.06)
+        img = ImageEnhance.Color(img).enhance(1.05)
+        img = ImageEnhance.Brightness(img).enhance(1.02)
+        return img
+
+    def _get_realtime_history(self, key):
+        if key not in self.realtime_history:
+            self.realtime_history[key] = deque(maxlen=self.realtime_window)
+        return self.realtime_history[key]
+
+    def detect_realtime(self, img_bytes: bytes, user_key=None):
+        if self.model is None or self.device is None:
+            return [], None, 0.0
+
+        img = PILImage.open(io.BytesIO(img_bytes)).convert('RGB')
+        img = self._preprocess_realtime_image(img)
+        is_gpu = self.device.type in ['cuda', 'mps']
+
+        with torch.no_grad():
+            cls_transform = transforms.Compose([
+                transforms.Resize((self.cls_imgsz, self.cls_imgsz)),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=self.cls_mean, std=self.cls_std),
+            ])
+            img_tensor = cls_transform(img).unsqueeze(0).to(self.device)
+            img_tensor = img_tensor.half() if is_gpu else img_tensor.float()
+            outputs = self.model(img_tensor)
+            pred = self._select_output(outputs)
+
+        if pred is None:
+            return [], None, 0.0
+
+        if pred.ndimension() == 1:
+            pred = pred.unsqueeze(0)
+        if pred.ndimension() != 2:
+            return [], None, 0.0
+
+        probs = torch.softmax(pred, dim=1)[0].detach().float().cpu()
+        history = self._get_realtime_history(user_key or 'anon')
+        history.append(probs)
+        avg_probs = torch.stack(list(history)).mean(dim=0)
+
+        top_k = min(5, len(self.class_names) if self.class_names else avg_probs.numel())
+        topk_probs, topk_idxs = avg_probs.topk(top_k)
+
+        results = []
+        for score, idx in zip(topk_probs.tolist(), topk_idxs.tolist()):
+            name = self._map_index_to_chinese(int(idx))
+            results.append({
+                'class': int(idx),
+                'class_name': name,
+                'confidence': float(score),
+                'bbox': None
+            })
+
+        top1_conf = results[0]['confidence'] if results else 0.0
+        if top1_conf < self.realtime_conf_threshold:
+            return [], None, top1_conf
+
+        return results, None, top1_conf
+
     def detect(self, img_bytes: bytes):
         if self.model is None or self.device is None:
             return [], None
 
-        # 模型输入：固定 resize 到 imgsz（保持你原逻辑）
         img = PILImage.open(io.BytesIO(img_bytes)).convert('RGB')
-        img = img.resize((self.imgsz, self.imgsz), PILImage.LANCZOS)
-        img_array = np.array(img)
+        is_gpu = self.device.type in ['cuda', 'mps']
 
+        with torch.no_grad():
+            # For classification, use ImageNet normalization and 448x448 input
+            cls_transform = transforms.Compose([
+                transforms.Resize((self.cls_imgsz, self.cls_imgsz)),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=self.cls_mean, std=self.cls_std),
+            ])
+            img_tensor = cls_transform(img).unsqueeze(0).to(self.device)
+            img_tensor = img_tensor.half() if is_gpu else img_tensor.float()
+            outputs = self.model(img_tensor)
+            pred = self._select_output(outputs)
+
+        if pred is None:
+            return [], None
+
+        # Classification output: [batch, num_classes]
+        if pred.ndimension() == 2:
+            probs = torch.softmax(pred, dim=1)[0]
+            top_k = min(5, len(self.class_names) if self.class_names else probs.numel())
+            topk_probs, topk_idxs = probs.topk(top_k)
+
+            display_img = PILImage.open(io.BytesIO(img_bytes)).convert('RGB')
+            result_img_pil = display_img.copy()
+            draw = ImageDraw.Draw(result_img_pil)
+            font = self._load_chinese_font(18)
+
+            results = []
+            text_lines = []
+            for score, idx in zip(topk_probs.tolist(), topk_idxs.tolist()):
+                name = self._map_index_to_chinese(int(idx))
+                results.append({
+                    'class': int(idx),
+                    'class_name': name,
+                    'confidence': float(score),
+                    'bbox': None
+                })
+                text_lines.append(f"{name} {score * 100:.1f}%")
+
+            if text_lines:
+                text = " | ".join(text_lines)
+                draw.text((10, 10), text, fill=(255, 255, 255), font=font)
+
+            return results, result_img_pil
+
+        # Detection path (fallback)
+        img_resized = img.resize((self.imgsz, self.imgsz), PILImage.LANCZOS)
+        img_array = np.array(img_resized)
         img_tensor = torch.from_numpy(img_array.transpose(2, 0, 1)).to(self.device)
         img_tensor = img_tensor / 255.0
-        is_gpu = self.device.type in ['cuda', 'mps']
         img_tensor = img_tensor.half() if is_gpu else img_tensor.float()
         if img_tensor.ndimension() == 3:
             img_tensor = img_tensor.unsqueeze(0)
 
         with torch.no_grad():
-            pred = self.model(img_tensor, augment=False)[0]
+            pred = self.model(img_tensor)[0]
 
         pred = self.non_max_suppression(pred, 0.1, 0.45, None, False, max_det=1000)
 
@@ -171,4 +363,3 @@ class YoloService:
                     })
 
         return results, result_img_pil
-

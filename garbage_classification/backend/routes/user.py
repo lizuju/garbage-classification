@@ -83,7 +83,7 @@ def get_user_history():
     for record in pagination.items:
         try:
             results = json.loads(record.result) if record.result else []
-            detection_count = len(results)
+            detection_count = 1 if results else 0
             
             history_list.append({
                 'id': record.id,
@@ -130,4 +130,3 @@ def delete_user_history(history_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'status': 'error', 'message': f'删除失败: {str(e)}'}), 500
-

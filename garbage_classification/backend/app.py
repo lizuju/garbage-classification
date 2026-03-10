@@ -1,8 +1,9 @@
 import os
 from pathlib import Path
 
-from flask import Flask, send_from_directory, session
+from flask import Flask, send_from_directory, session, jsonify
 from sqlalchemy import text
+from werkzeug.exceptions import RequestEntityTooLarge
 
 from .config import Config
 from .extensions import db, cors
@@ -64,6 +65,13 @@ def create_app():
     @app.route('/uploads/<filename>')
     def uploaded_file(filename):
         return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+    @app.errorhandler(RequestEntityTooLarge)
+    def handle_file_too_large(_error):
+        return jsonify({
+            'status': 'error',
+            'message': '上传内容过大，请减少文件数量或压缩图片后重试（总大小不超过 30MB）'
+        }), 413
 
     # init db & default admin
     with app.app_context():

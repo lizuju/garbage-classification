@@ -11,22 +11,23 @@ class Config:
 
     FILE = Path(__file__).resolve()
 
-    # 从 backend/config.py 开始，逐层向上找 yolov5-6.2
+    # 从 backend/config.py 开始，逐层向上找 yolov5
     YOLOV5_PATH = None
     for parent in FILE.parents:
-        candidate = parent / 'yolov5-6.2'
+        candidate = parent / 'yolov5'
         if candidate.exists():
             YOLOV5_PATH = candidate
             break
     if YOLOV5_PATH is None:
-        raise RuntimeError("❌ 未找到 yolov5-6.2 目录，请检查项目结构")
+        raise RuntimeError("❌ 未找到 yolov5 目录，请检查项目结构")
 
     ROOT = YOLOV5_PATH.parent  # 项目根目录（Garbage_classification_Yolov5）
     BASE_DIR = FILE.parent  # backend/
 
     # Flask
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-key-should-be-changed')
-    MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5MB
+    # 请求体总大小限制（用于批量上传）；单张大小由业务逻辑单独限制
+    MAX_CONTENT_LENGTH = 30 * 1024 * 1024  # 30MB
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
     # JWT 配置

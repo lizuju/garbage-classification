@@ -15,14 +15,28 @@ class StatsManager(BaseManager):
         today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
         
         new_users_today = User.query.filter(User.created_at >= today_start).count()
-        total_detections = Image.query.count()
-        detections_today = Image.query.filter(Image.created_at >= today_start).count()
+        total_detections = DetectionHistory.query.count()
+        detections_today = DetectionHistory.query.filter(DetectionHistory.created_at >= today_start).count()
 
-        # Calculate average confidence from DetectionHistory
-        histories = DetectionHistory.query.filter(DetectionHistory.confidence > 0).all()
+        # Calculate average confidence from top-1 per record (use result JSON if available)
+        histories = DetectionHistory.query.all()
         avg_confidence = 0.0
-        if histories:
-            avg_confidence = sum(h.confidence for h in histories) / len(histories)
+        top_confidences = []
+        for record in histories:
+            if not record.result:
+                continue
+            try:
+                results = json.loads(record.result)
+                if not results:
+                    continue
+                top_item = max(results, key=lambda r: r.get('confidence', 0))
+                conf = float(top_item.get('confidence', 0))
+                if conf > 0:
+                    top_confidences.append(conf)
+            except Exception:
+                continue
+        if top_confidences:
+            avg_confidence = sum(top_confidences) / len(top_confidences)
         
         # Class distribution
         class_distribution = self._get_class_distribution()
@@ -38,7 +52,7 @@ class StatsManager(BaseManager):
         }
 
     def _get_class_distribution(self):
-        class_names = ['可回收垃圾', '有害垃圾', '厨余垃圾', '其他垃圾']
+        class_names = ['可回收物', '有害垃圾', '厨余垃圾', '其他垃圾']
         class_counts = {name: 0 for name in class_names}
         
         all_history = DetectionHistory.query.all()
@@ -46,15 +60,21 @@ class StatsManager(BaseManager):
             if record.result:
                 try:
                     results = json.loads(record.result)
-                    for res in results:
-                        name = res.get('class_name')
-                        if name == '可回收': name = '可回收垃圾'
-                        elif name == '有害': name = '有害垃圾'
-                        elif name == '厨余': name = '厨余垃圾'
-                        elif name == '其他': name = '其他垃圾'
-                        
-                        if name in class_counts:
-                            class_counts[name] += 1
+                    if not results:
+                        continue
+                    top_item = max(results, key=lambda r: r.get('confidence', 0))
+                    name = top_item.get('class_name', '')
+                    if '可回收' in name:
+                        name = '可回收物'
+                    elif '有害' in name:
+                        name = '有害垃圾'
+                    elif '厨余' in name:
+                        name = '厨余垃圾'
+                    else:
+                        name = '其他垃圾'
+
+                    if name in class_counts:
+                        class_counts[name] += 1
                 except:
                     continue
         return class_counts

@@ -201,7 +201,7 @@
                     <div class="gc-progress-container" style="height: 10px;">
                       <div
                         class="gc-progress-bar"
-                        :class="`bg-${getColorForClass(className)}`"
+                        :class="getColorForClass(className)"
                         :style="{ width: `${(count / (getTotalCount() || 1)) * 100}%` }"
                       ></div>
                     </div>
@@ -711,12 +711,12 @@ const getTotalCount = () => {
 
 const getColorForClass = (className) => {
   const colorMap = {
-    '可回收垃圾': 'success',
-    '有害垃圾': 'danger',
-    '厨余垃圾': 'warning',
-    '其他垃圾': 'secondary',
+    '可回收物': 'gc-bar-recyclable',
+    '有害垃圾': 'gc-bar-harmful',
+    '厨余垃圾': 'gc-bar-kitchen',
+    '其他垃圾': 'gc-bar-other',
   }
-  return colorMap[className] || 'primary'
+  return colorMap[className] || 'gc-bar-recyclable'
 }
 
 const getProgressLevelClass = (confidence) => {
