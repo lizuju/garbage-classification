@@ -56,6 +56,7 @@ server.log
 datasets/
 data/images/
 data/labels/
+*.db
 *.zip
 *.tar
 *.pt
