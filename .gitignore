@@ -70,6 +70,9 @@ best.mlpackage/
 *.png
 *.jpeg
 *.gif
+!garbage_classification_frontend/src/assets/*.jpg
+!garbage_classification_frontend/src/assets/icons/*.png
+!docs/assets/*.png
 
 # 忽略所有 txt 格式的 cookie 文件
 cookies.txt
